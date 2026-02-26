@@ -1,11 +1,13 @@
 """FastAPI application: wiring only. No business logic."""
 
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse, RedirectResponse
 from scalar_fastapi import get_scalar_api_reference
 
 from app.api.v1 import api_router
 from app.core.config import get_settings
 from app.core.exception_handlers import register_exception_handlers
+from app.pages import render_landing_page
 
 app = FastAPI(
     title=get_settings().app_name,
@@ -16,16 +18,17 @@ app = FastAPI(
 )
 
 
-@app.get("/", include_in_schema=False)
-def root() -> dict:
-    """Root: links to API and docs."""
-    return {
-        "name": get_settings().app_name,
-        "description": "Enterprise Performance Management API",
-        "api": "/api/v1",
-        "openapi": "/api/v1/openapi.json",
-        "docs": "/api/v1/docs",
-    }
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def root() -> HTMLResponse:
+    """Landing page with grid and API links."""
+    settings = get_settings()
+    return HTMLResponse(content=render_landing_page(settings.app_name))
+
+
+@app.get("/docs", include_in_schema=False)
+def docs_redirect() -> RedirectResponse:
+    """Redirect /docs to Scalar API reference."""
+    return RedirectResponse(url="/api/v1/docs", status_code=302)
 
 
 @app.get("/api/v1/docs", include_in_schema=False)
