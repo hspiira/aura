@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
-
 ACHIEVEMENT_CAP_MIN = Decimal("0")
 ACHIEVEMENT_CAP_MAX = Decimal("150")
 

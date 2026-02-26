@@ -12,6 +12,9 @@ from app.infrastructure.persistence.repositories.audit_log_repo import (
 from app.infrastructure.persistence.repositories.baseline_snapshot_repo import (
     BaselineSnapshotRepository,
 )
+from app.infrastructure.persistence.repositories.calibration_session_repo import (
+    CalibrationSessionRepository,
+)
 from app.infrastructure.persistence.repositories.behavioral_indicator_repo import (
     BehavioralIndicatorRepository,
 )
@@ -50,6 +53,9 @@ from app.infrastructure.persistence.repositories.performance_summary_repo import
 )
 from app.infrastructure.persistence.repositories.review_session_repo import (
     ReviewSessionRepository,
+)
+from app.infrastructure.persistence.repositories.reward_policy_repo import (
+    RewardPolicyRepository,
 )
 from app.infrastructure.persistence.repositories.role_dimension_weight_repo import (
     RoleDimensionWeightRepository,
@@ -182,3 +188,17 @@ async def get_review_session_repo(
 ) -> ReviewSessionRepository:
     """Yield review session repository."""
     return ReviewSessionRepository(session)
+
+
+async def get_calibration_session_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> CalibrationSessionRepository:
+    """Yield calibration session repository."""
+    return CalibrationSessionRepository(session)
+
+
+async def get_reward_policy_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> RewardPolicyRepository:
+    """Yield reward policy repository."""
+    return RewardPolicyRepository(session)

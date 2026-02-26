@@ -60,6 +60,7 @@ def override_db_dependency(
     db_session: AsyncSession,
 ) -> Callable[[], AsyncIterator[AsyncSession]]:
     """Factory for overriding get_db_transactional in API tests."""
+
     async def override_get_db() -> AsyncIterator[AsyncSession]:
         yield db_session
 
@@ -125,7 +126,7 @@ async def seed_phase1(db_session):
     db_session.add(dimension)
     await db_session.flush()
 
-    yield {
+    return {
         "organization_id": org.id,
         "department_id": dept.id,
         "role_id": role.id,

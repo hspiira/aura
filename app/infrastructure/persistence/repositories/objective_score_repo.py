@@ -64,6 +64,8 @@ class ObjectiveScoreRepository:
         calculated_at: datetime,
     ) -> ObjectiveScore:
         """Update calculated fields (recalculation)."""
+        if score.locked:
+            raise ValueError("Cannot recalculate a locked objective score")
         score.achievement_percentage = achievement_percentage
         score.weighted_score = weighted_score
         score.calculated_at = calculated_at

@@ -109,7 +109,7 @@ def _parse_status(value: str, default: ObjectiveStatus | None) -> ObjectiveStatu
             return default
         raise TransitionViolationException(
             f"Invalid status: {value}", "", value
-        )
+        ) from None
 
 
 @router.get("/{id}", response_model=ObjectiveResponse)
@@ -256,7 +256,7 @@ async def lock_objective(
     now = utc_now()
     objective = await repo.set_locked_at(objective, now)
     if score is not None and not score.locked:
-        await score_repo.set_locked(score, True)
+        await score_repo.set_locked(score, locked=True)
     await audit_repo.add(
         entity_type="objective",
         entity_id=objective.id,

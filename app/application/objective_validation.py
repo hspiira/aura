@@ -40,7 +40,7 @@ async def run_smart_validation(
         exclude_objective_id=objective.id,
     )
     has_baseline = True
-    if template and template.requires_baseline_snapshot and objective.template_id:
+    if template and template.requires_baseline_snapshot:
         baseline = await baseline_repo.get_by_user_cycle_template(
             objective.user_id,
             objective.performance_cycle_id,

@@ -39,9 +39,14 @@ def validate_objective(
     cycle_end: "date",
     template: "ObjectiveTemplate | None" = None,
     other_weights_sum: Decimal = Decimal("0"),
-    has_baseline_for_template: bool = True,
+    has_baseline_for_template: bool = False,
 ) -> ValidationResult:
-    """Run SMART validation; returns ValidationResult(valid, errors)."""
+    """Run SMART validation; returns ValidationResult(valid, errors).
+
+    has_baseline_for_template defaults to False so that callers must explicitly
+    pass True when a baseline exists; otherwise template.requires_baseline_snapshot
+    is enforced (fail closed).
+    """
     errors: list[str] = []
 
     if len(title) < TITLE_MIN_LENGTH:

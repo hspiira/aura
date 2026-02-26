@@ -55,13 +55,12 @@ async def get_summary_by_user_cycle(
     performance_cycle_id: str = Query(..., description="Performance cycle id"),
 ) -> PerformanceSummaryResponse:
     """Get summary for a user and cycle (404 if not found)."""
-    summary = await repo.get_by_user_cycle(user_id, performance_cycle_id)
-    if summary is None:
-        from app.domain.exceptions import ResourceNotFoundException
-
-        raise ResourceNotFoundException(
-            "PerformanceSummary", f"{user_id}/{performance_cycle_id}"
-        )
+    resource_id = f"{user_id}/{performance_cycle_id}"
+    summary = await get_one_or_raise(
+        repo.get_by_user_cycle(user_id, performance_cycle_id),
+        resource_id,
+        "PerformanceSummary",
+    )
     return PerformanceSummaryResponse.model_validate(summary)
 
 

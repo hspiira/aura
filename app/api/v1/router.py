@@ -7,9 +7,11 @@ from app.api.v1.endpoints import (
     baseline_snapshots,
     behavioral_indicators,
     behavioral_scores,
+    calibration_sessions,
     departments,
     health,
     performance_summaries,
+    reward_policies,
     review_sessions,
     objective_evidence,
     objective_scores,
@@ -95,4 +97,14 @@ api_router.include_router(
     review_sessions.router,
     prefix="/review-sessions",
     tags=["review-sessions"],
+)
+api_router.include_router(
+    calibration_sessions.router,
+    prefix="/calibration-sessions",
+    tags=["calibration-sessions"],
+)
+api_router.include_router(
+    reward_policies.router,
+    prefix="/reward-policies",
+    tags=["reward-policies"],
 )

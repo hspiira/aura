@@ -33,7 +33,6 @@ async def test_baseline_snapshot_add_and_get_by_id(db_session, seed_phase1) -> N
         is_active=True,
     )
     template = await template_repo.add(template)
-    await db_session.flush()
 
     repo = BaselineSnapshotRepository(db_session)
     snapshot = BaselineSnapshot(
@@ -45,7 +44,6 @@ async def test_baseline_snapshot_add_and_get_by_id(db_session, seed_phase1) -> N
         data_source="manual",
     )
     snapshot = await repo.add(snapshot)
-    await db_session.flush()
 
     found = await repo.get_by_id(snapshot.id)
     assert found is not None
@@ -75,7 +73,6 @@ async def test_baseline_snapshot_list_by_user_cycle(db_session, seed_phase1) -> 
         is_active=True,
     )
     template2 = await template_repo.add(template2)
-    await db_session.flush()
 
     repo = BaselineSnapshotRepository(db_session)
     s1 = BaselineSnapshot(
@@ -94,7 +91,6 @@ async def test_baseline_snapshot_list_by_user_cycle(db_session, seed_phase1) -> 
     )
     await repo.add(s1)
     await repo.add(s2)
-    await db_session.flush()
 
     listed = await repo.list_by_user_cycle(
         seed_phase1["user_id"],
@@ -120,7 +116,6 @@ async def test_baseline_snapshot_get_by_user_cycle_template(
         is_active=True,
     )
     template = await template_repo.add(template)
-    await db_session.flush()
 
     repo = BaselineSnapshotRepository(db_session)
     snapshot = BaselineSnapshot(
@@ -131,7 +126,6 @@ async def test_baseline_snapshot_get_by_user_cycle_template(
         snapshot_date=date(2026, 2, 1),
     )
     snapshot = await repo.add(snapshot)
-    await db_session.flush()
 
     found = await repo.get_by_user_cycle_template(
         seed_phase1["user_id"],
@@ -167,7 +161,6 @@ async def test_baseline_snapshot_create_via_api(
         is_active=True,
     )
     template = await template_repo.add(template)
-    await db_session.flush()
 
     app.dependency_overrides[get_db_transactional] = override_db_dependency
     try:

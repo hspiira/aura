@@ -4,6 +4,9 @@ from app.infrastructure.persistence.models.audit_log import AuditLog
 from app.infrastructure.persistence.models.baseline_snapshot import (
     BaselineSnapshot,
 )
+from app.infrastructure.persistence.models.calibration_session import (
+    CalibrationSession,
+)
 from app.infrastructure.persistence.models.behavioral_indicator import (
     BehavioralIndicator,
 )
@@ -31,6 +34,7 @@ from app.infrastructure.persistence.models.performance_summary import (
     PerformanceSummary,
 )
 from app.infrastructure.persistence.models.review_session import ReviewSession
+from app.infrastructure.persistence.models.reward_policy import RewardPolicy
 from app.infrastructure.persistence.models.role import Role
 from app.infrastructure.persistence.models.role_dimension_weight import (
     RoleDimensionWeight,
@@ -42,6 +46,7 @@ __all__ = [
     "BaselineSnapshot",
     "BehavioralIndicator",
     "BehavioralScore",
+    "CalibrationSession",
     "Department",
     "Objective",
     "ObjectiveEvidence",
@@ -53,6 +58,7 @@ __all__ = [
     "PerformanceDimension",
     "PerformanceSummary",
     "ReviewSession",
+    "RewardPolicy",
     "Role",
     "RoleDimensionWeight",
     "User",

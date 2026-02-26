@@ -2,6 +2,7 @@
 
 from datetime import date
 from decimal import Decimal
+from types import SimpleNamespace
 
 from app.domain.smart_validation import validate_objective
 
@@ -84,10 +85,8 @@ def test_kpi_type_matches_template_passes() -> None:
     assert result.valid is True
 
 
-def _template(kpi_type: str | None = "number") -> "SimpleNamespace":
+def _template(kpi_type: str | None = "number") -> SimpleNamespace:
     """Minimal template-like object for unit tests."""
-    from types import SimpleNamespace
-
     return SimpleNamespace(
         kpi_type=kpi_type,
         min_target=Decimal("0"),

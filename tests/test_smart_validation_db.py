@@ -258,7 +258,7 @@ async def test_validate_objective_requires_baseline_present(
         other_weights_sum=Decimal("0"),
         has_baseline_for_template=True,
     )
-    assert "baseline" not in [e.lower() for e in result.errors]
+    assert not any("baseline" in e.lower() for e in result.errors)
     assert result.valid is True
 
 
