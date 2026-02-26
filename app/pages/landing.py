@@ -105,7 +105,9 @@ def render_landing_page(app_name: str) -> str:
 </head>
 <body>
     <div class="landing">
-        <p class="headline">Objectives aligned. Ratings defensible—without the spreadsheets.</p>
+        <p class="headline">
+            Objectives aligned. Ratings defensible—without the spreadsheets.
+        </p>
         <div class="grid-wrap">
             {grid_svg}
         </div>
@@ -117,4 +119,3 @@ def render_landing_page(app_name: str) -> str:
 </body>
 </html>
 """.strip()
-

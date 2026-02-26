@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     env: str = "development"
     debug: bool = False
     database_url: str = ""
+    database_echo: bool = False
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -7,6 +7,7 @@ from scalar_fastapi import get_scalar_api_reference
 from app.api.v1 import api_router
 from app.core.config import get_settings
 from app.core.exception_handlers import register_exception_handlers
+from app.core.lifespan import lifespan
 from app.pages import render_landing_page
 
 app = FastAPI(
@@ -15,6 +16,7 @@ app = FastAPI(
     openapi_url="/api/v1/openapi.json",
     docs_url=None,
     redoc_url=None,
+    lifespan=lifespan,
 )
 
 
