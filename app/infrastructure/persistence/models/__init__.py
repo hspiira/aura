@@ -21,10 +21,16 @@ from app.infrastructure.persistence.models.objective_update import (
     ObjectiveUpdate,
 )
 from app.infrastructure.persistence.models.organization import Organization
-from app.infrastructure.persistence.models.performance_cycle import PerformanceCycle
+from app.infrastructure.persistence.models.performance_cycle import (
+    PerformanceCycle,
+)
 from app.infrastructure.persistence.models.performance_dimension import (
     PerformanceDimension,
 )
+from app.infrastructure.persistence.models.performance_summary import (
+    PerformanceSummary,
+)
+from app.infrastructure.persistence.models.review_session import ReviewSession
 from app.infrastructure.persistence.models.role import Role
 from app.infrastructure.persistence.models.role_dimension_weight import (
     RoleDimensionWeight,
@@ -45,6 +51,8 @@ __all__ = [
     "Organization",
     "PerformanceCycle",
     "PerformanceDimension",
+    "PerformanceSummary",
+    "ReviewSession",
     "Role",
     "RoleDimensionWeight",
     "User",

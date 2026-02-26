@@ -9,6 +9,8 @@ from app.api.v1.endpoints import (
     behavioral_scores,
     departments,
     health,
+    performance_summaries,
+    review_sessions,
     objective_evidence,
     objective_scores,
     objective_templates,
@@ -83,4 +85,14 @@ api_router.include_router(
     behavioral_scores.router,
     prefix="/behavioral-scores",
     tags=["behavioral-scores"],
+)
+api_router.include_router(
+    performance_summaries.router,
+    prefix="/performance-summaries",
+    tags=["performance-summaries"],
+)
+api_router.include_router(
+    review_sessions.router,
+    prefix="/review-sessions",
+    tags=["review-sessions"],
 )

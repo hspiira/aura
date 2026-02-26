@@ -45,6 +45,12 @@ from app.infrastructure.persistence.repositories.performance_cycle_repo import (
 from app.infrastructure.persistence.repositories.performance_dimension_repo import (
     PerformanceDimensionRepository,
 )
+from app.infrastructure.persistence.repositories.performance_summary_repo import (
+    PerformanceSummaryRepository,
+)
+from app.infrastructure.persistence.repositories.review_session_repo import (
+    ReviewSessionRepository,
+)
 from app.infrastructure.persistence.repositories.role_dimension_weight_repo import (
     RoleDimensionWeightRepository,
 )
@@ -162,3 +168,17 @@ async def get_behavioral_score_repo(
 ) -> BehavioralScoreRepository:
     """Yield behavioral score repository."""
     return BehavioralScoreRepository(session)
+
+
+async def get_performance_summary_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> PerformanceSummaryRepository:
+    """Yield performance summary repository."""
+    return PerformanceSummaryRepository(session)
+
+
+async def get_review_session_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> ReviewSessionRepository:
+    """Yield review session repository."""
+    return ReviewSessionRepository(session)

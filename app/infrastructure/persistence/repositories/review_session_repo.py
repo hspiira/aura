@@ -1,0 +1,50 @@
+"""Review session repository."""
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.infrastructure.persistence.models.review_session import ReviewSession
+from app.infrastructure.persistence.persist import persist_and_refresh
+
+
+class ReviewSessionRepository:
+    """Repository for ReviewSession entities."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def list_all(self) -> list[ReviewSession]:
+        """Return all review sessions."""
+        result = await self._session.execute(
+            select(ReviewSession).order_by(
+                ReviewSession.performance_cycle_id,
+                ReviewSession.user_id,
+                ReviewSession.created_at.desc(),
+            )
+        )
+        return list(result.scalars().all())
+
+    async def list_by_user_cycle(
+        self, user_id: str, performance_cycle_id: str
+    ) -> list[ReviewSession]:
+        """Return sessions for a user and cycle."""
+        result = await self._session.execute(
+            select(ReviewSession)
+            .where(
+                ReviewSession.user_id == user_id,
+                ReviewSession.performance_cycle_id == performance_cycle_id,
+            )
+            .order_by(ReviewSession.scheduled_at.desc().nullslast())
+        )
+        return list(result.scalars().all())
+
+    async def get_by_id(self, id: str) -> ReviewSession | None:
+        """Return one session by id."""
+        result = await self._session.execute(
+            select(ReviewSession).where(ReviewSession.id == id)
+        )
+        return result.scalar_one_or_none()
+
+    async def add(self, session: ReviewSession) -> ReviewSession:
+        """Persist a review session."""
+        return await persist_and_refresh(self._session, session)
