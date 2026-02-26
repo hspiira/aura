@@ -5,6 +5,8 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     audit_logs,
     baseline_snapshots,
+    behavioral_indicators,
+    behavioral_scores,
     departments,
     health,
     objective_evidence,
@@ -71,4 +73,14 @@ api_router.include_router(
     baseline_snapshots.router,
     prefix="/baseline-snapshots",
     tags=["baseline-snapshots"],
+)
+api_router.include_router(
+    behavioral_indicators.router,
+    prefix="/behavioral-indicators",
+    tags=["behavioral-indicators"],
+)
+api_router.include_router(
+    behavioral_scores.router,
+    prefix="/behavioral-scores",
+    tags=["behavioral-scores"],
 )

@@ -12,6 +12,12 @@ from app.infrastructure.persistence.repositories.audit_log_repo import (
 from app.infrastructure.persistence.repositories.baseline_snapshot_repo import (
     BaselineSnapshotRepository,
 )
+from app.infrastructure.persistence.repositories.behavioral_indicator_repo import (
+    BehavioralIndicatorRepository,
+)
+from app.infrastructure.persistence.repositories.behavioral_score_repo import (
+    BehavioralScoreRepository,
+)
 from app.infrastructure.persistence.repositories.department_repo import (
     DepartmentRepository,
 )
@@ -142,3 +148,17 @@ async def get_baseline_snapshot_repo(
 ) -> BaselineSnapshotRepository:
     """Yield baseline snapshot repository."""
     return BaselineSnapshotRepository(session)
+
+
+async def get_behavioral_indicator_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> BehavioralIndicatorRepository:
+    """Yield behavioral indicator repository."""
+    return BehavioralIndicatorRepository(session)
+
+
+async def get_behavioral_score_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> BehavioralScoreRepository:
+    """Yield behavioral score repository."""
+    return BehavioralScoreRepository(session)
