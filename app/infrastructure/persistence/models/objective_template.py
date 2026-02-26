@@ -34,6 +34,11 @@ class ObjectiveTemplate(CuidMixin, TimestampMixin, Base):
     default_weight: Mapped[Decimal] = mapped_column(
         Numeric(5, 2), default=Decimal("0"), nullable=False
     )
+    min_target: Mapped[Decimal | None] = mapped_column(Numeric(20, 4), nullable=True)
+    max_target: Mapped[Decimal | None] = mapped_column(Numeric(20, 4), nullable=True)
+    requires_baseline_snapshot: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     dimension: Mapped[PerformanceDimension] = relationship(

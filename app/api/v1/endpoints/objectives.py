@@ -1,21 +1,46 @@
 """Objective endpoints."""
 
+from decimal import Decimal
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.api.v1.dependencies import get_audit_log_repo, get_objective_repo
+from app.api.v1.dependencies import (
+    get_audit_log_repo,
+    get_baseline_snapshot_repo,
+    get_objective_repo,
+    get_objective_template_repo,
+    get_performance_cycle_repo,
+)
 from app.domain.exceptions import (
     ResourceNotFoundException,
     TransitionViolationException,
+    ValidationException,
 )
 from app.domain.objective import ObjectiveStatus, can_transition
+from app.domain.smart_validation import (
+    has_baseline_for_user_cycle_template,
+    validate_objective,
+)
 from app.infrastructure.persistence.models.objective import Objective
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
 )
+from app.infrastructure.persistence.repositories.baseline_snapshot_repo import (
+    BaselineSnapshotRepository,
+)
 from app.infrastructure.persistence.repositories.objective_repo import (
     ObjectiveRepository,
+)
+from app.infrastructure.persistence.repositories.objective_template_repo import (
+    ObjectiveTemplateRepository,
+)
+from app.infrastructure.persistence.repositories.performance_cycle_repo import (
+    PerformanceCycleRepository,
+)
+from app.schemas.baseline_snapshot import (
+    ValidateObjectiveRequest,
+    ValidateObjectiveResponse,
 )
 from app.schemas.objective import (
     ObjectiveCreate,
@@ -66,6 +91,56 @@ async def create_objective(
     return ObjectiveResponse.model_validate(objective)
 
 
+async def _run_smart_validation(
+    objective: Objective,
+    cycle_repo: PerformanceCycleRepository,
+    template_repo: ObjectiveTemplateRepository,
+    objective_repo: ObjectiveRepository,
+    baseline_repo: BaselineSnapshotRepository,
+) -> ValidateObjectiveResponse:
+    """Load cycle, template, other objectives, baselines; run SMART validation."""
+    cycle = await cycle_repo.get_by_id(objective.performance_cycle_id)
+    if not cycle:
+        return ValidateObjectiveResponse(
+            valid=False,
+            errors=["performance cycle not found"],
+        )
+    template = None
+    if objective.template_id:
+        template = await template_repo.get_by_id(objective.template_id)
+    others = await objective_repo.list_by_cycle(objective.performance_cycle_id)
+    other_weights = sum(
+        o.weight
+        for o in others
+        if o.user_id == objective.user_id and o.id != objective.id
+    )
+    baselines = await baseline_repo.list_by_user_cycle(
+        objective.user_id, objective.performance_cycle_id
+    )
+    has_baseline = True
+    if template and template.requires_baseline_snapshot and objective.template_id:
+        has_baseline = has_baseline_for_user_cycle_template(
+            baselines,
+            objective.user_id,
+            objective.performance_cycle_id,
+            objective.template_id,
+        )
+    result = validate_objective(
+        title=objective.title,
+        kpi_type=objective.kpi_type,
+        target_value=objective.target_value,
+        weight=objective.weight,
+        start_date=objective.start_date,
+        end_date=objective.end_date,
+        cycle_start=cycle.start_date,
+        cycle_end=cycle.end_date,
+        template=template,
+        other_weights_sum=Decimal(str(other_weights)),
+        has_baseline_for_template=has_baseline,
+    )
+    return ValidateObjectiveResponse(valid=result.valid, errors=result.errors)
+
+
 @router.get("/{id}", response_model=ObjectiveResponse)
 async def get_objective(
     id: str,
@@ -78,14 +153,46 @@ async def get_objective(
     return ObjectiveResponse.model_validate(objective)
 
 
+@router.post("/validate", response_model=ValidateObjectiveResponse)
+async def validate_objective_by_id(
+    payload: ValidateObjectiveRequest,
+    repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
+    cycle_repo: Annotated[
+        PerformanceCycleRepository, Depends(get_performance_cycle_repo)
+    ],
+    template_repo: Annotated[
+        ObjectiveTemplateRepository, Depends(get_objective_template_repo)
+    ],
+    baseline_repo: Annotated[
+        BaselineSnapshotRepository, Depends(get_baseline_snapshot_repo)
+    ],
+) -> ValidateObjectiveResponse:
+    """Run SMART validation for an existing objective."""
+    objective = await repo.get_by_id(payload.objective_id)
+    if objective is None:
+        raise ResourceNotFoundException("Objective", payload.objective_id)
+    return await _run_smart_validation(
+        objective, cycle_repo, template_repo, repo, baseline_repo
+    )
+
+
 @router.patch("/{id}/status", response_model=ObjectiveResponse)
 async def update_objective_status(
     id: str,
     payload: ObjectiveUpdateStatus,
     repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    cycle_repo: Annotated[
+        PerformanceCycleRepository, Depends(get_performance_cycle_repo)
+    ],
+    template_repo: Annotated[
+        ObjectiveTemplateRepository, Depends(get_objective_template_repo)
+    ],
+    baseline_repo: Annotated[
+        BaselineSnapshotRepository, Depends(get_baseline_snapshot_repo)
+    ],
 ) -> ObjectiveResponse:
-    """Transition objective status (validated against lifecycle)."""
+    """Transition objective status (lifecycle + SMART when submitting)."""
     objective = await repo.get_by_id(id)
     if objective is None:
         raise ResourceNotFoundException("Objective", id)
@@ -107,6 +214,15 @@ async def update_objective_status(
             from_status.value,
             to_status.value,
         )
+    if to_status == ObjectiveStatus.SUBMITTED:
+        validation = await _run_smart_validation(
+            objective, cycle_repo, template_repo, repo, baseline_repo
+        )
+        if not validation.valid:
+            raise ValidationException(
+                "SMART validation failed",
+                errors=validation.errors,
+            )
     old_status = objective.status
     objective = await repo.update_status(objective, to_status.value)
     await audit_repo.add(

@@ -42,6 +42,9 @@ async def create_objective_template(
         dimension_id=payload.dimension_id,
         kpi_type=payload.kpi_type,
         default_weight=payload.default_weight,
+        min_target=payload.min_target,
+        max_target=payload.max_target,
+        requires_baseline_snapshot=payload.requires_baseline_snapshot,
         is_active=payload.is_active,
     )
     template = await repo.add(template)

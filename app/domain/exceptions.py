@@ -21,6 +21,14 @@ class AuraException(Exception):
         super().__init__(self.message)
 
 
+class ValidationException(AuraException):
+    """Raised when domain/application validation fails (e.g. SMART)."""
+
+    def __init__(self, message: str, errors: list[str] | None = None) -> None:
+        details = {"errors": errors or []}
+        super().__init__(message, "VALIDATION_ERROR", details)
+
+
 class ResourceNotFoundException(AuraException):
     """Raised when a requested resource is not found."""
 

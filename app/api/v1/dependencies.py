@@ -9,6 +9,9 @@ from app.infrastructure.persistence.database import get_db_transactional
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
 )
+from app.infrastructure.persistence.repositories.baseline_snapshot_repo import (
+    BaselineSnapshotRepository,
+)
 from app.infrastructure.persistence.repositories.department_repo import (
     DepartmentRepository,
 )
@@ -132,3 +135,10 @@ async def get_audit_log_repo(
 ) -> AuditLogRepository:
     """Yield audit log repository."""
     return AuditLogRepository(session)
+
+
+async def get_baseline_snapshot_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> BaselineSnapshotRepository:
+    """Yield baseline snapshot repository."""
+    return BaselineSnapshotRepository(session)
