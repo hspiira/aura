@@ -1,0 +1,323 @@
+================================================================================
+  ENTERPRISE PERFORMANCE MANAGEMENT SYSTEM
+  Proposal for C-Suite Approval
+================================================================================
+
+EXECUTIVE SUMMARY
+-----------------
+This document proposes an enterprise-grade performance management system that:
+•	Aligns objectives to strategy across departments and roles
+•	Combines quantitative (KPIs) and behavioral evaluation with calibration
+•	Enforces a full audit trail and reward mapping for fairness and legal defensibility
+•	Supports multi-year cycles and portfolio-based KPIs (insurance/broker context)
+
+Ask: Approve the policy and governance preconditions below; endorse a phased rollout (Foundation → Pilot → Scale) over approximately 8–12 months, with an executive sponsor and pilot department.
+
+Critical success factor: Governance and policy must be in place before the system goes live. Without signed executive policy and locked reward mapping, the system becomes ceremonial and will degrade within two cycles.
+
+
+SECTION 1 — WHY: BUSINESS CASE & RISK OF INACTION
+--------------------------------------------------
+
+1.1 The Problem
+•	Performance expectations and rewards need to be transparent, consistent, and defensible across the organization.
+•	Multi-department, role-based hierarchy and multi-year cycles require a single system of record—not spreadsheets or ad hoc process.
+•	Quantitative and behavioral evaluation must be separated, weighted by role, and calibrated to avoid rating inflation and bias.
+
+1.2 Risk of Inaction
+If we allow:
+•	Manual scoring without evidence or audit
+•	Silent target changes mid-cycle
+•	Flexible weight manipulation or late-year bulk updates
+the system (and trust in it) will degrade within two cycles. Governance must be stricter than culture initially.
+
+1.3 Benefits
+•	Transparency: Clear objectives, locked timelines, and visible calibration
+•	Fairness: Reward mapping and role-based weights applied consistently
+•	Legal defensibility: Full audit trail, immutable closed scores, amendment protocol
+•	Analytics: Multi-year trends, promotion readiness, attrition risk, rating distribution
+
+
+SECTION 2 — VISION, SCOPE & PRINCIPLES
+--------------------------------------
+
+2.1 Scope (What We Are Proposing)
+This model assumes:
+•	Multi-department organization
+•	Role-based hierarchy
+•	Multi-year performance cycles
+•	Quantitative + behavioral scoring
+•	Calibration and reward mapping
+•	Full audit trail
+
+2.2 Architectural Principles
+•	Separation of calculation engine from storage
+•	No manual override without audit
+•	Configurable weighting by role
+•	Strict workflow enforcement
+•	Time-stamped updates only
+
+2.3 Critical Governance Rules (High Level)
+1.	Objectives locked after Q1.
+2.	No update for 90 days → auto-flag.
+3.	Weight sum must equal 100%.
+4.	Score auto-calculated — not manually entered.
+5.	Closed objectives immutable.
+
+
+SECTION 3 — PRECONDITIONS: POLICY & GOVERNANCE FIRST
+----------------------------------------------------
+The system must NOT go live unless all conditions below are satisfied.
+
+3.1 Executive Policy Signed
+•	Written performance policy approved by executive leadership.
+•	Defines: weight distribution rules, review cadence, reward mapping, consequences for non-compliance.
+•	Without policy, software becomes ceremonial.
+
+3.2 Role & KPI Alignment Complete
+•	Every role has: defined performance dimensions, default weight distribution, mandatory objective templates.
+•	Department KPIs mapped to corporate KPIs. No orphan objectives allowed.
+
+3.3 Reward Mapping Finalized
+Reward bands must be configured before cycle starts. Example:
+Final Score    Outcome
+≥90           Tier A Bonus
+80–89         Tier B Bonus
+70–79         Standard
+<70           PIP
+If reward logic is undefined, scoring loses integrity.
+
+3.4 Annual Operational Calendar (When Things Happen)
+Month 0 (Pre-Cycle): Executive KPI confirmation, department KPI cascading, template publication, reward band confirmation.
+Month 1 (Planning Window): Staff draft objectives, supervisor approvals, baseline snapshots captured, objectives locked.
+Quarter 1 End: Mandatory update, performance variance report, at-risk objectives flagged.
+Mid-Year Review: Formal review session, preliminary scoring, calibration check.
+Quarter 3 Review: Progress validation, PIP identification (if required).
+Year-End: Final updates locked, scoring engine runs, behavioral scoring, calibration session, final summaries, reward mapping executed.
+
+
+SECTION 4 — HOW IT WORKS (CONCEPTUAL)
+--------------------------------------
+
+4.1 End-to-End Flow
+Organization → Departments → Roles → Users (with reporting lines)
+     ↓
+Performance Cycle (e.g. 2026 Annual) + Dimensions (Financial, Operational, Client, Compliance, Behavioral, Innovation)
+     ↓
+Objectives (per user, per cycle): measurable goals with target, weight, approval, and lifecycle
+     ↓
+Objective Updates (periodic progress) + Evidence (proof) → Objective Scores (calculated, locked)
+     ↓
+Behavioral Indicators + Behavioral Scores (e.g. 1–5 scale, weighted)
+     ↓
+Review Sessions (quarterly, mid-year, final) → Performance Summary (final weighted score, rating band, comments)
+     ↓
+Calibration Session (department/org) + Reward Policy (score → bonus/promotion/PIP)
+     ↓
+Audit Log (all changes for defensibility)
+
+4.2 Objective Lifecycle (Simplified)
+Draft → Submitted → Approved → Active → Under Review → Closed
+(Rejected and Amended are supported with justification and audit.)
+
+4.3 Portfolio-Based KPIs (Insurance/Broker Context)
+Replace vague retention with structured metrics:
+•	Revenue Retention Rate = (Renewed Premium Value / Total Premium at Start) × 100
+•	Net Growth Rate = ((New Business Premium - Lost Premium) / Baseline Premium) × 100
+•	Claims Ratio (if applicable) = (Total Claims Paid / Total Premium) × 100
+•	Policy Renewal Lead Time = average days before expiry renewal completed
+•	Client Concentration Risk = Top 5 Clients Premium / Total Premium
+
+KPI governance: All financial KPIs must pull from system of record. No manual financial input. Adjust for reassigned portfolios. Economic shocks require executive-wide adjustment, not individual edits.
+
+
+SECTION 5 — GOVERNANCE IN PRACTICE
+----------------------------------
+
+5.1 Templates & Validation
+•	Objective templates are immutable after cycle start; any change requires versioning.
+•	SMART validation before submission: title length, KPI type, target in range, weight sum = 100%, dates in cycle, baseline snapshot when required.
+•	Anti-gaming: new target cannot be >20% below last achievement without justification; custom objectives max 30% weight; mandatory templates cannot be removed; free-text objectives prohibited unless Behavioral.
+
+5.2 Baseline Snapshots
+•	Baseline frozen at cycle start (or at objective approval for mid-cycle join).
+•	Baseline cannot be edited. Portfolio reassignment → adjustment record, prorated target, audit log. No manual baseline unless dual approval.
+
+5.3 Lifecycle Enforcement
+Mandatory transitions: Draft → Submitted → Approved → Active → Under Review → Closed.
+Hard controls: Objectives lock after Q1. No updates 90 days → auto-flag. Closed objectives immutable. Amendments require written justification, supervisor approval, HR visibility, audit log.
+
+5.4 Calibration & Abuse Prevention
+•	Distribution monitoring: score histogram per department, mean vs standard deviation, manager variance. Flag excessive clustering above 90% and outlier managers.
+•	Override logging: any manual score override requires written justification, HR approval, audit record.
+•	Enforcement: failure to complete quarterly update → weight reduced by 5% or flag as compliance breach.
+
+5.5 Pre-Production Go-Live Checklist
+System cannot go live unless:
+•	Templates versioned, reward mapping tested, baseline snapshot automation verified
+•	SMART engine tested with invalid cases, weight enforcement validated
+•	Calibration dashboard functioning, audit logging verified
+•	Role-based permissions enforced, test cycle executed with pilot group
+•	Executive sign-off documented
+
+5.6 Structural Warning (Reinforced)
+If you allow manual scoring, silent target changes, flexible weight manipulation, or late-year bulk updates, the system will degrade within 2 cycles. Governance must be stricter than culture initially.
+
+
+SECTION 6 — RECOMMENDATIONS & ENHANCEMENTS (Industry Practice)
+--------------------------------------------------------------
+These additions strengthen the blueprint and align with patterns used in Workday, SuccessFactors, Lattice, and similar systems.
+
+6.1 Calibration: Visibility Over Forced Distribution
+•	Do NOT enforce a forced bell curve (fixed % per rating band). Research shows forced distribution increases gaming and undermines collaboration.
+•	Use calibration as visibility and conversation: score histograms, mean vs standard deviation, manager variance, heatmaps.
+•	Optional: publish soft guidelines (e.g. "expect ~X% in top band") for discussion only — never system-enforced quotas.
+•	Flag excessive clustering above 90% and outlier managers; require narrative justification, not forced redistribution.
+
+6.2 Continuous Feedback / Check-Ins (Optional)
+•	Consider a first-class Feedback or CheckIn entity: manager ↔ employee, tied to cycle and optionally to objective.
+•	Enables ongoing conversation and reduces reliance on year-end evidence only.
+•	Schema sketch: feedback_sessions (id, user_id, cycle_id, reviewer_id, type, date, comment, created_at).
+
+6.3 Role-Based Access Control (RBAC)
+•	Add minimal RBAC early: permissions, role_permissions, user_roles (with optional scope_department_id).
+•	Define who can: approve objectives, run calibration, view audit logs, override scores, manage templates.
+
+6.4 Notifications and Deadlines
+•	"No update for 90 days → auto-flag" and "objectives lock after Q1" require executed actions.
+•	Define notification_rules (event_type, recipient_role, channel, template) and notification_log. Events: quarterly_update_due, objective_locked, calibration_scheduled, review_completed, amendment_requested. At least one channel (email or in-app) must be implemented.
+
+6.5 Integrations and System of Record
+•	Add data_sources or integration_systems and link baseline_snapshots and objective actuals. Baseline and actuals for financial KPIs should reference system of record; no manual financial input without dual approval and audit.
+
+6.6 Objective Versioning
+•	"Amended" state and "old target preserved" require traceable versioning. Add objective_versions table (or version column + audit history). Recalculation uses latest approved target; previous versions remain for audit and legal defensibility.
+
+
+SECTION 7 — IMPLEMENTATION: PHASED ROLLOUT & ASK
+------------------------------------------------
+
+7.1 Governance and Product as One Roadmap
+•	Policy first: Get Executive Policy signed and published before building.
+•	Reward mapping: Lock reward bands and document in system (RewardPolicy) before first cycle. Run dry run with prior-year or synthetic data to validate.
+
+7.2 Phased Rollout (Chronological)
+•	Foundation (2–3 months): Policy, templates, role/dimension weights, reward bands, RBAC, one pilot department.
+•	Pilot (3–4 months): 1–2 departments, full cycle (objectives → updates → scoring → calibration → summary), baseline automation, SMART validation.
+•	Scale (2–4 months): Roll out by department/division; calibration dashboard, audit review, analytics.
+•	Optimize (ongoing): Optional feedback/check-ins, integrations, refinements from calibration and HR feedback.
+•	Pilot with a group that has clear, measurable KPIs (e.g. one broker/portfolio team) so baseline snapshots and system-of-record integration are tested early.
+
+7.3 Build Order (Recommended)
+1.	Org layer + performance framework (org, department, role, user, cycle, dimensions, role-dimension weights).
+2.	Objectives + lifecycle (objectives, templates, statuses, approval, lock rules).
+3.	SMART validation + baseline snapshots (validation engine, baseline table, data source linkage).
+4.	Updates + evidence + scoring engine (objective updates, evidence, score calculation, caps, edge cases).
+5.	Behavioral layer (indicators, behavioral scores, weighting into final score).
+6.	Review + summary (review sessions, performance summary, workflow).
+7.	Calibration + audit (calibration sessions, distribution reports, audit log, immutable close).
+8.	RBAC + notifications (permissions, reminder/notification execution).
+9.	Analytics (star schema, ETL from OLTP, dashboards).
+
+7.4 Change Management and Adoption
+•	Executive sponsor: One C-level or VP who runs their own objectives and reviews in the system and references it in all-hands.
+•	Pilot feedback: After first pilot cycle, collect feedback and implement at least one process or UX change so the organization sees that input matters.
+•	Training by persona: Separate short flows for employee (set objectives, submit updates), manager (approve, score, comment), HR (templates, calibration, audit), analysts (reporting).
+•	Messaging: Frame the system as "transparent expectations and fair rewards, fewer year-end surprises" — not surveillance.
+
+7.5 Release Gates
+Implement "no manual override without audit" and "amendments require justification + approval + audit" in code and process from day one. Use the Pre-Production Go-Live Checklist (5.5) as real release gates: no go-live without reward mapping tested, baseline automation verified, and audit logging verified.
+
+
+SECTION 8 — NEXT STEPS & ASK
+-----------------------------
+•	Approve this proposal and the preconditions in Section 3.
+•	Designate an executive sponsor and confirm pilot department.
+•	Sign Executive Performance Policy and lock reward mapping before development completion.
+•	If needed, next stage can include: role-based permission matrix, clean architecture domain model, risk assessment of adoption failure, detailed runbooks for calibration and amendment workflows.
+
+
+================================================================================
+  APPENDIX A — DATA MODEL (ENTITIES & LIFECYCLE)
+================================================================================
+
+A.1 Organizational Structure Layer
+•	Organization (legal entity; multi-tenant, policy scope)
+•	Department (parent, head; reporting rollups, calibration grouping)
+•	Role (department, level, is managerial; default dimensions, templates)
+•	User (role, department, supervisor; objectives, reporting lines)
+
+A.2 Performance Framework Layer
+•	PerformanceCycle (name, start/end, status, review frequency)
+•	PerformanceDimension (e.g. Financial, Operational, Client, Compliance, Behavioral, Innovation; is quantitative, default weight)
+•	RoleDimensionWeight (role, dimension, weight %) — e.g. executives 50% financial, junior 70% operational
+
+A.3 Objective Layer
+•	Objective (user, cycle, dimension, title, description, KPIType, target, weight, dates, status, locked/approved)
+•	ObjectiveUpdate (progress updates, actual value, comment, submitted by)
+•	ObjectiveEvidence (file, description, uploaded by/at)
+•	ObjectiveScore (achievement %, weighted score, calculated at, locked)
+
+A.4 Behavioral Evaluation Layer
+•	BehavioralIndicator (dimension, name, description, rating scale definition)
+•	BehavioralScore (user, cycle, indicator, rating 1–5, manager comment)
+
+A.5 Review & Workflow Layer
+•	ReviewSession (user, cycle, reviewer, type, status, scheduled/completed date)
+•	PerformanceSummary (user, cycle, quantitative score, behavioral score, final weighted score, final rating band, manager/employee comment, HR approval)
+
+A.6 Calibration & Governance Layer
+•	CalibrationSession (cycle, department, conducted by, date, notes)
+•	RewardPolicy (min/max score, reward type, reward value)
+
+A.7 Audit & Integrity Layer
+•	AuditLog (entity type, entity id, action, old/new value, changed by, changed at)
+
+A.8 Objective Lifecycle States (Detail)
+Draft → Submitted → Rejected | Approved → Active → At Risk (system) | Completed → Under Review → Closed. Amended: requires justification, supervisor approval, audit; old target preserved, versioning applied.
+
+
+================================================================================
+  APPENDIX B — TECHNICAL BLUEPRINT (SQL, ER, SCORING, ANALYTICS)
+================================================================================
+
+B.1 SQL-Level Database Schema (PostgreSQL — Core Tables)
+Organizational Layer: organizations, departments, roles, users (with org_id, department_id, role_id, supervisor_id).
+Performance Framework: performance_cycles, performance_dimensions, role_dimension_weights.
+Objectives: objectives (user_id, performance_cycle_id, dimension_id, title, description, kpi_type, target_value, unit_of_measure, weight, start_date, end_date, status, approved_at, approved_by, locked_at). Constraint: weight > 0.
+Objective Updates & Evidence: objective_updates, objective_evidence.
+Scoring: objective_scores (achievement_percentage, weighted_score, calculated_at, locked).
+Behavioral: behavioral_indicators, behavioral_scores (rating 1–5).
+Final Summary: performance_summaries (quantitative_score, behavioral_score, final_weighted_score, final_rating_band, manager_comment, employee_comment, hr_approved).
+Audit: audit_logs (entity_type, entity_id, action, old_value JSONB, new_value JSONB, changed_by, changed_at).
+
+B.2 ER Structure (Logical)
+Organization → Departments → Roles → Users → Objectives → ObjectiveUpdates, ObjectiveEvidence, ObjectiveScores. Users → BehavioralScores. PerformanceCycle → Objectives, BehavioralScores, PerformanceSummary. One User → Many Objectives; One Objective → Many Updates, One Final Score; One User per Cycle → One PerformanceSummary.
+
+B.3 Scoring Algorithm
+•	Achievement % = (Actual / Target) × 100 (or Target/Actual for inverse metrics). Cap: 0 ≤ % ≤ 150.
+•	Weighted Score = (Achievement % × Objective Weight) / 100. Total Quant Score = SUM(Weighted Scores).
+•	Behavioral % = (Average Rating / 5) × 100; apply dimension weight (e.g. 20%).
+•	Final Score = (Quantitative Score × 0.8) + (Behavioral Score × 0.2) (example 80/20).
+Edge cases: No updates → flag, default 0 unless manager override with justification. Target revised mid-year → old preserved, recalculation uses latest approved target, amendment record. Objective completed early → freeze updates, calculate immediately. Partial employment → prorate weight by days in cycle. Weight sum ≠ 100% → reject approval. Zero target → use milestone-based scoring, no division.
+
+B.4 Multi-Year Analytics Model
+Separate OLTP from analytics. Never overwrite objective_scores or performance_summaries. Star schema: fact_performance_summary (user_id, department_id, role_id, cycle_year, quantitative_score, behavioral_score, final_score, rating_band); dimensions: dim_user, dim_department, dim_role, dim_cycle, dim_time. Use cases: performance trend 3–5 years, rating distribution (inflation by department), promotion readiness (e.g. 3 consecutive > 85%, no violations), attrition risk (high performer + low reward mapping).
+
+
+================================================================================
+  APPENDIX C — FULL GOVERNANCE SCHEMA (TEMPLATES, BASELINE, SMART)
+================================================================================
+
+C.1 ObjectiveTemplate Table
+objective_templates (id, code UNIQUE, title, description, dimension_id, kpi_type, formula_type, data_source, default_target, min_target, max_target, default_weight, difficulty_factor, mandatory_for_role, allow_target_override, allow_weight_override, requires_baseline_snapshot, is_active, created_by, created_at). Governance: templates immutable after cycle start; versioning for changes; target ranges and data source declared; difficulty factor mandatory for financial KPIs.
+
+C.2 SMART Validation Engine (Pseudocode)
+IF title.length < 10 → reject. IF kpi_type IS NULL → reject. IF target_value IS NULL → reject. IF target_value < template.min_target OR > template.max_target → reject. IF weight_total != 100 → reject. IF start_date < cycle.start_date OR end_date > cycle.end_date → reject. IF requires_baseline_snapshot = TRUE AND baseline_snapshot_missing → reject. Anti-gaming: previous cycle — new target cannot be >20% below last achievement without justification; custom objectives max 30% weight; mandatory templates cannot be removed; free-text prohibited unless Behavioral.
+
+C.3 BaselineSnapshot Table
+baseline_snapshots (id, user_id, performance_cycle_id, template_id, baseline_value, snapshot_date, data_source, created_at). Rules: snapshot on cycle start or objective approval (mid-cycle join); baseline cannot be edited; portfolio reassignment → adjustment record, prorated target, audit; no manual baseline unless dual approval.
+
+================================================================================
+  END OF PROPOSAL
+================================================================================
