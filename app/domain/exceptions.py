@@ -33,6 +33,17 @@ class ResourceNotFoundException(AuraException):
         )
 
 
+class TransitionViolationException(AuraException):
+    """Raised when an objective status transition is not allowed."""
+
+    def __init__(self, message: str, from_status: str, to_status: str) -> None:
+        super().__init__(
+            message,
+            "TRANSITION_VIOLATION",
+            {"from_status": from_status, "to_status": to_status},
+        )
+
+
 class SqlNotConfiguredException(AuraException):
     """Raised when an operation requires a database that is not configured."""
 

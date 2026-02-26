@@ -3,8 +3,14 @@
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    audit_logs,
     departments,
     health,
+    objective_evidence,
+    objective_scores,
+    objective_templates,
+    objective_updates,
+    objectives,
     organizations,
     performance_cycles,
     performance_dimensions,
@@ -38,3 +44,25 @@ api_router.include_router(
     prefix="/role-dimension-weights",
     tags=["role-dimension-weights"],
 )
+api_router.include_router(
+    objective_templates.router,
+    prefix="/objective-templates",
+    tags=["objective-templates"],
+)
+api_router.include_router(objectives.router, prefix="/objectives", tags=["objectives"])
+api_router.include_router(
+    objective_updates.router,
+    prefix="/objective-updates",
+    tags=["objective-updates"],
+)
+api_router.include_router(
+    objective_evidence.router,
+    prefix="/objective-evidence",
+    tags=["objective-evidence"],
+)
+api_router.include_router(
+    objective_scores.router,
+    prefix="/objective-scores",
+    tags=["objective-scores"],
+)
+api_router.include_router(audit_logs.router, prefix="/audit-logs", tags=["audit-logs"])

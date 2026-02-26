@@ -27,6 +27,7 @@ uv run uvicorn app.main:app --reload
 - `make test` — run tests (excluding DB-dependent)
 - `make test-all` — run all tests (requires `DATABASE_URL`)
 - `make audit-deps` — run pip-audit
+- Create DB (once): `createdb aura` (or `psql -c "CREATE DATABASE aura;"`)
 - `uv run alembic upgrade head` — run DB migrations (requires `DATABASE_URL`)
 
 ## Deploy (Vercel)

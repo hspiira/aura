@@ -6,8 +6,26 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.persistence.database import get_db_transactional
+from app.infrastructure.persistence.repositories.audit_log_repo import (
+    AuditLogRepository,
+)
 from app.infrastructure.persistence.repositories.department_repo import (
     DepartmentRepository,
+)
+from app.infrastructure.persistence.repositories.objective_evidence_repo import (
+    ObjectiveEvidenceRepository,
+)
+from app.infrastructure.persistence.repositories.objective_repo import (
+    ObjectiveRepository,
+)
+from app.infrastructure.persistence.repositories.objective_score_repo import (
+    ObjectiveScoreRepository,
+)
+from app.infrastructure.persistence.repositories.objective_template_repo import (
+    ObjectiveTemplateRepository,
+)
+from app.infrastructure.persistence.repositories.objective_update_repo import (
+    ObjectiveUpdateRepository,
 )
 from app.infrastructure.persistence.repositories.organization_repo import (
     OrganizationRepository,
@@ -72,3 +90,45 @@ async def get_role_dimension_weight_repo(
 ) -> RoleDimensionWeightRepository:
     """Yield role dimension weight repository."""
     return RoleDimensionWeightRepository(session)
+
+
+async def get_objective_template_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> ObjectiveTemplateRepository:
+    """Yield objective template repository."""
+    return ObjectiveTemplateRepository(session)
+
+
+async def get_objective_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> ObjectiveRepository:
+    """Yield objective repository."""
+    return ObjectiveRepository(session)
+
+
+async def get_objective_update_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> ObjectiveUpdateRepository:
+    """Yield objective update repository."""
+    return ObjectiveUpdateRepository(session)
+
+
+async def get_objective_evidence_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> ObjectiveEvidenceRepository:
+    """Yield objective evidence repository."""
+    return ObjectiveEvidenceRepository(session)
+
+
+async def get_objective_score_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> ObjectiveScoreRepository:
+    """Yield objective score repository."""
+    return ObjectiveScoreRepository(session)
+
+
+async def get_audit_log_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> AuditLogRepository:
+    """Yield audit log repository."""
+    return AuditLogRepository(session)
