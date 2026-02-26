@@ -143,9 +143,7 @@ async def test_validate_objective_kpi_type_must_match_template(
         has_baseline_for_template=True,
     )
     assert result.valid is False
-    assert any(
-        "match template" in e and "percent" in e for e in result.errors
-    )
+    assert any("match template" in e and "percent" in e for e in result.errors)
 
 
 @pytest.mark.asyncio
@@ -319,7 +317,7 @@ async def test_has_baseline_for_user_cycle_template_with_db_baselines(
 
 @pytest.mark.asyncio
 async def test_validate_endpoint_returns_errors_when_invalid(
-    db_session, seed_phase1
+    db_session, seed_phase1, override_db_dependency
 ) -> None:
     """POST /objectives/validate returns valid=False and errors when invalid."""
     from app.infrastructure.persistence.database import get_db_transactional
@@ -350,10 +348,7 @@ async def test_validate_endpoint_returns_errors_when_invalid(
     objective = await obj_repo.add(objective)
     await db_session.flush()
 
-    async def override_get_db():
-        yield db_session
-
-    app.dependency_overrides[get_db_transactional] = override_get_db
+    app.dependency_overrides[get_db_transactional] = override_db_dependency
     try:
         from httpx import ASGITransport, AsyncClient
 

@@ -1,5 +1,8 @@
 """Objective score repository."""
 
+from datetime import datetime
+from decimal import Decimal
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,6 +32,28 @@ class ObjectiveScoreRepository:
     async def add(self, score: ObjectiveScore) -> ObjectiveScore:
         """Persist an objective score."""
         self._session.add(score)
+        await self._session.flush()
+        await self._session.refresh(score)
+        return score
+
+    async def update_calculated(
+        self,
+        score: ObjectiveScore,
+        achievement_percentage: Decimal,
+        weighted_score: Decimal,
+        calculated_at: datetime,
+    ) -> ObjectiveScore:
+        """Update calculated fields (recalculation)."""
+        score.achievement_percentage = achievement_percentage
+        score.weighted_score = weighted_score
+        score.calculated_at = calculated_at
+        await self._session.flush()
+        await self._session.refresh(score)
+        return score
+
+    async def set_locked(self, score: ObjectiveScore, locked: bool) -> ObjectiveScore:
+        """Set score locked flag."""
+        score.locked = locked
         await self._session.flush()
         await self._session.refresh(score)
         return score

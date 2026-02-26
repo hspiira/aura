@@ -55,7 +55,10 @@ def validate_objective(
                 f"kpi_type must match template kpi_type ({template.kpi_type})"
             )
 
-    if target_value is None and (not template or template.kpi_type):
+    requires_target_value = (
+        template is None or (template and template.kpi_type) or kpi_type
+    )
+    if target_value is None and requires_target_value:
         errors.append("target_value is required for quantitative objectives")
 
     if template and target_value is not None:

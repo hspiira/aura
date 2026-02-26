@@ -151,7 +151,9 @@ async def test_baseline_snapshot_get_by_user_cycle_template(
 
 
 @pytest.mark.asyncio
-async def test_baseline_snapshot_create_via_api(db_session, seed_phase1) -> None:
+async def test_baseline_snapshot_create_via_api(
+    db_session, seed_phase1, override_db_dependency
+) -> None:
     """POST /baseline-snapshots creates a snapshot and returns 201."""
     from app.infrastructure.persistence.database import get_db_transactional
     from app.main import app
@@ -167,10 +169,7 @@ async def test_baseline_snapshot_create_via_api(db_session, seed_phase1) -> None
     template = await template_repo.add(template)
     await db_session.flush()
 
-    async def override_get_db():
-        yield db_session
-
-    app.dependency_overrides[get_db_transactional] = override_get_db
+    app.dependency_overrides[get_db_transactional] = override_db_dependency
     try:
         from httpx import ASGITransport, AsyncClient
 

@@ -42,9 +42,27 @@ def test_kpi_type_must_match_template() -> None:
     )
     assert result.valid is False
     assert any(
-        "kpi_type must match template" in e and "percent" in e
-        for e in result.errors
+        "kpi_type must match template" in e and "percent" in e for e in result.errors
     )
+
+
+def test_target_value_required_when_objective_has_kpi_type() -> None:
+    """Validation fails when objective kpi_type is set but target_value is missing."""
+    result = validate_objective(
+        title="A long enough objective title here",
+        kpi_type="number",
+        target_value=None,
+        weight=Decimal("100"),
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 12, 31),
+        cycle_start=date(2026, 1, 1),
+        cycle_end=date(2026, 12, 31),
+        template=_template(kpi_type=None),
+        other_weights_sum=Decimal("0"),
+        has_baseline_for_template=True,
+    )
+    assert result.valid is False
+    assert any("target_value is required" in e for e in result.errors)
 
 
 def test_kpi_type_matches_template_passes() -> None:
@@ -66,7 +84,7 @@ def test_kpi_type_matches_template_passes() -> None:
     assert result.valid is True
 
 
-def _template(kpi_type: str | None = "number"):
+def _template(kpi_type: str | None = "number") -> "SimpleNamespace":
     """Minimal template-like object for unit tests."""
     from types import SimpleNamespace
 

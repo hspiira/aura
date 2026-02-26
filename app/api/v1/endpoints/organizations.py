@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.api.v1.dependencies import get_organization_repo
-from app.domain.exceptions import ResourceNotFoundException
+from app.api.v1.helpers import get_one_or_raise
 from app.infrastructure.persistence.models.organization import Organization
 from app.infrastructure.persistence.repositories.organization_repo import (
     OrganizationRepository,
@@ -41,7 +41,5 @@ async def get_organization(
     repo: Annotated[OrganizationRepository, Depends(get_organization_repo)],
 ) -> OrganizationResponse:
     """Get one organization by id."""
-    org = await repo.get_by_id(id)
-    if org is None:
-        raise ResourceNotFoundException("Organization", id)
+    org = await get_one_or_raise(repo.get_by_id(id), id, "Organization")
     return OrganizationResponse.model_validate(org)

@@ -1,8 +1,10 @@
 """Pytest configuration and shared fixtures."""
 
 import os
+from collections.abc import AsyncIterator, Callable
 
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
 
 # Mark all tests in test_*_db.py as requires_db when we add the marker to the module
 # (handled per-test or per-module in the test files)
@@ -35,6 +37,7 @@ async def db_session(database_url: str):
     Ensures engine is created, then opens a new session, begins a transaction,
     yields the session, and rolls back so no data persists.
     """
+    _ = database_url  # consumed for fixture ordering; skip when unset
     from app.infrastructure.persistence.database import (
         AsyncSessionLocal,
         _ensure_engine,
@@ -50,6 +53,17 @@ async def db_session(database_url: str):
     finally:
         await session.rollback()
         await session.close()
+
+
+@pytest.fixture
+def override_db_dependency(
+    db_session: AsyncSession,
+) -> Callable[[], AsyncIterator[AsyncSession]]:
+    """Factory for overriding get_db_transactional in API tests."""
+    async def override_get_db() -> AsyncIterator[AsyncSession]:
+        yield db_session
+
+    return override_get_db
 
 
 @pytest.fixture
