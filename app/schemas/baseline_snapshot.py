@@ -29,16 +29,3 @@ class BaselineSnapshotResponse(BaseModel):
     data_source: str | None
 
     model_config = {"from_attributes": True}
-
-
-class ValidateObjectiveRequest(BaseModel):
-    """Request body for objective validation."""
-
-    objective_id: str
-
-
-class ValidateObjectiveResponse(BaseModel):
-    """Response from objective validation."""
-
-    valid: bool
-    errors: list[str]

@@ -36,6 +36,11 @@ def upgrade() -> None:
             server_default="false",
         ),
     )
+    op.create_check_constraint(
+        "ck_objective_templates_min_le_max",
+        "objective_templates",
+        "(min_target IS NULL) OR (max_target IS NULL) OR (min_target <= max_target)",
+    )
     op.create_table(
         "baseline_snapshots",
         sa.Column("id", sa.String(), nullable=False),
@@ -69,12 +74,23 @@ def upgrade() -> None:
             ["objective_templates.id"],
             ondelete="CASCADE",
         ),
+        sa.UniqueConstraint(
+            "user_id",
+            "performance_cycle_id",
+            "template_id",
+            name="uq_baseline_snapshots_user_cycle_template",
+        ),
     )
 
 
 def downgrade() -> None:
     """Remove baseline_snapshots and template columns."""
     op.drop_table("baseline_snapshots")
+    op.drop_constraint(
+        "ck_objective_templates_min_le_max",
+        "objective_templates",
+        type_="check",
+    )
     op.drop_column("objective_templates", "requires_baseline_snapshot")
     op.drop_column("objective_templates", "max_target")
     op.drop_column("objective_templates", "min_target")

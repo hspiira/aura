@@ -6,7 +6,7 @@ from datetime import date
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Date, ForeignKey, Numeric, String
+from sqlalchemy import Date, ForeignKey, Numeric, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.persistence.database import Base
@@ -26,6 +26,14 @@ class BaselineSnapshot(CuidMixin, TimestampMixin, Base):
     """Baseline value for a user/cycle/template. Immutable once created."""
 
     __tablename__ = "baseline_snapshots"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "performance_cycle_id",
+            "template_id",
+            name="uq_baseline_snapshots_user_cycle_template",
+        ),
+    )
 
     user_id: Mapped[str] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),

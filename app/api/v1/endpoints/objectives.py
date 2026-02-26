@@ -18,10 +18,7 @@ from app.domain.exceptions import (
     ValidationException,
 )
 from app.domain.objective import ObjectiveStatus, can_transition
-from app.domain.smart_validation import (
-    has_baseline_for_user_cycle_template,
-    validate_objective,
-)
+from app.domain.smart_validation import validate_objective
 from app.infrastructure.persistence.models.objective import Objective
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
@@ -38,7 +35,7 @@ from app.infrastructure.persistence.repositories.objective_template_repo import 
 from app.infrastructure.persistence.repositories.performance_cycle_repo import (
     PerformanceCycleRepository,
 )
-from app.schemas.baseline_snapshot import (
+from app.schemas.objective_validation import (
     ValidateObjectiveRequest,
     ValidateObjectiveResponse,
 )
@@ -114,17 +111,14 @@ async def _run_smart_validation(
         for o in others
         if o.user_id == objective.user_id and o.id != objective.id
     )
-    baselines = await baseline_repo.list_by_user_cycle(
-        objective.user_id, objective.performance_cycle_id
-    )
     has_baseline = True
     if template and template.requires_baseline_snapshot and objective.template_id:
-        has_baseline = has_baseline_for_user_cycle_template(
-            baselines,
+        baseline = await baseline_repo.get_by_user_cycle_template(
             objective.user_id,
             objective.performance_cycle_id,
             objective.template_id,
         )
+        has_baseline = baseline is not None
     result = validate_objective(
         title=objective.title,
         kpi_type=objective.kpi_type,

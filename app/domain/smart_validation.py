@@ -47,8 +47,13 @@ def validate_objective(
     if len(title) < TITLE_MIN_LENGTH:
         errors.append(f"title must be at least {TITLE_MIN_LENGTH} characters")
 
-    if template and template.kpi_type and not kpi_type:
-        errors.append("kpi_type is required when template defines kpi_type")
+    if template and template.kpi_type:
+        if not kpi_type:
+            errors.append("kpi_type is required when template defines kpi_type")
+        elif kpi_type != template.kpi_type:
+            errors.append(
+                f"kpi_type must match template kpi_type ({template.kpi_type})"
+            )
 
     if target_value is None and (not template or template.kpi_type):
         errors.append("target_value is required for quantitative objectives")

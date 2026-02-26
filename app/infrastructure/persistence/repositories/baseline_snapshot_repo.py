@@ -24,7 +24,10 @@ class BaselineSnapshotRepository:
                 BaselineSnapshot.user_id == user_id,
                 BaselineSnapshot.performance_cycle_id == performance_cycle_id,
             )
-            .order_by(BaselineSnapshot.snapshot_date.desc())
+            .order_by(
+                BaselineSnapshot.snapshot_date.desc(),
+                BaselineSnapshot.id.desc(),
+            )
         )
         return list(result.scalars().all())
 
@@ -42,7 +45,10 @@ class BaselineSnapshotRepository:
                 BaselineSnapshot.performance_cycle_id == performance_cycle_id,
                 BaselineSnapshot.template_id == template_id,
             )
-            .order_by(BaselineSnapshot.snapshot_date.desc())
+            .order_by(
+                BaselineSnapshot.snapshot_date.desc(),
+                BaselineSnapshot.id.desc(),
+            )
             .limit(1)
         )
         return result.scalar_one_or_none()
