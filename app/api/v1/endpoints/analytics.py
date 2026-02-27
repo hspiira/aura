@@ -1,9 +1,8 @@
 """Analytics endpoints (read-only fact + ETL refresh)."""
 
-from typing import Annotated
-
 import asyncio
 from datetime import datetime, timezone
+from typing import Annotated
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
 

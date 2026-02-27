@@ -61,7 +61,7 @@ async def get_reward_policy_band_for_score(
     score: Annotated[Decimal, Query(description="Performance score to look up")],
     repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
 ) -> RewardPolicyResponse:
-    """Return the reward policy band that contains the given score (min <= score <= max). 404 if none."""
+    """Return the policy band containing the score (min<=score<=max). 404 if none."""
     policy = await repo.find_band_for_score(score)
     if policy is None:
         raise ResourceNotFoundException(

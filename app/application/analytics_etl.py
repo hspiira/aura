@@ -25,7 +25,7 @@ async def run_fact_performance_summary_etl(
     cycle_repo: PerformanceCycleRepository,
     fact_repo: FactPerformanceSummaryRepository,
 ) -> int:
-    """Copy all performance summaries into fact_performance_summary. Returns count upserted."""
+    """Copy summaries into fact_performance_summary. Returns count upserted."""
     summaries = await summary_repo.list_all()
     user_ids = {s.user_id for s in summaries}
     cycle_ids = {s.performance_cycle_id for s in summaries}
@@ -42,7 +42,8 @@ async def run_fact_performance_summary_etl(
         cycle = cycles_by_id.get(s.performance_cycle_id)
         if user is None or cycle is None:
             logger.warning(
-                "Skipping performance_summary %s: user_id=%s cycle_id=%s (missing user or cycle)",
+                "Skipping performance_summary %s: user_id=%s cycle_id=%s "
+                "(missing user or cycle)",
                 getattr(s, "id", None),
                 s.user_id,
                 s.performance_cycle_id,

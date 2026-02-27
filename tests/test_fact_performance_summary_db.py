@@ -18,7 +18,7 @@ pytestmark = pytest.mark.requires_db
 async def test_fact_performance_summary_upsert_inserts_when_no_existing(
     db_session, seed_phase1
 ) -> None:
-    """upsert inserts a new row when no row exists for user_id + performance_cycle_id."""
+    """upsert inserts when no row exists for user_id + performance_cycle_id."""
     repo = FactPerformanceSummaryRepository(db_session)
     fact = FactPerformanceSummary(
         user_id=seed_phase1["user_id"],
@@ -49,7 +49,7 @@ async def test_fact_performance_summary_upsert_inserts_when_no_existing(
 async def test_fact_performance_summary_upsert_updates_when_existing(
     db_session, seed_phase1
 ) -> None:
-    """upsert updates the existing row when one exists for user_id + performance_cycle_id."""
+    """upsert updates existing row for same user_id and performance_cycle_id."""
     repo = FactPerformanceSummaryRepository(db_session)
     fact1 = FactPerformanceSummary(
         user_id=seed_phase1["user_id"],

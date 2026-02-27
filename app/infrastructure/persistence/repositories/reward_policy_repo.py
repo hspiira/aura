@@ -33,8 +33,8 @@ class RewardPolicyRepository:
         return result.scalar_one_or_none()
 
     async def find_band_for_score(self, score: Decimal) -> RewardPolicy | None:
-        """Return the policy band that contains the given score (min_score <= score <= max_score).
-        If multiple bands overlap, returns the first (by min_score desc) and logs a warning.
+        """Return the policy band containing score (min_score<=score<=max_score).
+        If multiple bands overlap, returns the first (min_score desc) and logs.
         """
         result = await self._session.execute(
             select(RewardPolicy)
@@ -47,7 +47,8 @@ class RewardPolicyRepository:
         rows = list(result.scalars().all())
         if len(rows) > 1:
             logger.warning(
-                "find_band_for_score: score=%s matched %d overlapping policies (ids=%s); returning first",
+                "find_band_for_score: score=%s matched %d overlapping policies "
+                "(ids=%s); returning first",
                 score,
                 len(rows),
                 [r.id for r in rows],

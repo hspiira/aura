@@ -16,7 +16,6 @@ from app.api.v1.dependencies import (
 from app.api.v1.helpers import get_one_or_raise
 from app.application.objective_validation import run_smart_validation
 from app.domain.exceptions import (
-    ResourceNotFoundException,
     TransitionViolationException,
     ValidationException,
 )
@@ -45,16 +44,16 @@ from app.infrastructure.persistence.repositories.objective_update_repo import (
 from app.infrastructure.persistence.repositories.performance_cycle_repo import (
     PerformanceCycleRepository,
 )
-from app.schemas.objective_validation import (
-    ValidateObjectiveRequest,
-    ValidateObjectiveResponse,
-)
 from app.schemas.objective import (
     ObjectiveCreate,
     ObjectiveResponse,
     ObjectiveUpdateStatus,
 )
 from app.schemas.objective_score import ObjectiveScoreResponse
+from app.schemas.objective_validation import (
+    ValidateObjectiveRequest,
+    ValidateObjectiveResponse,
+)
 from app.shared.utils.datetime import utc_now
 
 router = APIRouter()
@@ -101,7 +100,7 @@ async def create_objective(
 
 
 def _parse_status(value: str, default: ObjectiveStatus | None) -> ObjectiveStatus:
-    """Parse status string; return default if invalid, else raise when default is None."""
+    """Parse status string; return default if invalid, else raise when default None."""
     try:
         return ObjectiveStatus(value.lower())
     except ValueError:

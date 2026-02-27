@@ -11,7 +11,7 @@ class BehavioralScoreCreate(BaseModel):
     indicator_id: str
     rating: int = Field(
         ge=1,
-        description="Rating within the indicator's scale (validated against indicator in handler).",
+        description="Rating within the indicator's scale (validated in handler).",
     )
     manager_comment: str | None = Field(default=None, max_length=2000)
 

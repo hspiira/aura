@@ -44,7 +44,7 @@ async def assign_permission_to_role(
     permission_repo: Annotated[PermissionRepository, Depends(get_permission_repo)],
     role_repo: Annotated[RoleRepository, Depends(get_role_repo)],
 ) -> RolePermissionResponse:
-    """Assign a permission to a role (idempotent: returns existing if already assigned)."""
+    """Assign permission to role (idempotent: returns existing if already assigned)."""
     existing = await repo.get_by_role_and_permission(
         payload.role_id, payload.permission_id
     )

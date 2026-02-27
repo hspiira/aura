@@ -9,13 +9,13 @@ from app.api.v1.dependencies import (
     get_role_repo,
 )
 from app.api.v1.helpers import get_one_or_raise
-from app.infrastructure.persistence.repositories.role_repo import RoleRepository
 from app.infrastructure.persistence.models.notification_rule import (
     NotificationRule,
 )
 from app.infrastructure.persistence.repositories.notification_rule_repo import (
     NotificationRuleRepository,
 )
+from app.infrastructure.persistence.repositories.role_repo import RoleRepository
 from app.schemas.notification_rule import (
     NotificationRuleCreate,
     NotificationRuleResponse,

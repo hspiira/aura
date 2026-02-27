@@ -24,9 +24,13 @@ uv run uvicorn app.main:app --reload
 
 ## Commands
 
+- `make lint` — run all lint checks (black, isort, flake8, mypy)
+- `make lint-fix` — fix formatting (black + isort)
 - `make test` — run tests (excluding DB-dependent)
 - `make test-all` — run all tests (requires `DATABASE_URL`)
 - `make audit-deps` — run pip-audit
+
+**Before committing:** run `make lint` and `make test` (CI runs these too).
 - Create DB (once): `createdb aura` (or `psql -c "CREATE DATABASE aura;"`)
 - `uv run alembic upgrade head` — run DB migrations (requires `DATABASE_URL`)
 
