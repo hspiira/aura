@@ -18,9 +18,7 @@ router = APIRouter()
 
 @router.get("", response_model=list[RewardPolicyResponse])
 async def list_reward_policies(
-    repo: Annotated[
-        RewardPolicyRepository, Depends(get_reward_policy_repo)
-    ],
+    repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
 ) -> list[RewardPolicyResponse]:
     """List all reward policy bands."""
     items = await repo.list_all()
@@ -30,9 +28,7 @@ async def list_reward_policies(
 @router.post("", response_model=RewardPolicyResponse, status_code=201)
 async def create_reward_policy(
     payload: RewardPolicyCreate,
-    repo: Annotated[
-        RewardPolicyRepository, Depends(get_reward_policy_repo)
-    ],
+    repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
 ) -> RewardPolicyResponse:
     """Create a reward policy band."""
     from app.infrastructure.persistence.models.reward_policy import (
@@ -52,9 +48,7 @@ async def create_reward_policy(
 @router.get("/band", response_model=RewardPolicyResponse)
 async def get_reward_policy_band_for_score(
     score: Annotated[Decimal, Query(description="Performance score to look up")],
-    repo: Annotated[
-        RewardPolicyRepository, Depends(get_reward_policy_repo)
-    ],
+    repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
 ) -> RewardPolicyResponse:
     """Return the reward policy band that contains the given score (min <= score <= max). 404 if none."""
     policy = await repo.find_band_for_score(score)
@@ -69,9 +63,7 @@ async def get_reward_policy_band_for_score(
 @router.get("/{id}", response_model=RewardPolicyResponse)
 async def get_reward_policy(
     id: str,
-    repo: Annotated[
-        RewardPolicyRepository, Depends(get_reward_policy_repo)
-    ],
+    repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
 ) -> RewardPolicyResponse:
     """Get one reward policy by id."""
     policy = await get_one_or_raise(repo.get_by_id(id), id, "RewardPolicy")

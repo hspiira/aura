@@ -16,8 +16,7 @@ class RolePermissionRepository:
     async def list_by_role(self, role_id: str) -> list[RolePermission]:
         """Return all role-permission links for a role."""
         result = await self._session.execute(
-            select(RolePermission)
-            .where(RolePermission.role_id == role_id)
+            select(RolePermission).where(RolePermission.role_id == role_id)
         )
         return list(result.scalars().all())
 

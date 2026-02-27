@@ -21,6 +21,7 @@ class CalibrationSessionRepository:
             select(CalibrationSession).order_by(
                 CalibrationSession.conducted_at.desc(),
                 CalibrationSession.created_at.desc(),
+                CalibrationSession.id.desc(),
             )
         )
         return list(result.scalars().all())
@@ -34,18 +35,42 @@ class CalibrationSessionRepository:
             .where(
                 CalibrationSession.performance_cycle_id == performance_cycle_id,
             )
-            .order_by(CalibrationSession.conducted_at.desc())
+            .order_by(
+                CalibrationSession.conducted_at.desc(),
+                CalibrationSession.created_at.desc(),
+                CalibrationSession.id.desc(),
+            )
         )
         return list(result.scalars().all())
 
-    async def list_by_department(
-        self, department_id: str
-    ) -> list[CalibrationSession]:
+    async def list_by_department(self, department_id: str) -> list[CalibrationSession]:
         """Return sessions for a department."""
         result = await self._session.execute(
             select(CalibrationSession)
             .where(CalibrationSession.department_id == department_id)
-            .order_by(CalibrationSession.conducted_at.desc())
+            .order_by(
+                CalibrationSession.conducted_at.desc(),
+                CalibrationSession.created_at.desc(),
+                CalibrationSession.id.desc(),
+            )
+        )
+        return list(result.scalars().all())
+
+    async def list_by_cycle_and_department(
+        self, performance_cycle_id: str, department_id: str
+    ) -> list[CalibrationSession]:
+        """Return sessions for a performance cycle and department."""
+        result = await self._session.execute(
+            select(CalibrationSession)
+            .where(
+                CalibrationSession.performance_cycle_id == performance_cycle_id,
+                CalibrationSession.department_id == department_id,
+            )
+            .order_by(
+                CalibrationSession.conducted_at.desc(),
+                CalibrationSession.created_at.desc(),
+                CalibrationSession.id.desc(),
+            )
         )
         return list(result.scalars().all())
 

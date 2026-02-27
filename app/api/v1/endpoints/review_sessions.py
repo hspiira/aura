@@ -20,30 +20,26 @@ router = APIRouter()
 
 @router.get("", response_model=list[ReviewSessionResponse])
 async def list_review_sessions(
-    repo: Annotated[
-        ReviewSessionRepository, Depends(get_review_session_repo)
-    ],
+    repo: Annotated[ReviewSessionRepository, Depends(get_review_session_repo)],
     user_id: str | None = Query(None),
     performance_cycle_id: str | None = Query(None),
 ) -> list[ReviewSessionResponse]:
     """List review sessions; filter by user_id and/or performance_cycle_id when set."""
     if user_id and performance_cycle_id:
         items = await repo.list_by_user_cycle(user_id, performance_cycle_id)
+    elif user_id:
+        items = await repo.list_by_user(user_id)
+    elif performance_cycle_id:
+        items = await repo.list_by_cycle(performance_cycle_id)
     else:
         items = await repo.list_all()
-    if user_id and not performance_cycle_id:
-        items = [i for i in items if i.user_id == user_id]
-    elif performance_cycle_id and not user_id:
-        items = [i for i in items if i.performance_cycle_id == performance_cycle_id]
     return [ReviewSessionResponse.model_validate(i) for i in items]
 
 
 @router.post("", response_model=ReviewSessionResponse, status_code=201)
 async def create_review_session(
     payload: ReviewSessionCreate,
-    repo: Annotated[
-        ReviewSessionRepository, Depends(get_review_session_repo)
-    ],
+    repo: Annotated[ReviewSessionRepository, Depends(get_review_session_repo)],
 ) -> ReviewSessionResponse:
     """Create a review session."""
     session = ReviewSession(
@@ -61,9 +57,7 @@ async def create_review_session(
 @router.get("/{id}", response_model=ReviewSessionResponse)
 async def get_review_session(
     id: str,
-    repo: Annotated[
-        ReviewSessionRepository, Depends(get_review_session_repo)
-    ],
+    repo: Annotated[ReviewSessionRepository, Depends(get_review_session_repo)],
 ) -> ReviewSessionResponse:
     """Get one review session by id."""
     session = await get_one_or_raise(repo.get_by_id(id), id, "ReviewSession")

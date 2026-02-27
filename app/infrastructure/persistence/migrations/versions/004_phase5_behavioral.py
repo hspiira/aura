@@ -56,6 +56,14 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.PrimaryKeyConstraint("id"),
+        sa.CheckConstraint(
+            "rating_scale_min >= 1",
+            name="ck_bi_rating_min_ge_1",
+        ),
+        sa.CheckConstraint(
+            "rating_scale_max >= rating_scale_min",
+            name="ck_bi_rating_max_ge_min",
+        ),
         sa.ForeignKeyConstraint(
             ["dimension_id"],
             ["performance_dimensions.id"],

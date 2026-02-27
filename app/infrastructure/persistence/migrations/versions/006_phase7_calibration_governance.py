@@ -75,6 +75,10 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
             nullable=False,
         ),
+        sa.CheckConstraint(
+            "min_score <= max_score",
+            name="ck_reward_policies_min_score_lte_max_score",
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
 

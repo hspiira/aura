@@ -5,9 +5,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import DateTime, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.domain.review_session import ReviewSessionStatus, ReviewSessionType
 from app.infrastructure.persistence.database import Base
 from app.infrastructure.persistence.models.mixins import CuidMixin, TimestampMixin
 
@@ -35,8 +36,15 @@ class ReviewSession(CuidMixin, TimestampMixin, Base):
         ForeignKey("users.id", ondelete="RESTRICT"),
         nullable=False,
     )
-    session_type: Mapped[str] = mapped_column(String(64), nullable=False)
-    status: Mapped[str] = mapped_column(String(32), default="scheduled", nullable=False)
+    session_type: Mapped[ReviewSessionType] = mapped_column(
+        Enum(ReviewSessionType, native_enum=False),
+        nullable=False,
+    )
+    status: Mapped[ReviewSessionStatus] = mapped_column(
+        Enum(ReviewSessionStatus, native_enum=False),
+        default=ReviewSessionStatus.SCHEDULED,
+        nullable=False,
+    )
     scheduled_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )

@@ -27,6 +27,26 @@ class PerformanceSummaryRepository:
         )
         return list(result.scalars().all())
 
+    async def list_filtered(
+        self,
+        user_id: str | None = None,
+        performance_cycle_id: str | None = None,
+    ) -> list[PerformanceSummary]:
+        """Return summaries with optional filters (DB-level)."""
+        query = select(PerformanceSummary)
+        if user_id is not None:
+            query = query.where(PerformanceSummary.user_id == user_id)
+        if performance_cycle_id is not None:
+            query = query.where(
+                PerformanceSummary.performance_cycle_id == performance_cycle_id
+            )
+        query = query.order_by(
+            PerformanceSummary.user_id,
+            PerformanceSummary.performance_cycle_id,
+        )
+        result = await self._session.execute(query)
+        return list(result.scalars().all())
+
     async def get_by_user_cycle(
         self, user_id: str, performance_cycle_id: str
     ) -> PerformanceSummary | None:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import CheckConstraint, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.persistence.database import Base
@@ -20,6 +20,16 @@ class BehavioralIndicator(CuidMixin, TimestampMixin, Base):
     """Behavioral indicator tied to a dimension (e.g. rating 1–5)."""
 
     __tablename__ = "behavioral_indicators"
+    __table_args__ = (
+        CheckConstraint(
+            "rating_scale_min >= 1",
+            name="ck_bi_rating_min_ge_1",
+        ),
+        CheckConstraint(
+            "rating_scale_max >= rating_scale_min",
+            name="ck_bi_rating_max_ge_min",
+        ),
+    )
 
     dimension_id: Mapped[str] = mapped_column(
         ForeignKey("performance_dimensions.id", ondelete="RESTRICT"),

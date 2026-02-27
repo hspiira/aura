@@ -25,9 +25,7 @@ class NotificationRuleRepository:
         )
         return list(result.scalars().all())
 
-    async def list_by_event_type(
-        self, event_type: str
-    ) -> list[NotificationRule]:
+    async def list_by_event_type(self, event_type: str) -> list[NotificationRule]:
         """Return rules for an event type."""
         result = await self._session.execute(
             select(NotificationRule)

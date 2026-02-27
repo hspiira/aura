@@ -41,9 +41,7 @@ class FactPerformanceSummary(Base):
     behavioral_score: Mapped[Decimal | None] = mapped_column(
         Numeric(6, 2), nullable=True
     )
-    final_score: Mapped[Decimal | None] = mapped_column(
-        Numeric(10, 2), nullable=True
-    )
+    final_score: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
     rating_band: Mapped[str | None] = mapped_column(String(64), nullable=True)
     etl_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

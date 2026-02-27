@@ -42,15 +42,15 @@ class CalibrationSession(CuidMixin, TimestampMixin, Base):
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    performance_cycle: Mapped["PerformanceCycle"] = relationship(
+    performance_cycle: Mapped[PerformanceCycle] = relationship(
         "PerformanceCycle",
         foreign_keys=[performance_cycle_id],
     )
-    department: Mapped["Department"] = relationship(
+    department: Mapped[Department] = relationship(
         "Department",
         foreign_keys=[department_id],
     )
-    conducted_by: Mapped["User"] = relationship(
+    conducted_by: Mapped[User] = relationship(
         "User",
         foreign_keys=[conducted_by_id],
     )

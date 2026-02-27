@@ -22,9 +22,7 @@ class ObjectiveScoreRepository:
     ) -> Decimal:
         """Sum weighted_score of objective_scores for objectives in user/cycle."""
         result = await self._session.execute(
-            select(
-                func.coalesce(func.sum(ObjectiveScore.weighted_score), 0)
-            )
+            select(func.coalesce(func.sum(ObjectiveScore.weighted_score), 0))
             .select_from(ObjectiveScore)
             .join(Objective, Objective.id == ObjectiveScore.objective_id)
             .where(

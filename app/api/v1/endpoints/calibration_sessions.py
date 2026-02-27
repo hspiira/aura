@@ -30,8 +30,9 @@ async def list_calibration_sessions(
 ) -> list[CalibrationSessionResponse]:
     """List calibration sessions; filter by cycle and/or department when set."""
     if performance_cycle_id and department_id:
-        by_cycle = await repo.list_by_cycle(performance_cycle_id)
-        items = [s for s in by_cycle if s.department_id == department_id]
+        items = await repo.list_by_cycle_and_department(
+            performance_cycle_id, department_id
+        )
     elif performance_cycle_id:
         items = await repo.list_by_cycle(performance_cycle_id)
     elif department_id:
@@ -68,7 +69,5 @@ async def get_calibration_session(
     ],
 ) -> CalibrationSessionResponse:
     """Get one calibration session by id."""
-    session = await get_one_or_raise(
-        repo.get_by_id(id), id, "CalibrationSession"
-    )
+    session = await get_one_or_raise(repo.get_by_id(id), id, "CalibrationSession")
     return CalibrationSessionResponse.model_validate(session)

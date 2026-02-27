@@ -15,9 +15,7 @@ router = APIRouter()
 
 @router.get("", response_model=list[NotificationLogResponse])
 async def list_notification_logs(
-    repo: Annotated[
-        NotificationLogRepository, Depends(get_notification_log_repo)
-    ],
+    repo: Annotated[NotificationLogRepository, Depends(get_notification_log_repo)],
     event_type: str | None = Query(None),
     limit: int = Query(100, ge=1, le=500),
 ) -> list[NotificationLogResponse]:

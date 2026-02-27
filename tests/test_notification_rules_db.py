@@ -13,9 +13,7 @@ pytestmark = pytest.mark.requires_db
 
 
 @pytest.mark.asyncio
-async def test_notification_rule_add_and_get_by_id(
-    db_session, seed_phase1
-) -> None:
+async def test_notification_rule_add_and_get_by_id(db_session, seed_phase1) -> None:
     """Add a notification rule and retrieve it by id."""
     repo = NotificationRuleRepository(db_session)
     rule = NotificationRule(
@@ -34,9 +32,7 @@ async def test_notification_rule_add_and_get_by_id(
 
 
 @pytest.mark.asyncio
-async def test_notification_rule_list_by_event_type(
-    db_session, seed_phase1
-) -> None:
+async def test_notification_rule_list_by_event_type(db_session, seed_phase1) -> None:
     """list_by_event_type returns only rules for that event."""
     repo = NotificationRuleRepository(db_session)
     r1 = NotificationRule(

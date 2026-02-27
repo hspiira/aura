@@ -101,9 +101,27 @@ def upgrade() -> None:
             ondelete="RESTRICT",
         ),
     )
+    op.create_index(
+        "ix_review_sessions_user_cycle",
+        "review_sessions",
+        ["user_id", "performance_cycle_id"],
+    )
+    op.create_index(
+        "ix_review_sessions_reviewer_id",
+        "review_sessions",
+        ["reviewer_id"],
+    )
 
 
 def downgrade() -> None:
     """Drop review_sessions and performance_summaries."""
+    op.drop_index(
+        "ix_review_sessions_reviewer_id",
+        table_name="review_sessions",
+    )
+    op.drop_index(
+        "ix_review_sessions_user_cycle",
+        table_name="review_sessions",
+    )
     op.drop_table("review_sessions")
     op.drop_table("performance_summaries")

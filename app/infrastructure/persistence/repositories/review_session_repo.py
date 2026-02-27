@@ -24,6 +24,34 @@ class ReviewSessionRepository:
         )
         return list(result.scalars().all())
 
+    async def list_by_user(self, user_id: str) -> list[ReviewSession]:
+        """Return sessions for a user."""
+        result = await self._session.execute(
+            select(ReviewSession)
+            .where(ReviewSession.user_id == user_id)
+            .order_by(
+                ReviewSession.performance_cycle_id,
+                ReviewSession.scheduled_at.desc().nullslast(),
+            )
+        )
+        return list(result.scalars().all())
+
+    async def list_by_cycle(
+        self, performance_cycle_id: str
+    ) -> list[ReviewSession]:
+        """Return sessions for a performance cycle."""
+        result = await self._session.execute(
+            select(ReviewSession)
+            .where(
+                ReviewSession.performance_cycle_id == performance_cycle_id
+            )
+            .order_by(
+                ReviewSession.user_id,
+                ReviewSession.scheduled_at.desc().nullslast(),
+            )
+        )
+        return list(result.scalars().all())
+
     async def list_by_user_cycle(
         self, user_id: str, performance_cycle_id: str
     ) -> list[ReviewSession]:

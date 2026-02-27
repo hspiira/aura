@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.api.v1.dependencies import get_behavioral_indicator_repo
 from app.api.v1.helpers import get_one_or_raise
@@ -25,9 +25,13 @@ async def list_behavioral_indicators(
     repo: Annotated[
         BehavioralIndicatorRepository, Depends(get_behavioral_indicator_repo)
     ],
+    dimension_id: str | None = Query(None),
 ) -> list[BehavioralIndicatorResponse]:
-    """List all behavioral indicators."""
-    items = await repo.list_all()
+    """List all behavioral indicators; optionally filter by dimension_id."""
+    if dimension_id:
+        items = await repo.list_by_dimension(dimension_id)
+    else:
+        items = await repo.list_all()
     return [BehavioralIndicatorResponse.model_validate(i) for i in items]
 
 
@@ -59,7 +63,5 @@ async def get_behavioral_indicator(
     ],
 ) -> BehavioralIndicatorResponse:
     """Get one behavioral indicator by id."""
-    indicator = await get_one_or_raise(
-        repo.get_by_id(id), id, "BehavioralIndicator"
-    )
+    indicator = await get_one_or_raise(repo.get_by_id(id), id, "BehavioralIndicator")
     return BehavioralIndicatorResponse.model_validate(indicator)

@@ -29,9 +29,7 @@ router = APIRouter()
 @router.get("", response_model=list[RolePermissionResponse])
 async def list_role_permissions(
     role_id: Annotated[str, Query(description="Filter by role")],
-    repo: Annotated[
-        RolePermissionRepository, Depends(get_role_permission_repo)
-    ],
+    repo: Annotated[RolePermissionRepository, Depends(get_role_permission_repo)],
 ) -> list[RolePermissionResponse]:
     """List permissions assigned to a role."""
     items = await repo.list_by_role(role_id)
@@ -41,12 +39,8 @@ async def list_role_permissions(
 @router.post("", response_model=RolePermissionResponse, status_code=201)
 async def assign_permission_to_role(
     payload: RolePermissionCreate,
-    repo: Annotated[
-        RolePermissionRepository, Depends(get_role_permission_repo)
-    ],
-    permission_repo: Annotated[
-        PermissionRepository, Depends(get_permission_repo)
-    ],
+    repo: Annotated[RolePermissionRepository, Depends(get_role_permission_repo)],
+    permission_repo: Annotated[PermissionRepository, Depends(get_permission_repo)],
     role_repo: Annotated[RoleRepository, Depends(get_role_repo)],
 ) -> RolePermissionResponse:
     """Assign a permission to a role (idempotent: returns existing if already assigned)."""
@@ -76,9 +70,7 @@ async def assign_permission_to_role(
 @router.delete("/{id}", status_code=204)
 async def remove_role_permission(
     id: str,
-    repo: Annotated[
-        RolePermissionRepository, Depends(get_role_permission_repo)
-    ],
+    repo: Annotated[RolePermissionRepository, Depends(get_role_permission_repo)],
 ) -> None:
     """Remove a role-permission assignment by id."""
     rp = await get_one_or_raise(repo.get_by_id(id), id, "RolePermission")

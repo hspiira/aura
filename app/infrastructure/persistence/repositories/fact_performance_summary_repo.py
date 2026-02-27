@@ -29,9 +29,7 @@ class FactPerformanceSummaryRepository:
         if cycle_year is not None:
             q = q.where(FactPerformanceSummary.cycle_year == cycle_year)
         if department_id is not None:
-            q = q.where(
-                FactPerformanceSummary.department_id == department_id
-            )
+            q = q.where(FactPerformanceSummary.department_id == department_id)
         q = q.limit(limit)
         result = await self._session.execute(q)
         return list(result.scalars().all())
@@ -43,8 +41,7 @@ class FactPerformanceSummaryRepository:
         result = await self._session.execute(
             select(FactPerformanceSummary).where(
                 FactPerformanceSummary.user_id == user_id,
-                FactPerformanceSummary.performance_cycle_id
-                == performance_cycle_id,
+                FactPerformanceSummary.performance_cycle_id == performance_cycle_id,
             )
         )
         return result.scalar_one_or_none()

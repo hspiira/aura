@@ -47,22 +47,16 @@ class PerformanceSummary(CuidMixin, TimestampMixin, Base):
     final_weighted_score: Mapped[Decimal | None] = mapped_column(
         Numeric(10, 2), nullable=True
     )
-    final_rating_band: Mapped[str | None] = mapped_column(
-        String(64), nullable=True
-    )
-    manager_comment: Mapped[str | None] = mapped_column(
-        String(2000), nullable=True
-    )
-    employee_comment: Mapped[str | None] = mapped_column(
-        String(2000), nullable=True
-    )
+    final_rating_band: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    manager_comment: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    employee_comment: Mapped[str | None] = mapped_column(String(2000), nullable=True)
     hr_approved: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    user: Mapped["User"] = relationship(
+    user: Mapped[User] = relationship(
         "User",
         foreign_keys=[user_id],
     )
-    performance_cycle: Mapped["PerformanceCycle"] = relationship(
+    performance_cycle: Mapped[PerformanceCycle] = relationship(
         "PerformanceCycle",
         foreign_keys=[performance_cycle_id],
     )

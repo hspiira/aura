@@ -26,9 +26,7 @@ router = APIRouter()
 
 @router.get("", response_model=list[NotificationRuleResponse])
 async def list_notification_rules(
-    repo: Annotated[
-        NotificationRuleRepository, Depends(get_notification_rule_repo)
-    ],
+    repo: Annotated[NotificationRuleRepository, Depends(get_notification_rule_repo)],
     event_type: str | None = Query(None),
 ) -> list[NotificationRuleResponse]:
     """List notification rules; optionally filter by event_type."""
@@ -42,9 +40,7 @@ async def list_notification_rules(
 @router.post("", response_model=NotificationRuleResponse, status_code=201)
 async def create_notification_rule(
     payload: NotificationRuleCreate,
-    repo: Annotated[
-        NotificationRuleRepository, Depends(get_notification_rule_repo)
-    ],
+    repo: Annotated[NotificationRuleRepository, Depends(get_notification_rule_repo)],
     role_repo: Annotated[RoleRepository, Depends(get_role_repo)],
 ) -> NotificationRuleResponse:
     """Create a notification rule."""
@@ -66,12 +62,8 @@ async def create_notification_rule(
 @router.get("/{id}", response_model=NotificationRuleResponse)
 async def get_notification_rule(
     id: str,
-    repo: Annotated[
-        NotificationRuleRepository, Depends(get_notification_rule_repo)
-    ],
+    repo: Annotated[NotificationRuleRepository, Depends(get_notification_rule_repo)],
 ) -> NotificationRuleResponse:
     """Get one notification rule by id."""
-    rule = await get_one_or_raise(
-        repo.get_by_id(id), id, "NotificationRule"
-    )
+    rule = await get_one_or_raise(repo.get_by_id(id), id, "NotificationRule")
     return NotificationRuleResponse.model_validate(rule)

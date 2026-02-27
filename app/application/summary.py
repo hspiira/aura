@@ -48,9 +48,7 @@ async def compute_and_save_summary(
     final = quant * QUANT_WEIGHT + behavioral_pct * BEHAVIORAL_WEIGHT
     final = round(final, 2)
 
-    existing = await summary_repo.get_by_user_cycle(
-        user_id, performance_cycle_id
-    )
+    existing = await summary_repo.get_by_user_cycle(user_id, performance_cycle_id)
     if existing:
         return await summary_repo.update_scores(
             existing,

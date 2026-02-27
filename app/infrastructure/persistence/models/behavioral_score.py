@@ -1,4 +1,4 @@
-"""BehavioralScore ORM model (user, cycle, indicator, rating 1–5)."""
+"""BehavioralScore ORM model (user, cycle, indicator, rating 1-5)."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 class BehavioralScore(CuidMixin, TimestampMixin, Base):
-    """Behavioral score for a user/cycle/indicator (rating 1–5, manager comment)."""
+    """Behavioral score for a user/cycle/indicator (rating 1-5, manager comment)."""
 
     __tablename__ = "behavioral_scores"
     __table_args__ = (
@@ -48,15 +48,15 @@ class BehavioralScore(CuidMixin, TimestampMixin, Base):
     rating: Mapped[int] = mapped_column(Integer, nullable=False)
     manager_comment: Mapped[str | None] = mapped_column(String(2000), nullable=True)
 
-    user: Mapped["User"] = relationship(
+    user: Mapped[User] = relationship(
         "User",
         foreign_keys=[user_id],
     )
-    performance_cycle: Mapped["PerformanceCycle"] = relationship(
+    performance_cycle: Mapped[PerformanceCycle] = relationship(
         "PerformanceCycle",
         foreign_keys=[performance_cycle_id],
     )
-    indicator: Mapped["BehavioralIndicator"] = relationship(
+    indicator: Mapped[BehavioralIndicator] = relationship(
         "BehavioralIndicator",
         foreign_keys=[indicator_id],
     )

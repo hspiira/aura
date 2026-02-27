@@ -38,11 +38,10 @@ async def list_performance_summaries(
     performance_cycle_id: str | None = Query(None),
 ) -> list[PerformanceSummaryResponse]:
     """List summaries; filter by user_id and/or performance_cycle_id when set."""
-    items = await repo.list_all()
-    if user_id:
-        items = [i for i in items if i.user_id == user_id]
-    if performance_cycle_id:
-        items = [i for i in items if i.performance_cycle_id == performance_cycle_id]
+    items = await repo.list_filtered(
+        user_id=user_id,
+        performance_cycle_id=performance_cycle_id,
+    )
     return [PerformanceSummaryResponse.model_validate(i) for i in items]
 
 
@@ -100,9 +99,7 @@ async def get_performance_summary(
     ],
 ) -> PerformanceSummaryResponse:
     """Get one performance summary by id."""
-    summary = await get_one_or_raise(
-        repo.get_by_id(id), id, "PerformanceSummary"
-    )
+    summary = await get_one_or_raise(repo.get_by_id(id), id, "PerformanceSummary")
     return PerformanceSummaryResponse.model_validate(summary)
 
 
@@ -115,9 +112,7 @@ async def update_performance_summary(
     ],
 ) -> PerformanceSummaryResponse:
     """Update rating band, comments, and/or hr_approved."""
-    summary = await get_one_or_raise(
-        repo.get_by_id(id), id, "PerformanceSummary"
-    )
+    summary = await get_one_or_raise(repo.get_by_id(id), id, "PerformanceSummary")
     summary = await repo.update_metadata(
         summary,
         final_rating_band=payload.final_rating_band,

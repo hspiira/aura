@@ -4,6 +4,8 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from app.domain.review_session import ReviewSessionStatus, ReviewSessionType
+
 
 class ReviewSessionCreate(BaseModel):
     """Payload to create a review session."""
@@ -11,8 +13,8 @@ class ReviewSessionCreate(BaseModel):
     user_id: str
     performance_cycle_id: str
     reviewer_id: str
-    session_type: str
-    status: str = "scheduled"
+    session_type: ReviewSessionType
+    status: ReviewSessionStatus = ReviewSessionStatus.SCHEDULED
     scheduled_at: datetime | None = None
 
 
@@ -23,8 +25,8 @@ class ReviewSessionResponse(BaseModel):
     user_id: str
     performance_cycle_id: str
     reviewer_id: str
-    session_type: str
-    status: str
+    session_type: ReviewSessionType
+    status: ReviewSessionStatus
     scheduled_at: datetime | None
     completed_at: datetime | None
 

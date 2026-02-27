@@ -15,9 +15,7 @@ pytestmark = pytest.mark.requires_db
 
 
 @pytest.mark.asyncio
-async def test_calibration_session_add_and_get_by_id(
-    db_session, seed_phase1
-) -> None:
+async def test_calibration_session_add_and_get_by_id(db_session, seed_phase1) -> None:
     """Add a calibration session and retrieve it by id."""
     repo = CalibrationSessionRepository(db_session)
     session = CalibrationSession(
@@ -67,9 +65,7 @@ async def test_calibration_session_list_by_cycle(db_session, seed_phase1) -> Non
 
 
 @pytest.mark.asyncio
-async def test_calibration_session_list_by_department(
-    db_session, seed_phase1
-) -> None:
+async def test_calibration_session_list_by_department(db_session, seed_phase1) -> None:
     """list_by_department returns only sessions for that department."""
     repo = CalibrationSessionRepository(db_session)
     session = CalibrationSession(

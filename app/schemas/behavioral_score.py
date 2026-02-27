@@ -1,6 +1,6 @@
 """Behavioral score request/response schemas."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BehavioralScoreCreate(BaseModel):
@@ -9,8 +9,8 @@ class BehavioralScoreCreate(BaseModel):
     user_id: str
     performance_cycle_id: str
     indicator_id: str
-    rating: int
-    manager_comment: str | None = None
+    rating: int = Field(ge=1, description="Rating within the indicator's scale (validated against indicator in handler).")
+    manager_comment: str | None = Field(default=None, max_length=2000)
 
 
 class BehavioralScoreResponse(BaseModel):

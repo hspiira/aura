@@ -201,9 +201,7 @@ async def calculate_objective_score(
     update_repo: Annotated[
         ObjectiveUpdateRepository, Depends(get_objective_update_repo)
     ],
-    score_repo: Annotated[
-        ObjectiveScoreRepository, Depends(get_objective_score_repo)
-    ],
+    score_repo: Annotated[ObjectiveScoreRepository, Depends(get_objective_score_repo)],
 ) -> ObjectiveScoreResponse:
     """Compute and persist score for an objective (latest update actual or 0)."""
     objective = await get_one_or_raise(repo.get_by_id(id), id, "Objective")
@@ -243,9 +241,7 @@ async def calculate_objective_score(
 async def lock_objective(
     id: str,
     repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
-    score_repo: Annotated[
-        ObjectiveScoreRepository, Depends(get_objective_score_repo)
-    ],
+    score_repo: Annotated[ObjectiveScoreRepository, Depends(get_objective_score_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
 ) -> ObjectiveResponse:
     """Lock objective and its score (no further edits; score immutable)."""
