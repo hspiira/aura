@@ -269,7 +269,9 @@ function ObjectiveDetailPage() {
                   <li key={entry.id} className="text-stone-600">
                     <span className="font-medium text-stone-700">{entry.action}</span>
                     {' · '}
-                    {format(parseISO(entry.created_at), 'MMM d HH:mm')}
+                    {entry.changed_at
+                      ? format(parseISO(entry.changed_at), 'MMM d HH:mm')
+                      : '—'}
                     {entry.changed_by && ` · ${entry.changed_by}`}
                   </li>
                 ))}

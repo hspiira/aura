@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppReviewsRouteImport } from './routes/_app/reviews'
 import { Route as AppPeopleRouteImport } from './routes/_app/people'
 import { Route as AppObjectivesRouteImport } from './routes/_app/objectives'
+import { Route as AppMyComponentsRouteImport } from './routes/_app/my-components'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCyclesRouteImport } from './routes/_app/cycles'
 import { Route as AppComponentsRouteImport } from './routes/_app/components'
@@ -61,6 +62,11 @@ const AppPeopleRoute = AppPeopleRouteImport.update({
 const AppObjectivesRoute = AppObjectivesRouteImport.update({
   id: '/objectives',
   path: '/objectives',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMyComponentsRoute = AppMyComponentsRouteImport.update({
+  id: '/my-components',
+  path: '/my-components',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/components': typeof AppComponentsRoute
   '/cycles': typeof AppCyclesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
+  '/my-components': typeof AppMyComponentsRoute
   '/objectives': typeof AppObjectivesRouteWithChildren
   '/people': typeof AppPeopleRouteWithChildren
   '/reviews': typeof AppReviewsRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/components': typeof AppComponentsRoute
   '/cycles': typeof AppCyclesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
+  '/my-components': typeof AppMyComponentsRoute
   '/objectives': typeof AppObjectivesRouteWithChildren
   '/people': typeof AppPeopleRouteWithChildren
   '/reviews': typeof AppReviewsRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/_app/components': typeof AppComponentsRoute
   '/_app/cycles': typeof AppCyclesRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/my-components': typeof AppMyComponentsRoute
   '/_app/objectives': typeof AppObjectivesRouteWithChildren
   '/_app/people': typeof AppPeopleRouteWithChildren
   '/_app/reviews': typeof AppReviewsRoute
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/components'
     | '/cycles'
     | '/dashboard'
+    | '/my-components'
     | '/objectives'
     | '/people'
     | '/reviews'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/components'
     | '/cycles'
     | '/dashboard'
+    | '/my-components'
     | '/objectives'
     | '/people'
     | '/reviews'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/_app/components'
     | '/_app/cycles'
     | '/_app/dashboard'
+    | '/_app/my-components'
     | '/_app/objectives'
     | '/_app/people'
     | '/_app/reviews'
@@ -356,6 +368,13 @@ declare module '@tanstack/react-router' {
       path: '/objectives'
       fullPath: '/objectives'
       preLoaderRoute: typeof AppObjectivesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/my-components': {
+      id: '/_app/my-components'
+      path: '/my-components'
+      fullPath: '/my-components'
+      preLoaderRoute: typeof AppMyComponentsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/dashboard': {
@@ -558,6 +577,7 @@ interface AppRouteChildren {
   AppComponentsRoute: typeof AppComponentsRoute
   AppCyclesRoute: typeof AppCyclesRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
+  AppMyComponentsRoute: typeof AppMyComponentsRoute
   AppObjectivesRoute: typeof AppObjectivesRouteWithChildren
   AppPeopleRoute: typeof AppPeopleRouteWithChildren
   AppReviewsRoute: typeof AppReviewsRoute
@@ -570,6 +590,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppComponentsRoute: AppComponentsRoute,
   AppCyclesRoute: AppCyclesRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
+  AppMyComponentsRoute: AppMyComponentsRoute,
   AppObjectivesRoute: AppObjectivesRouteWithChildren,
   AppPeopleRoute: AppPeopleRouteWithChildren,
   AppReviewsRoute: AppReviewsRoute,

@@ -1,12 +1,22 @@
 'use client'
 
 import { Outlet } from '@tanstack/react-router'
-import { QueryClientProvider } from '@tanstack/react-query'
-import { queryClient } from '#/lib/query-client'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useState } from 'react'
 import { AppSidebar } from '#/components/app-shell/AppSidebar'
 import { AppTopBar } from '#/components/app-shell/AppTopBar'
 
 export function AppShell() {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000,
+          },
+        },
+      }),
+  )
   return (
     <QueryClientProvider client={queryClient}>
       <div className="flex h-svh bg-stone-50">

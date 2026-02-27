@@ -308,7 +308,7 @@ export interface AuditLogResponse {
   old_value: Record<string, unknown> | null
   new_value: Record<string, unknown> | null
   changed_by: string | null
-  created_at: string
+  changed_at: string
 }
 
 // ─── Baseline snapshots ───────────────────────────────────────────────────────
