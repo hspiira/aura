@@ -17,6 +17,14 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_BACKEND ?? 'http://localhost:8000',
+        changeOrigin: true,
+      },
+    },
+  },
 })
 
 export default config

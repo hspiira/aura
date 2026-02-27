@@ -540,7 +540,7 @@ export function auditLogsRecentQueryOptions(entityType: string, limit = 20) {
   return queryOptions({
     queryKey: queryKeys.auditLogs.recent(entityType, limit),
     queryFn: () =>
-      apiGet<PageResponse<AuditLogResponse>>(`audit-logs?${search}`).then((r) => r.items),
+      apiGet<AuditLogResponse[]>(`audit-logs/recent?${search}`),
     enabled: !!entityType,
   })
 }

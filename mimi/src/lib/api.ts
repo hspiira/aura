@@ -3,11 +3,8 @@
  * Attaches Authorization: Bearer <token>, handles 401 by invoking onUnauthorized.
  */
 
-const DEFAULT_BASE =
-  typeof import.meta !== 'undefined' &&
-  (import.meta.env as { VITE_API_BASE?: string }).VITE_API_BASE
-    ? ((import.meta.env as { VITE_API_BASE: string }).VITE_API_BASE)
-    : '/api/v1'
+const env = import.meta.env as unknown as { VITE_API_BASE?: string }
+const DEFAULT_BASE = env.VITE_API_BASE?.trim() ? env.VITE_API_BASE : '/api/v1'
 
 let onUnauthorized: (() => void) | null = null
 
@@ -68,6 +65,7 @@ export async function apiRequest<TResponse = unknown, TBody = unknown>(
   const url = path.startsWith('http') ? path : `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`
   const method = options.method ?? 'GET'
   const body = options.body !== undefined ? JSON.stringify(options.body) : undefined
+  const hadToken = !!(options.token !== undefined ? options.token : getToken())
   const response = await fetch(url, {
     method,
     headers: buildHeaders(options),
@@ -75,7 +73,8 @@ export async function apiRequest<TResponse = unknown, TBody = unknown>(
   })
 
   if (response.status === 401) {
-    onUnauthorized?.()
+    // Only clear and redirect when we actually sent a token (session expired/revoked)
+    if (hadToken) onUnauthorized?.()
     throw new ApiError('Unauthorized', 401)
   }
 
