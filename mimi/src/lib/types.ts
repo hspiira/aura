@@ -64,6 +64,15 @@ export interface MeResponse {
   permissions: string[]
 }
 
+// ─── Auth (login / signup responses) ─────────────────────────────────────────
+
+export interface LoginResponse {
+  token: string
+  user: UserResponse
+  permissions: string[]
+}
+
+
 // ─── Organizations ──────────────────────────────────────────────────────────
 
 export interface OrganizationResponse {

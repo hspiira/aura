@@ -44,6 +44,13 @@ class UserRepository:
         result = await self._session.execute(select(User).where(User.id == id))
         return result.scalar_one_or_none()
 
+    async def get_by_email(self, email: str) -> User | None:
+        """Return one user by email (case-insensitive match)."""
+        result = await self._session.execute(
+            select(User).where(func.lower(User.email) == func.lower(email))
+        )
+        return result.scalar_one_or_none()
+
     async def add(self, user: User) -> User:
         """Persist a user."""
         self._session.add(user)

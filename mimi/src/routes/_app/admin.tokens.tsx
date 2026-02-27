@@ -1,7 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Copy, Plus } from 'lucide-react'
+import {
+  Copy,
+  Plus,
+  User,
+  FileText,
+  Slash,
+  Clock,
+} from 'lucide-react'
+import { TablePagination } from '#/components/ui/table-pagination'
 import { format, parseISO } from 'date-fns'
 import {
   userTokensQueryOptions,
@@ -28,6 +36,12 @@ function AdminTokensPage() {
   const { data: usersData } = useQuery(usersQueryOptions({ limit: 200 }))
   const users = usersData?.items ?? []
   const userById = Object.fromEntries(users.map((u) => [u.id, u.name]))
+
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const total = tokens.length
+  const start = (page - 1) * pageSize
+  const displayTokens = tokens.slice(start, start + pageSize)
 
   const createMutation = useMutation({
     mutationFn: (body: UserTokenCreateRequest) => mutations.userTokens.create(body),
@@ -76,15 +90,43 @@ function AdminTokensPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-stone-200 bg-stone-50/80">
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">User</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Description</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Revoked</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Created</th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <User className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    User
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <FileText className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Description
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <Slash className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Revoked
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Created
+                  </span>
+                </div>
+              </th>
               <th className="w-20" />
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
-            {tokens.map((t) => (
+            {displayTokens.map((t) => (
               <tr key={t.id} className="hover:bg-stone-50/50">
                 <td className="px-4 py-3 font-medium text-stone-900">
                   {userById[t.user_id] ?? t.user_id}
@@ -116,6 +158,16 @@ function AdminTokensPage() {
             ))}
           </tbody>
         </table>
+        <TablePagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size)
+            setPage(1)
+          }}
+        />
       </div>
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

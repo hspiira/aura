@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import { useQueries, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import {
@@ -46,6 +46,9 @@ function weightDisplay(weight: string): string {
 }
 
 function ObjectivesPage() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const isListPage = pathname === '/objectives'
+
   const [statusFilter, setStatusFilter] = useState<string>('')
   const [dimensionFilter, setDimensionFilter] = useState<string>('')
   const [newModalOpen, setNewModalOpen] = useState(false)
@@ -78,6 +81,8 @@ function ObjectivesPage() {
 
   return (
     <div className="space-y-4">
+      {isListPage && (
+      <>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-lg font-semibold text-stone-900">Objectives</h1>
@@ -229,6 +234,9 @@ function ObjectivesPage() {
         userId={me?.user.id ?? ''}
         performanceCycleId={effectiveCycleId}
       />
+      </>
+      )}
+      <Outlet />
     </div>
   )
 }

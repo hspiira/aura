@@ -1,8 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Outlet, useRouterState } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { format, parseISO } from 'date-fns'
 import { Plus } from 'lucide-react'
+import { ReviewsTable } from '#/components/reviews-table'
 import {
   reviewSessionsQueryOptions,
   performanceCyclesQueryOptions,
@@ -28,6 +28,8 @@ const STATUS_LABELS: Record<ReviewSessionStatus, string> = {
 }
 
 function ReviewsPage() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const isListPage = pathname === '/reviews'
   const queryClient = useQueryClient()
   const [cycleFilter, setCycleFilter] = useState<string>('')
   const [formOpen, setFormOpen] = useState(false)
@@ -67,6 +69,7 @@ function ReviewsPage() {
   })
 
   const userById = Object.fromEntries(users.map((u) => [u.id, u.name]))
+  const cycleById = Object.fromEntries(cycles.map((c) => [c.id, c.name]))
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -83,88 +86,48 @@ function ReviewsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-lg font-semibold text-stone-900">Review sessions</h1>
-          <p className="mt-0.5 text-sm text-stone-500">
-            Schedule and track performance reviews.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => setFormOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 transition hover:bg-stone-800"
-        >
-          <Plus className="size-4" />
-          New review session
-        </button>
-      </div>
+      {isListPage && (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="text-lg font-semibold text-stone-900">Review sessions</h1>
+              <p className="mt-0.5 text-sm text-stone-500">
+                Schedule and track performance reviews.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFormOpen(true)}
+              className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 transition hover:bg-stone-800"
+            >
+              <Plus className="size-4" />
+              New review session
+            </button>
+          </div>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-stone-200 bg-white p-3">
-        <label className="flex items-center gap-2 text-sm">
-          <span className="text-stone-500">Cycle</span>
-          <select
-            value={cycleFilter}
-            onChange={(e) => setCycleFilter(e.target.value)}
-            className="rounded border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
-          >
-            <option value="">All</option>
-            {cycles.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+          <div className="flex flex-wrap items-center gap-3 rounded-xl border border-stone-200 bg-white p-3">
+            <label className="flex items-center gap-2 text-sm">
+              <span className="text-stone-500">Cycle</span>
+              <select
+                value={cycleFilter}
+                onChange={(e) => setCycleFilter(e.target.value)}
+                className="rounded border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
+              >
+                <option value="">All</option>
+                {cycles.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
 
-      <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
-        <table className="w-full min-w-[600px] text-sm">
-          <thead>
-            <tr className="border-b border-stone-200 bg-stone-50/80">
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Employee</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Reviewer</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Type</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Status</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Scheduled</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            {sessions.length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-stone-500">
-                  No review sessions.
-                </td>
-              </tr>
-            )}
-            {sessions.map((s) => (
-              <tr key={s.id} className="hover:bg-stone-50/50">
-                <td className="px-4 py-3 text-stone-800">
-                  {userById[s.user_id] ?? s.user_id}
-                </td>
-                <td className="px-4 py-3 text-stone-800">
-                  {userById[s.reviewer_id] ?? s.reviewer_id}
-                </td>
-                <td className="px-4 py-3">
-                  <span className="rounded bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-700">
-                    {SESSION_TYPE_LABELS[s.session_type]}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="rounded bg-stone-100 px-2 py-0.5 text-xs font-medium capitalize text-stone-700">
-                    {STATUS_LABELS[s.status]}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-stone-600">
-                  {s.scheduled_at
-                    ? format(parseISO(s.scheduled_at), 'MMM d, yyyy HH:mm')
-                    : '—'}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          <ReviewsTable data={sessions} userById={userById} cycleById={cycleById} />
+
+        </>
+      )}
+      <Outlet />
 
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

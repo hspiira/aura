@@ -84,6 +84,9 @@ from app.infrastructure.persistence.repositories.role_permission_repo import (
     RolePermissionRepository,
 )
 from app.infrastructure.persistence.repositories.role_repo import RoleRepository
+from app.infrastructure.persistence.repositories.user_identity_repo import (
+    UserIdentityRepository,
+)
 from app.infrastructure.persistence.repositories.user_repo import UserRepository
 from app.infrastructure.persistence.repositories.user_token_repo import (
     UserTokenRepository,
@@ -132,6 +135,7 @@ get_fact_performance_summary_repo = _repo_dep(FactPerformanceSummaryRepository)
 get_objective_version_repo = _repo_dep(ObjectiveVersionRepository)
 get_user_token_repo = _repo_dep(UserTokenRepository)
 get_notification_outbox_repo = _repo_dep(NotificationOutboxRepository)
+get_user_identity_repo = _repo_dep(UserIdentityRepository)
 
 
 async def get_current_user_permissions(

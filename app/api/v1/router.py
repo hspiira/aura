@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     analytics,
     audit_logs,
+    auth,
     baseline_snapshots,
     behavioral_indicators,
     behavioral_scores,
@@ -40,6 +41,7 @@ api_router.include_router(
     prefix="/analytics",
     tags=["analytics"],
 )
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(
     calibration_analytics.router,
     prefix="/analytics/calibration",

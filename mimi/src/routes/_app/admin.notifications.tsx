@@ -1,9 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import {
+  Plus,
+  Bell,
+  UserCircle2,
+  Send,
+  FileText,
+} from 'lucide-react'
 import { notificationRulesQueryOptions, rolesQueryOptions, mutations } from '#/lib/queries'
 import type { NotificationRuleCreate } from '#/lib/types'
+import { TablePagination } from '#/components/ui/table-pagination'
 
 export const Route = createFileRoute('/_app/admin/notifications')({
   component: AdminNotificationsPage,
@@ -20,6 +27,11 @@ function AdminNotificationsPage() {
   })
   const { data: roles = [] } = useQuery(rolesQueryOptions())
   const { data: rules = [] } = useQuery(notificationRulesQueryOptions())
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const total = rules.length
+  const start = (page - 1) * pageSize
+  const displayRules = rules.slice(start, start + pageSize)
   const createMutation = useMutation({
     mutationFn: (body: NotificationRuleCreate) => mutations.notificationRules.create(body),
     onSuccess: () => {
@@ -57,14 +69,42 @@ function AdminNotificationsPage() {
         <table className="w-full text-sm">
           <thead>
               <tr className="border-b border-stone-200 bg-stone-50/80">
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Event type</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Recipient role</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Channel</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Template</th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <Bell className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Event type
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <UserCircle2 className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Recipient role
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <Send className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Channel
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <FileText className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Template
+                  </span>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
-            {rules.map((r) => (
+            {displayRules.map((r) => (
               <tr key={r.id} className="hover:bg-stone-50/50">
                 <td className="px-4 py-3 font-medium text-stone-900">{r.event_type}</td>
                 <td className="px-4 py-3 text-stone-600">{r.recipient_role_id}</td>
@@ -76,6 +116,16 @@ function AdminNotificationsPage() {
             ))}
           </tbody>
         </table>
+        <TablePagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size)
+            setPage(1)
+          }}
+        />
       </div>
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

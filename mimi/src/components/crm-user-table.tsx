@@ -22,6 +22,7 @@ import {
   TableRow,
 } from '#/components/ui/table'
 import { cn } from '#/lib/utils'
+import { TablePagination } from '#/components/ui/table-pagination'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -92,15 +93,21 @@ function EngagementBadge({ score }: { score: EngagementScore }) {
 
 export function CrmUserTable({ users, className }: CrmUserTableProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
 
-  const allSelected = users.length > 0 && selected.size === users.length
+  const total = users.length
+  const start = (page - 1) * pageSize
+  const displayUsers = users.slice(start, start + pageSize)
+
+  const allSelected = displayUsers.length > 0 && selected.size === displayUsers.length
   const someSelected = selected.size > 0 && !allSelected
 
   function toggleAll() {
     if (allSelected) {
       setSelected(new Set())
     } else {
-      setSelected(new Set(users.map((u) => u.id)))
+      setSelected(new Set(displayUsers.map((u) => u.id)))
     }
   }
 
@@ -114,6 +121,15 @@ export function CrmUserTable({ users, className }: CrmUserTableProps) {
       }
       return next
     })
+  }
+
+  function goToPage(nextPage: number) {
+    setPage(nextPage)
+  }
+
+  function handlePageSizeChange(size: number) {
+    setPageSize(size)
+    setPage(1)
   }
 
   return (
@@ -157,7 +173,7 @@ export function CrmUserTable({ users, className }: CrmUserTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => {
+          {displayUsers.map((user) => {
             const isSelected = selected.has(user.id)
             return (
               <TableRow
@@ -222,6 +238,13 @@ export function CrmUserTable({ users, className }: CrmUserTableProps) {
           )}
         </TableBody>
       </Table>
+      <TablePagination
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        onPageChange={goToPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
     </div>
   )
 }

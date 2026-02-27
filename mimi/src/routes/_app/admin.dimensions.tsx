@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { Plus, SlidersHorizontal, Activity, Percent } from 'lucide-react'
 import { performanceDimensionsQueryOptions, mutations } from '#/lib/queries'
 import type { PerformanceDimensionCreate } from '#/lib/types'
+import { TablePagination } from '#/components/ui/table-pagination'
 
 export const Route = createFileRoute('/_app/admin/dimensions')({
   component: AdminDimensionsPage,
@@ -19,6 +20,11 @@ function AdminDimensionsPage() {
   })
 
   const { data: dimensions = [] } = useQuery(performanceDimensionsQueryOptions())
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const total = dimensions.length
+  const start = (page - 1) * pageSize
+  const displayDimensions = dimensions.slice(start, start + pageSize)
   const createMutation = useMutation({
     mutationFn: (body: PerformanceDimensionCreate) =>
       mutations.performanceDimensions.create(body),
@@ -56,13 +62,34 @@ function AdminDimensionsPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-stone-200 bg-stone-50/80">
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Name</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Quantitative</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Default weight %</th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <SlidersHorizontal className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Name
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <Activity className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Quantitative
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <Percent className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Default weight %
+                  </span>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
-            {dimensions.map((d) => (
+            {displayDimensions.map((d) => (
               <tr key={d.id} className="hover:bg-stone-50/50">
                 <td className="px-4 py-3 font-medium text-stone-900">{d.name}</td>
                 <td className="px-4 py-3 text-stone-600">{d.is_quantitative ? 'Yes' : 'No'}</td>
@@ -71,6 +98,16 @@ function AdminDimensionsPage() {
             ))}
           </tbody>
         </table>
+        <TablePagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size)
+            setPage(1)
+          }}
+        />
       </div>
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

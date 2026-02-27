@@ -1,10 +1,11 @@
 import '#/styles.css'
 import {
   Outlet,
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Scripts,
 } from '@tanstack/react-router'
+import type { QueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
 import { AppErrorPage, NotFoundPage } from '#/components/error-pages'
@@ -15,7 +16,9 @@ import { authStore, setAuth } from '#/stores/auth'
 // including SSR. The functions are no-ops when window is undefined.
 wireApiAuth()
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient: QueryClient
+}>()({
   head: () => ({
     meta: [
       { charSet: 'utf-8' },

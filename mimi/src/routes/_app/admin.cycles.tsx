@@ -2,7 +2,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
-import { Plus } from 'lucide-react'
+import {
+  Plus,
+  Calendar,
+  Hash,
+  CheckCircle2,
+} from 'lucide-react'
+import { TablePagination } from '#/components/ui/table-pagination'
 import { performanceCyclesQueryOptions, mutations } from '#/lib/queries'
 import type { PerformanceCycleCreate } from '#/lib/types'
 
@@ -21,6 +27,11 @@ function AdminCyclesPage() {
   })
 
   const { data: cycles = [] } = useQuery(performanceCyclesQueryOptions())
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const total = cycles.length
+  const start = (page - 1) * pageSize
+  const displayCycles = cycles.slice(start, start + pageSize)
   const createMutation = useMutation({
     mutationFn: (body: PerformanceCycleCreate) => mutations.performanceCycles.create(body),
     onSuccess: () => {
@@ -58,13 +69,34 @@ function AdminCyclesPage() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-stone-200 bg-stone-50/80">
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Name</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Dates</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Status</th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <Hash className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Name
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Dates
+                  </span>
+                </div>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-stone-500" />
+                  <span className="text-xs font-semibold text-stone-700">
+                    Status
+                  </span>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
-            {cycles.map((c) => (
+            {displayCycles.map((c) => (
               <tr key={c.id} className="hover:bg-stone-50/50">
                 <td className="px-4 py-3 font-medium text-stone-900">{c.name}</td>
                 <td className="px-4 py-3 text-stone-600">
@@ -79,6 +111,16 @@ function AdminCyclesPage() {
             ))}
           </tbody>
         </table>
+        <TablePagination
+          page={page}
+          pageSize={pageSize}
+          total={total}
+          onPageChange={setPage}
+          onPageSizeChange={(size) => {
+            setPageSize(size)
+            setPage(1)
+          }}
+        />
       </div>
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

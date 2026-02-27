@@ -2,6 +2,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { TablePagination } from '#/components/ui/table-pagination'
+import {
+  MainUserTable,
+  type MainUserTablePeopleRow,
+} from '#/components/main-user-table'
 import {
   usersQueryOptions,
   rolesQueryOptions,
@@ -29,6 +34,12 @@ function AdminUsersPage() {
   const { data: departments = [] } = useQuery(departmentsQueryOptions())
   const users = usersData?.items ?? []
 
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const total = users.length
+  const start = (page - 1) * pageSize
+  const displayUsers = users.slice(start, start + pageSize)
+
   const createMutation = useMutation({
     mutationFn: (body: UserCreate) => mutations.users.create(body),
     onSuccess: () => {
@@ -39,7 +50,19 @@ function AdminUsersPage() {
   })
 
   const roleById = Object.fromEntries(roles.map((r) => [r.id, r.name]))
-  const departmentById = Object.fromEntries(departments.map((d) => [d.id, d.name]))
+  const departmentById = Object.fromEntries(
+    departments.map((d) => [d.id, d.name]),
+  )
+  const supervisorById = Object.fromEntries(users.map((u) => [u.id, u.name]))
+
+  const tableData: MainUserTablePeopleRow[] = users.map((u) => ({
+    id: u.id,
+    name: u.name,
+    email: u.email ?? null,
+    role_id: u.role_id,
+    department_id: u.department_id,
+    supervisor_id: u.supervisor_id ?? null,
+  }))
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -65,28 +88,22 @@ function AdminUsersPage() {
           Create user
         </button>
       </div>
-      <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-stone-200 bg-stone-50/80">
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Name</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Role</th>
-              <th className="px-4 py-3 text-left font-semibold text-stone-700">Department</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
-            {users.map((u) => (
-              <tr key={u.id} className="hover:bg-stone-50/50">
-                <td className="px-4 py-3 font-medium text-stone-900">{u.name}</td>
-                <td className="px-4 py-3 text-stone-600">{roleById[u.role_id] ?? u.role_id}</td>
-                <td className="px-4 py-3 text-stone-600">
-                  {departmentById[u.department_id] ?? u.department_id}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <MainUserTable
+        variant="people"
+        data={tableData.slice(start, start + pageSize)}
+        roleById={roleById}
+        departmentById={departmentById}
+        supervisorById={supervisorById}
+        page={page}
+        pageSize={pageSize}
+        totalCount={total}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size)
+          setPage(1)
+        }}
+        className="rounded-xl shadow-sm"
+      />
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">

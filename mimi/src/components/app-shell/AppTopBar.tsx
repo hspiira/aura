@@ -6,6 +6,8 @@ import { useState, useRef, useEffect } from 'react'
 import { meQueryOptions } from '#/lib/queries'
 import { performanceCyclesQueryOptions } from '#/lib/queries'
 import { cn } from '#/lib/utils'
+import { apiPost } from '#/lib/api'
+import { clearAuth } from '#/stores/auth'
 import { setSelectedCycleId } from '#/stores/selected-cycle'
 import { useStore } from '@tanstack/react-store'
 import { selectedCycleStore } from '#/stores/selected-cycle'
@@ -94,9 +96,27 @@ export function AppTopBar() {
         </div>
 
         {/* Current user */}
-        <span className="text-sm font-medium text-stone-700 truncate max-w-[8rem]" title={displayName}>
+        <span
+          className="max-w-[8rem] truncate text-sm font-medium text-stone-700"
+          title={displayName}
+        >
           {displayName}
         </span>
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              await apiPost('auth/logout')
+            } catch {
+              // ignore failures; client-side clear is enough
+            }
+            clearAuth()
+            window.location.href = '/login'
+          }}
+          className="rounded-sm border border-stone-200 bg-stone-50 px-2.5 py-1.5 text-xs font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+        >
+          Sign out
+        </button>
       </div>
     </header>
   )

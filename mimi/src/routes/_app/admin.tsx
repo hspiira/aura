@@ -21,26 +21,28 @@ function AdminLayout() {
   const pathname = location.pathname
 
   return (
-    <div className="flex gap-6">
-      <nav className="w-48 shrink-0 space-y-0.5 rounded-xl border border-stone-200 bg-white p-2 shadow-sm">
-        <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-stone-400">
-          Admin
-        </p>
-        {ADMIN_LINKS.map(({ to, label }) => (
-          <Link
-            key={to}
-            to={to}
-            className={cn(
-              'block rounded-lg px-3 py-2 text-sm font-medium transition',
-              pathname === to || pathname.startsWith(to + '/')
-                ? 'bg-amber-100 text-amber-900'
-                : 'text-stone-600 hover:bg-stone-50 hover:text-stone-900',
-            )}
-          >
-            {label}
-          </Link>
-        ))}
-      </nav>
+    <div className="flex flex-col gap-4">
+      <div className="-mx-4 -mt-4 border-b border-stone-200 bg-white">
+        <nav className="flex h-12 items-stretch gap-1 px-4">
+          {ADMIN_LINKS.map(({ to, label }) => {
+            const isActive = pathname === to || pathname.startsWith(to + '/')
+            return (
+              <Link
+                key={to}
+                to={to}
+                className={cn(
+                  'inline-flex h-full items-center border-b-2 px-3 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'border-amber-500 text-amber-900'
+                    : 'border-transparent text-stone-600 hover:border-stone-300 hover:text-stone-900',
+                )}
+              >
+                {label}
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
       <main className="min-w-0 flex-1">
         <Outlet />
       </main>
