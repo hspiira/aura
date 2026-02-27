@@ -9,6 +9,9 @@ from app.infrastructure.persistence.models.notification_log import (
 from app.infrastructure.persistence.persist import persist_and_refresh
 
 
+MAX_LIMIT = 1000
+
+
 class NotificationLogRepository:
     """Repository for NotificationLog (append-only)."""
 
@@ -17,6 +20,7 @@ class NotificationLogRepository:
 
     async def list_all(self, limit: int = 100) -> list[NotificationLog]:
         """Return recent log entries (newest first)."""
+        limit = max(1, min(limit, MAX_LIMIT))
         result = await self._session.execute(
             select(NotificationLog)
             .order_by(NotificationLog.sent_at.desc())
@@ -28,6 +32,7 @@ class NotificationLogRepository:
         self, event_type: str, limit: int = 50
     ) -> list[NotificationLog]:
         """Return log entries for an event type."""
+        limit = max(1, min(limit, MAX_LIMIT))
         result = await self._session.execute(
             select(NotificationLog)
             .where(NotificationLog.event_type == event_type)

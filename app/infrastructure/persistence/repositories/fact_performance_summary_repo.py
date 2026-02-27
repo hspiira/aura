@@ -48,7 +48,21 @@ class FactPerformanceSummaryRepository:
 
     async def upsert(self, fact: FactPerformanceSummary) -> FactPerformanceSummary:
         """Insert or update one fact row (by user_id, performance_cycle_id)."""
-        return await persist_and_refresh(self._session, fact)
+        existing = await self.get_by_user_cycle(
+            user_id=fact.user_id,
+            performance_cycle_id=fact.performance_cycle_id,
+        )
+        if existing is None:
+            return await persist_and_refresh(self._session, fact)
+
+        existing.department_id = fact.department_id
+        existing.role_id = fact.role_id
+        existing.cycle_year = fact.cycle_year
+        existing.quantitative_score = fact.quantitative_score
+        existing.behavioral_score = fact.behavioral_score
+        existing.final_score = fact.final_score
+        existing.rating_band = fact.rating_band
+        return await self.refresh(existing)
 
     async def refresh(self, fact: FactPerformanceSummary) -> FactPerformanceSummary:
         """Flush and refresh an existing fact row."""

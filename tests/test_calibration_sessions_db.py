@@ -86,6 +86,7 @@ async def test_calibration_session_create_via_api(
     db_session, seed_phase1, override_db_dependency
 ) -> None:
     """POST /calibration-sessions creates a session and returns 201."""
+    _ = db_session
     from app.infrastructure.persistence.database import get_db_transactional
     from app.main import app
 

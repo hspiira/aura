@@ -2,7 +2,7 @@
 
 from datetime import date, datetime
 
-from sqlalchemy import Date, DateTime, Integer, String
+from sqlalchemy import CheckConstraint, Date, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -14,6 +14,12 @@ class DimCycle(Base):
     """Analytics dimension: performance cycle (ETL snapshot)."""
 
     __tablename__ = "dim_cycle"
+    __table_args__ = (
+        CheckConstraint(
+            "end_date >= start_date",
+            name="ck_dim_cycle_end_after_start",
+        ),
+    )
 
     id: Mapped[str] = mapped_column(
         String,

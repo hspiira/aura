@@ -100,6 +100,7 @@ async def test_baseline_snapshot_list_by_user_cycle(db_session, seed_phase1) -> 
     ids = {b.id for b in listed}
     assert s1.id in ids
     assert s2.id in ids
+    assert [b.id for b in listed] == [s2.id, s1.id]
 
 
 @pytest.mark.asyncio

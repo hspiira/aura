@@ -71,6 +71,10 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
             nullable=False,
         ),
+        sa.CheckConstraint(
+            "end_date >= start_date",
+            name="ck_dim_cycle_end_after_start",
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("cycle_id", name="uq_dim_cycle_cycle_id"),
     )

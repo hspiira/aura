@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, String, Text
+from sqlalchemy import DateTime, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -14,6 +14,10 @@ class NotificationLog(CuidMixin, Base):
     """Log entry for a notification sent (append-only)."""
 
     __tablename__ = "notification_logs"
+    __table_args__ = (
+        Index("ix_notification_logs_sent_at", "sent_at"),
+        Index("ix_notification_logs_event_type_sent_at", "event_type", "sent_at"),
+    )
 
     event_type: Mapped[str] = mapped_column(String(64), nullable=False)
     recipient_id: Mapped[str | None] = mapped_column(String(128), nullable=True)

@@ -27,7 +27,7 @@ class NotificationRule(CuidMixin, TimestampMixin, Base):
     channel: Mapped[str] = mapped_column(String(32), nullable=False)
     template_body: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    recipient_role: Mapped["Role"] = relationship(
+    recipient_role: Mapped[Role] = relationship(
         "Role",
         foreign_keys=[recipient_role_id],
     )

@@ -85,11 +85,33 @@ def test_kpi_type_matches_template_passes() -> None:
     assert result.valid is True
 
 
-def _template(kpi_type: str | None = "number") -> SimpleNamespace:
+def test_requires_baseline_snapshot_when_template_requires_it() -> None:
+    """Validation fails when template requires baseline but none exists."""
+    result = validate_objective(
+        title="A long enough objective title here",
+        kpi_type="number",
+        target_value=Decimal("80"),
+        weight=Decimal("100"),
+        start_date=date(2026, 1, 1),
+        end_date=date(2026, 12, 31),
+        cycle_start=date(2026, 1, 1),
+        cycle_end=date(2026, 12, 31),
+        template=_template(kpi_type="number", requires_baseline_snapshot=True),
+        other_weights_sum=Decimal("0"),
+        has_baseline_for_template=False,
+    )
+    assert result.valid is False
+    assert any("baseline" in e for e in result.errors)
+
+
+def _template(
+    kpi_type: str | None = "number",
+    requires_baseline_snapshot: bool = False,
+) -> SimpleNamespace:
     """Minimal template-like object for unit tests."""
     return SimpleNamespace(
         kpi_type=kpi_type,
         min_target=Decimal("0"),
         max_target=Decimal("100"),
-        requires_baseline_snapshot=False,
+        requires_baseline_snapshot=requires_baseline_snapshot,
     )

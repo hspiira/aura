@@ -364,6 +364,6 @@ async def test_validate_endpoint_returns_errors_when_invalid(
         data = response.json()
         assert data["valid"] is False
         assert isinstance(data["errors"], list)
-        assert len(data["errors"]) > 0
+        assert any("title must be at least" in e.lower() for e in data["errors"])
     finally:
         app.dependency_overrides.pop(get_db_transactional, None)
