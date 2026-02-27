@@ -4,10 +4,15 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.api.v1.dependencies import get_audit_log_repo, get_objective_template_repo
+from app.api.v1.dependencies import (
+    get_audit_log_repo,
+    get_objective_template_repo,
+    require_permission,
+)
 from app.core.audit import audit_log
 from app.core.auth import CurrentUserIdOptional
 from app.domain.exceptions import ResourceNotFoundException
+from app.domain.permissions import MANAGE_TEMPLATES
 from app.infrastructure.persistence.models.objective_template import (
     ObjectiveTemplate,
 )
@@ -41,6 +46,7 @@ async def create_objective_template(
     repo: Annotated[ObjectiveTemplateRepository, Depends(get_objective_template_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
     changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_TEMPLATES))],
 ) -> ObjectiveTemplateResponse:
     """Create an objective template."""
     template = ObjectiveTemplate(
@@ -86,6 +92,7 @@ async def update_objective_template(
     repo: Annotated[ObjectiveTemplateRepository, Depends(get_objective_template_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
     changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_TEMPLATES))],
 ) -> ObjectiveTemplateResponse:
     """Update an objective template. Returns 409 if template is in use in a started cycle."""
     template = await repo.get_by_id(id)
@@ -116,6 +123,7 @@ async def delete_objective_template(
     repo: Annotated[ObjectiveTemplateRepository, Depends(get_objective_template_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
     changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_TEMPLATES))],
 ) -> None:
     """Soft-deactivate an objective template. Returns 409 if in use in a started cycle."""
     template = await repo.get_by_id(id)

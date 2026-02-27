@@ -5,11 +5,16 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.api.v1.dependencies import get_audit_log_repo, get_reward_policy_repo
+from app.api.v1.dependencies import (
+    get_audit_log_repo,
+    get_reward_policy_repo,
+    require_permission,
+)
 from app.api.v1.helpers import get_one_or_raise
 from app.core.audit import audit_log
 from app.core.auth import CurrentUserIdOptional
 from app.domain.exceptions import ResourceNotFoundException
+from app.domain.permissions import MANAGE_REWARD_POLICY
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
 )
@@ -36,6 +41,7 @@ async def create_reward_policy(
     repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
     changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_REWARD_POLICY))],
 ) -> RewardPolicyResponse:
     """Create a reward policy band."""
     existing = await repo.list_all()

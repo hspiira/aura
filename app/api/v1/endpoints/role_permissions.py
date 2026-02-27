@@ -10,10 +10,12 @@ from app.api.v1.dependencies import (
     get_permission_repo,
     get_role_permission_repo,
     get_role_repo,
+    require_permission,
 )
 from app.api.v1.helpers import get_one_or_raise
 from app.core.audit import audit_log
 from app.core.auth import CurrentUserIdOptional
+from app.domain.permissions import MANAGE_RBAC
 from app.infrastructure.persistence.models.role_permission import RolePermission
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
@@ -51,6 +53,7 @@ async def assign_permission_to_role(
     role_repo: Annotated[RoleRepository, Depends(get_role_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
     changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_RBAC))],
 ) -> RolePermissionResponse:
     """Assign permission to role (idempotent: returns existing if already assigned)."""
     existing = await repo.get_by_role_and_permission(
@@ -98,6 +101,7 @@ async def remove_role_permission(
     repo: Annotated[RolePermissionRepository, Depends(get_role_permission_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
     changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_RBAC))],
 ) -> None:
     """Remove a role-permission assignment by id."""
     rp = await get_one_or_raise(repo.get_by_id(id), id, "RolePermission")

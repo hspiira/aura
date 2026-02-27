@@ -7,12 +7,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.api.v1.dependencies import (
     get_audit_log_repo,
     get_baseline_snapshot_repo,
+    get_notification_log_repo,
+    get_notification_rule_repo,
     get_objective_repo,
     get_objective_score_repo,
     get_objective_template_repo,
     get_objective_update_repo,
     get_performance_cycle_repo,
     get_performance_dimension_repo,
+    get_user_repo,
     require_permission,
 )
 from app.domain.permissions import APPROVE_OBJECTIVES, EDIT_OBJECTIVES
@@ -48,6 +51,14 @@ from app.infrastructure.persistence.repositories.objective_update_repo import (
 from app.infrastructure.persistence.repositories.performance_cycle_repo import (
     PerformanceCycleRepository,
 )
+from app.infrastructure.persistence.repositories.notification_log_repo import (
+    NotificationLogRepository,
+)
+from app.infrastructure.persistence.repositories.notification_rule_repo import (
+    NotificationRuleRepository,
+)
+from app.infrastructure.persistence.repositories.user_repo import UserRepository
+from app.application.notification_service import emit_event
 from app.infrastructure.persistence.repositories.performance_dimension_repo import (
     PerformanceDimensionRepository,
 )
@@ -292,6 +303,13 @@ async def lock_objective(
     score_repo: Annotated[ObjectiveScoreRepository, Depends(get_objective_score_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
     changed_by: CurrentUserIdOptional,
+    notification_rule_repo: Annotated[
+        NotificationRuleRepository, Depends(get_notification_rule_repo)
+    ],
+    notification_log_repo: Annotated[
+        NotificationLogRepository, Depends(get_notification_log_repo)
+    ],
+    user_repo: Annotated[UserRepository, Depends(get_user_repo)],
     _perm: Annotated[None, Depends(require_permission(APPROVE_OBJECTIVES))],
 ) -> ObjectiveResponse:
     """Lock objective and its score (no further edits; score immutable)."""
@@ -309,5 +327,16 @@ async def lock_objective(
         action="lock",
         new_value={"locked_at": now.isoformat()},
         changed_by=changed_by,
+    )
+    await emit_event(
+        event_type="objective_locked",
+        context={
+            "objective_id": objective.id,
+            "user_id": objective.user_id,
+            "performance_cycle_id": objective.performance_cycle_id,
+        },
+        rule_repo=notification_rule_repo,
+        log_repo=notification_log_repo,
+        user_repo=user_repo,
     )
     return ObjectiveResponse.model_validate(objective)

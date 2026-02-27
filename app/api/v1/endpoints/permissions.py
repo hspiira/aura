@@ -4,10 +4,15 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.api.v1.dependencies import get_audit_log_repo, get_permission_repo
+from app.api.v1.dependencies import (
+    get_audit_log_repo,
+    get_permission_repo,
+    require_permission,
+)
 from app.api.v1.helpers import get_one_or_raise
 from app.core.audit import audit_log
 from app.core.auth import CurrentUserIdOptional
+from app.domain.permissions import MANAGE_RBAC
 from app.infrastructure.persistence.models.permission import Permission
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
@@ -35,6 +40,7 @@ async def create_permission(
     repo: Annotated[PermissionRepository, Depends(get_permission_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
     changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_RBAC))],
 ) -> PermissionResponse:
     """Create a permission."""
     existing = await repo.get_by_code(payload.code)

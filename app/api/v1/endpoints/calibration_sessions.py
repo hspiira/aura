@@ -7,10 +7,12 @@ from fastapi import APIRouter, Depends, Query
 from app.api.v1.dependencies import (
     get_audit_log_repo,
     get_calibration_session_repo,
+    require_permission,
 )
 from app.api.v1.helpers import get_one_or_raise
 from app.core.audit import audit_log
 from app.core.auth import CurrentUserIdOptional
+from app.domain.permissions import RUN_CALIBRATION
 from app.infrastructure.persistence.models.calibration_session import (
     CalibrationSession,
 )
@@ -58,6 +60,7 @@ async def create_calibration_session(
     ],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
     changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(RUN_CALIBRATION))],
 ) -> CalibrationSessionResponse:
     """Create a calibration session."""
     session = CalibrationSession(
