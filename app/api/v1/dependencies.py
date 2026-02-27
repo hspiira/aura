@@ -24,6 +24,9 @@ from app.infrastructure.persistence.repositories.behavioral_score_repo import (
 from app.infrastructure.persistence.repositories.department_repo import (
     DepartmentRepository,
 )
+from app.infrastructure.persistence.repositories.fact_performance_summary_repo import (
+    FactPerformanceSummaryRepository,
+)
 from app.infrastructure.persistence.repositories.objective_evidence_repo import (
     ObjectiveEvidenceRepository,
 )
@@ -242,3 +245,10 @@ async def get_notification_log_repo(
 ) -> NotificationLogRepository:
     """Yield notification log repository."""
     return NotificationLogRepository(session)
+
+
+async def get_fact_performance_summary_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> FactPerformanceSummaryRepository:
+    """Yield analytics fact repository."""
+    return FactPerformanceSummaryRepository(session)

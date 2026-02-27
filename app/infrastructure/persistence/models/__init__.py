@@ -12,6 +12,11 @@ from app.infrastructure.persistence.models.behavioral_indicator import (
 )
 from app.infrastructure.persistence.models.behavioral_score import BehavioralScore
 from app.infrastructure.persistence.models.department import Department
+from app.infrastructure.persistence.models.dim_cycle import DimCycle
+from app.infrastructure.persistence.models.dim_time import DimTime
+from app.infrastructure.persistence.models.fact_performance_summary import (
+    FactPerformanceSummary,
+)
 from app.infrastructure.persistence.models.objective import Objective
 from app.infrastructure.persistence.models.objective_evidence import (
     ObjectiveEvidence,
@@ -54,6 +59,9 @@ __all__ = [
     "BehavioralScore",
     "CalibrationSession",
     "Department",
+    "DimCycle",
+    "DimTime",
+    "FactPerformanceSummary",
     "Objective",
     "ObjectiveEvidence",
     "ObjectiveScore",
