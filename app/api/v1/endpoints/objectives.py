@@ -222,6 +222,20 @@ async def amend_objective(
             detail="Only approved or active objectives can be amended.",
         )
 
+    # Reject no-op amendments where neither target_value nor weight changes.
+    effective_target = (
+        objective.target_value if payload.target_value is None else payload.target_value
+    )
+    effective_weight = objective.weight if payload.weight is None else payload.weight
+    if (
+        effective_target == objective.target_value
+        and effective_weight == objective.weight
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="At least one of target_value or weight must change.",
+        )
+
     existing_versions = await version_repo.list_by_objective(objective.id)
     next_version = existing_versions[-1].version + 1 if existing_versions else 1
 
@@ -267,7 +281,7 @@ async def amend_objective(
                 else None
             ),
             "weight": str(objective.weight),
-            "justification": payload.justification,
+            "justification_provided": True,
             "version": next_version,
         },
         changed_by=changed_by,
@@ -431,15 +445,19 @@ async def lock_objective(
         new_value={"locked_at": now.isoformat()},
         changed_by=changed_by,
     )
-    await emit_event(
-        event_type="objective_locked",
-        context={
-            "objective_id": objective.id,
-            "user_id": objective.user_id,
-            "performance_cycle_id": objective.performance_cycle_id,
-        },
-        rule_repo=notification_rule_repo,
-        log_repo=notification_log_repo,
-        user_repo=user_repo,
-    )
+    try:
+        await emit_event(
+            event_type="objective_locked",
+            context={
+                "objective_id": objective.id,
+                "user_id": objective.user_id,
+                "performance_cycle_id": objective.performance_cycle_id,
+            },
+            rule_repo=notification_rule_repo,
+            log_repo=notification_log_repo,
+            user_repo=user_repo,
+        )
+    except Exception:
+        # Keep objective lock durable; emit via outbox/background retry instead.
+        pass
     return ObjectiveResponse.model_validate(objective)

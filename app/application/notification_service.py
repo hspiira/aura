@@ -8,6 +8,7 @@ from __future__ import annotations
 from typing import Any
 
 from app.infrastructure.persistence.models.notification_log import NotificationLog
+from app.infrastructure.persistence.models.user import User
 from app.infrastructure.persistence.repositories.notification_log_repo import (
     NotificationLogRepository,
 )
@@ -23,6 +24,7 @@ async def emit_event(
     rule_repo: NotificationRuleRepository,
     log_repo: NotificationLogRepository,
     user_repo: UserRepository,
+    pre_fetched_users: list[User] | None = None,
 ) -> None:
     """Emit an event: resolve rules, recipients, and append NotificationLog entries.
 
@@ -35,7 +37,12 @@ async def emit_event(
         return
 
     # Load all users once and group by role_id for simple recipient resolution.
-    users = await user_repo.list_all()
+    # Callers may optionally pass pre_fetched_users to avoid repeated queries.
+    users = (
+        pre_fetched_users
+        if pre_fetched_users is not None
+        else await user_repo.list_all()
+    )
     users_by_role: dict[str, list[str]] = {}
     for user in users:
         users_by_role.setdefault(user.role_id, []).append(user.id)
@@ -49,11 +56,16 @@ async def emit_event(
             error_message: str | None = None
             status = "sent"
 
-            # Render template if present; errors are non-fatal and recorded.
+            # Render template if present to validate it against the context;
+            # the rendered body is not currently persisted in NotificationLog.
             if rule.template_body:
                 try:
                     _ = rule.template_body.format(**context)
-                except Exception as exc:  # pragma: no cover - defensive
+                except (
+                    KeyError,
+                    ValueError,
+                    IndexError,
+                ) as exc:  # pragma: no cover - defensive
                     status = "error"
                     error_message = f"template render failed: {exc}"
 

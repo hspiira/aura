@@ -3,7 +3,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class ObjectiveCreate(BaseModel):
@@ -35,6 +35,15 @@ class ObjectiveAmend(BaseModel):
     target_value: Decimal | None = None
     weight: Decimal | None = None
     justification: str
+
+    @field_validator("justification")
+    @classmethod
+    def _validate_amendment(cls, value: str, info):
+        if info.data.get("target_value") is None and info.data.get("weight") is None:
+            raise ValueError(
+                "At least one of target_value or weight must be provided"
+            )
+        return value
 
 
 class ObjectiveResponse(BaseModel):

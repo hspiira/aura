@@ -104,10 +104,7 @@ async def compute_summary(
         "performance_summary",
         summary.id,
         "compute",
-        new_value={
-            "user_id": summary.user_id,
-            "performance_cycle_id": summary.performance_cycle_id,
-        },
+        new_value={"computed": True},
         changed_by=changed_by,
     )
     return PerformanceSummaryResponse.model_validate(summary)
@@ -151,7 +148,7 @@ async def update_performance_summary(
         id,
         "update_metadata",
         new_value={
-            "final_rating_band": payload.final_rating_band is not None,
+            "final_rating_band": payload.final_rating_band,
             "hr_approved": payload.hr_approved,
         },
         changed_by=changed_by,

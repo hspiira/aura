@@ -60,7 +60,12 @@ async def run_smart_validation(
         )
         has_baseline = baseline is not None
     dimension = await dimension_repo.get_by_id(objective.dimension_id)
-    is_behavioral = dimension is not None and dimension.name.lower() == "behavioral"
+    if dimension is None:
+        return ValidateObjectiveResponse(
+            valid=False,
+            errors=["performance dimension not found"],
+        )
+    is_behavioral = dimension.name.lower() == "behavioral"
     is_custom = template is None
 
     result = validate_objective(
@@ -76,7 +81,7 @@ async def run_smart_validation(
         other_weights_sum=other_weights,
         has_baseline_for_template=has_baseline,
         last_achievement_value=last_achievement_value,
-        justification_for_lower_target=justification_for_lower_target or None,
+        justification_for_lower_target=justification_for_lower_target,
         is_custom_objective=is_custom,
         is_behavioral_dimension=is_behavioral,
     )

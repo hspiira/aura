@@ -13,13 +13,22 @@ class ObjectiveFlagRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
+    async def list_by_type(self, flag_type: str) -> list[ObjectiveFlag]:
+        """Return all flags of a given type."""
+        result = await self._session.execute(
+            select(ObjectiveFlag).where(ObjectiveFlag.flag_type == flag_type)
+        )
+        return list(result.scalars().all())
+
     async def has_flag(self, objective_id: str, flag_type: str) -> bool:
         """Return True if this objective already has this flag type."""
         result = await self._session.execute(
-            select(ObjectiveFlag).where(
+            select(ObjectiveFlag.id)
+            .where(
                 ObjectiveFlag.objective_id == objective_id,
                 ObjectiveFlag.flag_type == flag_type,
             )
+            .limit(1)
         )
         return result.scalar_one_or_none() is not None
 

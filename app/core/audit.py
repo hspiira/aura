@@ -4,6 +4,17 @@ from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
 )
 
+SENSITIVE_KEYS = {"email", "phone", "ssn", "token", "password"}
+
+
+def _redact(value: dict | None) -> dict | None:
+    if value is None:
+        return None
+    return {
+        k: ("[REDACTED]" if k.lower() in SENSITIVE_KEYS else v)
+        for k, v in value.items()
+    }
+
 
 async def audit_log(
     repo: AuditLogRepository,
@@ -19,7 +30,7 @@ async def audit_log(
         entity_type=entity_type,
         entity_id=entity_id,
         action=action,
-        old_value=old_value,
-        new_value=new_value,
+        old_value=_redact(old_value),
+        new_value=_redact(new_value),
         changed_by=changed_by,
     )

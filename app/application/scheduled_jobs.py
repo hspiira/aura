@@ -1,11 +1,9 @@
 """Scheduled governance jobs: auto-lock objectives by date, 90-day stale flags."""
 
 import logging
-from datetime import date, timedelta, timezone
+from datetime import UTC, date, timedelta
 
 from app.infrastructure.persistence.database import get_db_transactional
-from app.infrastructure.persistence.models.objective import Objective
-from app.infrastructure.persistence.models.objective_score import ObjectiveScore
 from app.shared.utils.datetime import utc_now
 
 logger = logging.getLogger(__name__)
@@ -46,6 +44,7 @@ async def run_objectives_lock_job() -> None:
         notification_rule_repo = NotificationRuleRepository(session)
         notification_log_repo = NotificationLogRepository(session)
         user_repo = UserRepository(session)
+        users = await user_repo.list_all()
 
         cycles = await cycle_repo.list_cycles_pending_objectives_lock(today)
         for cycle in cycles:
@@ -64,14 +63,15 @@ async def run_objectives_lock_job() -> None:
                     new_value={"locked_at": now.isoformat()},
                     changed_by=None,
                 )
+            await cycle_repo.set_objectives_locked_at(cycle, now)
             if to_lock:
-                await cycle_repo.set_objectives_locked_at(cycle, now)
                 logger.info(
                     "Locked %d objectives for cycle %s",
                     len(to_lock),
                     cycle.id,
                 )
-                # Emit a single objective_locked event per cycle run with summary context.
+                # Emit a single objective_locked event per cycle run
+                # with summary context.
                 await emit_event(
                     event_type="objective_locked",
                     context={
@@ -82,6 +82,7 @@ async def run_objectives_lock_job() -> None:
                     rule_repo=notification_rule_repo,
                     log_repo=notification_log_repo,
                     user_repo=user_repo,
+                    pre_fetched_users=users,
                 )
 
 
@@ -106,16 +107,19 @@ async def run_stale_update_flags_job() -> None:
         last_update_map = await update_repo.get_last_update_at_by_objective()
         objectives = await objective_repo.list_all()
         unlocked = [o for o in objectives if o.locked_at is None]
+
+        existing_flags = await flag_repo.list_by_type(STALE_FLAG_TYPE)
+        flagged_ids = {f.objective_id for f in existing_flags}
+
         added = 0
         for obj in unlocked:
             last_activity = last_update_map.get(obj.id) or obj.created_at
             if not last_activity:
                 continue
             if last_activity.tzinfo is None:
-                last_activity = last_activity.replace(tzinfo=timezone.utc)
-            if last_activity < cutoff:
-                if not await flag_repo.has_flag(obj.id, STALE_FLAG_TYPE):
-                    await flag_repo.add_flag(obj.id, STALE_FLAG_TYPE)
-                    added += 1
+                last_activity = last_activity.replace(tzinfo=UTC)
+            if last_activity < cutoff and obj.id not in flagged_ids:
+                await flag_repo.add_flag(obj.id, STALE_FLAG_TYPE)
+                added += 1
         if added:
             logger.info("Set stale_update flag on %d objectives", added)

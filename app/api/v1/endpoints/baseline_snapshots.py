@@ -64,7 +64,7 @@ async def create_baseline_snapshot(
         "baseline_snapshot",
         snapshot.id,
         "create",
-        new_value={"user_id": snapshot.user_id, "template_id": snapshot.template_id},
+        new_value={"template_id": snapshot.template_id},
         changed_by=changed_by,
     )
     return BaselineSnapshotResponse.model_validate(snapshot)

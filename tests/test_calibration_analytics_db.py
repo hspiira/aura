@@ -64,15 +64,18 @@ async def test_calibration_analytics_endpoints_require_permission(
     db_session, seed_phase1, override_db_dependency
 ):
     """Endpoints should be wired and reachable (permission checked by dependency)."""
-    from app.api.main import app
+    from app.main import app
     from app.infrastructure.persistence.database import get_db_transactional
 
     app.dependency_overrides[get_db_transactional] = override_db_dependency
 
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        resp = await client.get(
-            "/api/v1/analytics/calibration/distribution",
-            params={"cycle_id": seed_phase1["performance_cycle_id"]},
-        )
+    try:
+        async with AsyncClient(app=app, base_url="http://test") as client:
+            resp = await client.get(
+                "/api/v1/analytics/calibration/distribution",
+                params={"cycle_id": seed_phase1["performance_cycle_id"]},
+            )
+    finally:
+        app.dependency_overrides.pop(get_db_transactional, None)
     # When RBAC denies, this is 403; when allowed, 200. Just assert not 404.
     assert resp.status_code in (200, 403)

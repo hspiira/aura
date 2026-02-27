@@ -10,7 +10,7 @@ from app.application.scheduled_jobs import (
     run_objectives_lock_job,
     run_stale_update_flags_job,
 )
-from app.infrastructure.persistence.database import _ensure_engine, engine
+from app.infrastructure.persistence import database as db
 
 # When running multiple Uvicorn workers, run the scheduler in a single process
 # (e.g. a dedicated worker or set workers=1) so the lock/flag jobs run once.
@@ -19,10 +19,7 @@ from app.infrastructure.persistence.database import _ensure_engine, engine
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Lifespan context: ensure DB engine, start scheduler, dispose on shutdown."""
-    try:
-        _ensure_engine()
-    except Exception:
-        pass
+    db._ensure_engine()
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
         run_objectives_lock_job,
@@ -41,5 +38,5 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     scheduler.start()
     yield
     scheduler.shutdown(wait=False)
-    if engine is not None:
-        engine.sync_engine.dispose()
+    if db.engine is not None:
+        await db.engine.dispose()

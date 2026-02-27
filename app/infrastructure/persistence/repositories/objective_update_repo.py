@@ -39,7 +39,7 @@ class ObjectiveUpdateRepository:
         return update
 
     async def get_last_update_at_by_objective(self) -> dict[str, datetime]:
-        """Return mapping of objective_id -> latest update created_at (for staleness)."""
+        """Return mapping of objective_id to latest update timestamp for staleness."""
         result = await self._session.execute(
             select(
                 ObjectiveUpdate.objective_id,

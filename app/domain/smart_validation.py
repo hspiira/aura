@@ -126,13 +126,15 @@ def validate_objective(
     # Anti-gaming: custom objectives max 30% weight
     if is_custom_objective and weight > max_custom_weight:
         errors.append(
-            f"custom objectives may not exceed {max_custom_weight}% weight (current: {weight}%)"
+            f"custom objectives may not exceed {max_custom_weight}% weight "
+            f"(current: {weight}%)"
         )
 
     # Anti-gaming: free-text (no template) only allowed for Behavioral dimension
     if not is_behavioral_dimension and template is None:
         errors.append(
-            "free-text objectives (no template) are only allowed for Behavioral dimension"
+            "free-text objectives (no template) are only allowed "
+            "for Behavioral dimension"
         )
 
     return ValidationResult(valid=len(errors) == 0, errors=errors)

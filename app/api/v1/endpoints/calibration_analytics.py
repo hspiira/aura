@@ -24,16 +24,16 @@ router = APIRouter()
 
 @router.get("/distribution", response_model=list[DistributionBucket])
 async def get_calibration_distribution(
+    repo: Annotated[
+        FactPerformanceSummaryRepository,
+        Depends(get_fact_performance_summary_repo),
+    ],
+    _perm: Annotated[None, Depends(require_permission(RUN_CALIBRATION))],
     cycle_id: str = Query(..., description="Performance cycle ID"),
     department_id: str | None = Query(
         None,
         description="Optional department filter",
     ),
-    repo: Annotated[
-        FactPerformanceSummaryRepository,
-        Depends(get_fact_performance_summary_repo),
-    ] = None,
-    _perm: Annotated[None, Depends(require_permission(RUN_CALIBRATION))] = None,
 ) -> list[DistributionBucket]:
     """Return distribution of final scores for a cycle (and optional department)."""
     return await get_distribution(repo, cycle_id=cycle_id, department_id=department_id)
@@ -41,16 +41,16 @@ async def get_calibration_distribution(
 
 @router.get("/variance", response_model=list[VarianceItem])
 async def get_calibration_variance(
+    repo: Annotated[
+        FactPerformanceSummaryRepository,
+        Depends(get_fact_performance_summary_repo),
+    ],
+    _perm: Annotated[None, Depends(require_permission(RUN_CALIBRATION))],
     cycle_id: str = Query(..., description="Performance cycle ID"),
     department_id: str | None = Query(
         None,
         description="Optional department filter",
     ),
-    repo: Annotated[
-        FactPerformanceSummaryRepository,
-        Depends(get_fact_performance_summary_repo),
-    ] = None,
-    _perm: Annotated[None, Depends(require_permission(RUN_CALIBRATION))] = None,
 ) -> list[VarianceItem]:
     """Return variance statistics by department for a cycle."""
     return await get_variance(repo, cycle_id=cycle_id, department_id=department_id)

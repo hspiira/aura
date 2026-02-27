@@ -1,9 +1,10 @@
 """ObjectiveVersion repository for amendment history snapshots."""
 
 from datetime import datetime
-from typing import Sequence
+from collections.abc import Sequence
 
-from sqlalchemy import Select, select
+from sqlalchemy import select
+from sqlalchemy.sql.elements import Select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.persistence.models.objective import Objective

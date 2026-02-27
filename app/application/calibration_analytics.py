@@ -3,7 +3,7 @@
 from collections import Counter, defaultdict
 from decimal import Decimal
 from math import sqrt
-from typing import Iterable
+from collections.abc import Iterable
 
 from pydantic import BaseModel
 
@@ -111,7 +111,8 @@ async def get_variance(
     items: list[VarianceItem] = []
     for dept_id, scores in scores_by_dept.items():
         mean, std = _compute_mean_std(scores)
-        is_outlier = mean > mean_threshold or std < std_threshold
+        # Flag as outlier only when scores are both high and tightly clustered.
+        is_outlier = mean > mean_threshold and std < std_threshold
         items.append(
             VarianceItem(
                 department_id=dept_id,

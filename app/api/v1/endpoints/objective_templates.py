@@ -106,7 +106,7 @@ async def update_objective_template(
             status_code=409,
             detail="Template is in use in a started cycle and cannot be modified.",
         )
-    update_data = payload.model_dump(exclude_unset=True)
+    update_data = payload.model_dump(exclude_unset=True, mode="json")
     if not update_data:
         return ObjectiveTemplateResponse.model_validate(template)
 

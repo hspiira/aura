@@ -12,10 +12,24 @@ from app.infrastructure.persistence.models.objective_template import (
 from app.infrastructure.persistence.models.performance_cycle import (
     PerformanceCycle,
 )
+from app.shared.utils.datetime import utc_now
 
 
 class ObjectiveTemplateRepository:
     """Repository for ObjectiveTemplate entities."""
+
+    _UPDATABLE_FIELDS = frozenset(
+        {
+            "title",
+            "description",
+            "kpi_type",
+            "default_weight",
+            "min_target",
+            "max_target",
+            "requires_baseline_snapshot",
+            "is_active",
+        }
+    )
 
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
@@ -61,7 +75,7 @@ class ObjectiveTemplateRepository:
         self, template_id: str, on_date: date | None = None
     ) -> bool:
         """True if any objective using this template is in a cycle already started."""
-        today = on_date or date.today()
+        today = on_date or utc_now().date()
         result = await self._session.execute(
             select(1)
             .select_from(Objective)
@@ -80,10 +94,20 @@ class ObjectiveTemplateRepository:
     async def update(
         self, template: ObjectiveTemplate, **kwargs: object
     ) -> ObjectiveTemplate:
-        """Update template fields (caller must ensure immutability)."""
+        """Update mutable template fields (id/code/version remain immutable)."""
         for key, value in kwargs.items():
-            if hasattr(template, key):
+            if key in self._UPDATABLE_FIELDS:
                 setattr(template, key, value)
+            elif key not in {
+                "id",
+                "code",
+                "version",
+                "superseded_by_id",
+                "created_at",
+                "updated_at",
+            }:
+                # Unknown or disallowed fields are ignored.
+                continue
         await self._session.flush()
         await self._session.refresh(template)
         return template
