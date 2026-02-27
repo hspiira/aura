@@ -8,7 +8,6 @@ from app.infrastructure.persistence.models.notification_log import (
 )
 from app.infrastructure.persistence.persist import persist_and_refresh
 
-
 MAX_LIMIT = 1000
 
 

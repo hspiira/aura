@@ -36,15 +36,11 @@ class ReviewSessionRepository:
         )
         return list(result.scalars().all())
 
-    async def list_by_cycle(
-        self, performance_cycle_id: str
-    ) -> list[ReviewSession]:
+    async def list_by_cycle(self, performance_cycle_id: str) -> list[ReviewSession]:
         """Return sessions for a performance cycle."""
         result = await self._session.execute(
             select(ReviewSession)
-            .where(
-                ReviewSession.performance_cycle_id == performance_cycle_id
-            )
+            .where(ReviewSession.performance_cycle_id == performance_cycle_id)
             .order_by(
                 ReviewSession.user_id,
                 ReviewSession.scheduled_at.desc().nullslast(),

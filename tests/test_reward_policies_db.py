@@ -179,7 +179,7 @@ async def test_reward_policy_band_endpoint_returns_matching_band(
 
 @pytest.mark.asyncio
 async def test_reward_policy_band_endpoint_returns_404_when_no_band(
-    override_db_dependency
+    override_db_dependency,
 ) -> None:
     """GET /reward-policies/band?score=... returns 404 when no band contains score."""
     from app.infrastructure.persistence.database import get_db_transactional

@@ -53,8 +53,13 @@ async def create_behavioral_score(
     """Create a behavioral score (rating within indicator's scale for user/cycle/indicator)."""
     indicator = await indicator_repo.get_by_id(payload.indicator_id)
     if indicator is None:
-        raise HTTPException(404, f"BehavioralIndicator {payload.indicator_id!r} not found")
-    if payload.rating < indicator.rating_scale_min or payload.rating > indicator.rating_scale_max:
+        raise HTTPException(
+            404, f"BehavioralIndicator {payload.indicator_id!r} not found"
+        )
+    if (
+        payload.rating < indicator.rating_scale_min
+        or payload.rating > indicator.rating_scale_max
+    ):
         raise HTTPException(
             400,
             f"rating must be between {indicator.rating_scale_min} and {indicator.rating_scale_max} "
