@@ -6,13 +6,11 @@ import {
   Scripts,
 } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
-import { useEffect } from 'react'
 import { AppErrorPage, NotFoundPage } from '#/components/error-pages'
 import { wireApiAuth } from '#/lib/api-auth-wire'
-import { authStore, setAuth } from '#/stores/auth'
 
-// Wire token getter and 401 handler at module load time — runs before any render,
-// including SSR. The functions are no-ops when window is undefined.
+// Wire token getter, refresh handler, and 401 handler at module load time —
+// runs before any render, including SSR. The functions are no-ops when window is undefined.
 wireApiAuth()
 
 export const Route = createRootRoute({
@@ -29,22 +27,6 @@ export const Route = createRootRoute({
 })
 
 function RootComponent() {
-  // Rehydrate auth from localStorage after client mount (SSR may have left store empty)
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    try {
-      const raw = localStorage.getItem('aura_auth')
-      if (!raw) return
-      const data = JSON.parse(raw) as { token?: string; userId?: string }
-      const token = typeof data.token === 'string' ? data.token : null
-      if (token && authStore.state.token !== token) {
-        setAuth(token, data.userId ?? null)
-      }
-    } catch {
-      // ignore
-    }
-  }, [])
-
   return (
     <RootDocument>
       <Outlet />

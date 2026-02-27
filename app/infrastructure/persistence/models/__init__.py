@@ -18,6 +18,7 @@ from app.infrastructure.persistence.models.fact_performance_summary import (
     FactPerformanceSummary,
 )
 from app.infrastructure.persistence.models.notification_log import NotificationLog
+from app.infrastructure.persistence.models.refresh_token import RefreshToken
 from app.infrastructure.persistence.models.notification_outbox import NotificationOutbox
 from app.infrastructure.persistence.models.notification_rule import (
     NotificationRule,
@@ -76,6 +77,7 @@ __all__ = [
     "NotificationLog",
     "NotificationRule",
     "NotificationOutbox",
+    "RefreshToken",
     "Organization",
     "Permission",
     "PerformanceCycle",

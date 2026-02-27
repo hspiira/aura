@@ -1,8 +1,13 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { ApiError, apiGet } from '#/lib/api'
-import type { PageResponse, UserResponse } from '#/lib/types'
-import { setAuth } from '#/stores/auth'
+import { ApiError, apiPost } from '#/lib/api'
+import { setAccessToken } from '#/stores/auth'
+
+interface TokenResponse {
+  access_token: string
+  token_type: string
+  expires_in: number
+}
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
@@ -10,28 +15,30 @@ export const Route = createFileRoute('/login')({
 
 function LoginPage() {
   const navigate = useNavigate()
-  const [token, setToken] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const value = token.trim()
-    if (!value) {
-      setError('Enter your token.')
+    if (!email.trim() || !password) {
+      setError('Enter your email and password.')
       return
     }
     setError(null)
     setLoading(true)
     try {
-      // Validate token with an authenticated endpoint (health is unauthenticated)
-      await apiGet<PageResponse<UserResponse>>('users?limit=1', { token: value })
-      setAuth(value, null)
+      const res = await apiPost<TokenResponse, { email: string; password: string }>(
+        'auth/login',
+        { email: email.trim(), password },
+      )
+      setAccessToken(res.access_token)
       navigate({ to: '/dashboard' })
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 401
-          ? 'Invalid or expired token.'
+          ? 'Invalid email or password.'
           : 'Something went wrong. Try again.',
       )
     } finally {
@@ -53,24 +60,43 @@ function LoginPage() {
             Sign in
           </h1>
           <p className="mt-1 text-[13px] text-stone-500">
-            Paste your bearer token below. Tokens are issued by an admin.
+            Sign in with your email and password.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <div>
-              <label htmlFor="token" className="sr-only">
-                Bearer token
+              <label htmlFor="email" className="block text-[13px] font-medium text-stone-700 mb-1">
+                Email
               </label>
               <input
-                id="token"
-                type="password"
-                autoComplete="off"
-                value={token}
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
                 onChange={(e) => {
-                  setToken(e.target.value)
+                  setEmail(e.target.value)
                   setError(null)
                 }}
-                placeholder="Paste your token"
+                placeholder="you@company.com"
+                className="w-full rounded-sm border border-stone-300 bg-stone-50/50 px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-600/60 focus:outline-none focus:ring-1 focus:ring-amber-600/40"
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-[13px] font-medium text-stone-700 mb-1">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setError(null)
+                }}
+                placeholder="Enter your password"
                 className="w-full rounded-sm border border-stone-300 bg-stone-50/50 px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-600/60 focus:outline-none focus:ring-1 focus:ring-amber-600/40"
                 disabled={loading}
               />
@@ -87,7 +113,7 @@ function LoginPage() {
               disabled={loading}
               className="w-full rounded-sm bg-stone-900 px-4 py-2.5 text-sm font-medium text-stone-50 transition hover:bg-stone-800 disabled:opacity-60"
             >
-              {loading ? 'Checking…' : 'Sign in'}
+              {loading ? 'Signing in…' : 'Sign in'}
             </button>
           </form>
         </div>

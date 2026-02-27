@@ -913,6 +913,11 @@ export const mutations = {
       apiPost<UserTokenCreateResponse, UserTokenCreateRequest>('user-tokens', body),
     revoke: (id: string) => apiPost<void>(`user-tokens/${id}/revoke`),
   },
+  auth: {
+    login: (body: { email: string; password: string }) =>
+      apiPost<{ access_token: string; token_type: string; expires_in: number }>('auth/login', body),
+    logout: () => apiPost<void>('auth/logout'),
+  },
   analytics: {
     refresh: () => apiPost<unknown>('analytics/refresh'),
     refreshOptions: () => ({ mutationKey: queryKeys.analytics.refreshStatus } as const),

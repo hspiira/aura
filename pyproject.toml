@@ -13,6 +13,8 @@ dependencies = [
     "asyncpg>=0.29.0",
     "alembic>=1.13.0",
     "apscheduler>=3.10.0",
+    "pyjwt>=2.9.0",
+    "argon2-cffi>=23.1.0",
 ]
 
 [project.optional-dependencies]

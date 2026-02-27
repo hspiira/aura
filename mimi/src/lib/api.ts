@@ -1,6 +1,6 @@
 /**
  * Typed HTTP client for the FastAPI backend.
- * Attaches Authorization: Bearer <token>, handles 401 by invoking onUnauthorized.
+ * Attaches Authorization: Bearer <JWT>, handles 401 with automatic token refresh.
  */
 
 const env = import.meta.env as unknown as { VITE_API_BASE?: string }
@@ -24,14 +24,22 @@ export interface ApiRequestOptions<TBody = unknown> {
   headers?: Record<string, string>
   /** Optional: override token (e.g. for login flow). If not provided, getToken() is used. */
   token?: string | null
+  /** Skip automatic token refresh on 401 (used internally to prevent loops) */
+  _skipRefresh?: boolean
 }
 
 export type GetToken = () => string | null
+export type RefreshFn = () => Promise<string | null>
 
 let getToken: GetToken = () => null
+let refreshTokenFn: RefreshFn | null = null
 
 export function setApiTokenGetter(fn: GetToken) {
   getToken = fn
+}
+
+export function setApiRefreshFn(fn: RefreshFn) {
+  refreshTokenFn = fn
 }
 
 function buildHeaders(options: ApiRequestOptions & { token?: string | null }): HeadersInit {
@@ -57,6 +65,9 @@ export class ApiError extends Error {
   }
 }
 
+// Singleton refresh promise to coalesce concurrent 401s
+let activeRefresh: Promise<string | null> | null = null
+
 export async function apiRequest<TResponse = unknown, TBody = unknown>(
   path: string,
   options: ApiRequestOptions<TBody> = {},
@@ -70,10 +81,27 @@ export async function apiRequest<TResponse = unknown, TBody = unknown>(
     method,
     headers: buildHeaders(options),
     body,
+    credentials: 'include', // send httpOnly cookies (refresh token)
   })
 
   if (response.status === 401) {
-    // Only clear and redirect when we actually sent a token (session expired/revoked)
+    // Try silent refresh if we have a refresh function and haven't already tried
+    if (hadToken && refreshTokenFn && !options._skipRefresh) {
+      // Coalesce concurrent refresh attempts
+      if (!activeRefresh) {
+        activeRefresh = refreshTokenFn().finally(() => { activeRefresh = null })
+      }
+      const newToken = await activeRefresh
+      if (newToken) {
+        // Retry the original request with the new token
+        return apiRequest<TResponse, TBody>(path, {
+          ...options,
+          token: newToken,
+          _skipRefresh: true,
+        })
+      }
+    }
+    // Refresh failed or not available — trigger unauthorized handler
     if (hadToken) onUnauthorized?.()
     throw new ApiError('Unauthorized', 401)
   }
