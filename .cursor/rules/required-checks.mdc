@@ -1,0 +1,24 @@
+---
+description: Required lint and test checks before considering work done
+alwaysApply: true
+---
+
+# Required checks for this project
+
+Before considering a task complete, run the project's quality checks and fix any failures.
+
+## Commands (from repo root)
+
+- **Lint (all):** `make lint`  
+  Or individually: `uv run black --check app tests`, `uv run isort --check-only app tests`, `uv run flake8 app tests`, `uv run mypy app`
+- **Fix formatting only:** `make lint-fix` (black + isort)
+- **Unit tests (no DB):** `make test` or `uv run pytest -m "not requires_db" -v`
+- **Dependency audit:** `make audit-deps` or `uv run pip-audit`
+
+## What to do
+
+1. After editing code, run `make lint` and fix any black, isort, flake8, or mypy issues.
+2. Run `make test` and fix any failing tests.
+3. Optionally run `make audit-deps` to confirm no known dependency vulnerabilities.
+
+CI runs the same checks (see `.github/workflows/ci.yml`). Keeping local lint and tests passing avoids CI failures.

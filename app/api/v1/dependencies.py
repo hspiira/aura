@@ -9,8 +9,29 @@ from app.infrastructure.persistence.database import get_db_transactional
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
 )
+from app.infrastructure.persistence.repositories.baseline_snapshot_repo import (
+    BaselineSnapshotRepository,
+)
+from app.infrastructure.persistence.repositories.behavioral_indicator_repo import (
+    BehavioralIndicatorRepository,
+)
+from app.infrastructure.persistence.repositories.behavioral_score_repo import (
+    BehavioralScoreRepository,
+)
+from app.infrastructure.persistence.repositories.calibration_session_repo import (
+    CalibrationSessionRepository,
+)
 from app.infrastructure.persistence.repositories.department_repo import (
     DepartmentRepository,
+)
+from app.infrastructure.persistence.repositories.fact_performance_summary_repo import (
+    FactPerformanceSummaryRepository,
+)
+from app.infrastructure.persistence.repositories.notification_log_repo import (
+    NotificationLogRepository,
+)
+from app.infrastructure.persistence.repositories.notification_rule_repo import (
+    NotificationRuleRepository,
 )
 from app.infrastructure.persistence.repositories.objective_evidence_repo import (
     ObjectiveEvidenceRepository,
@@ -36,8 +57,23 @@ from app.infrastructure.persistence.repositories.performance_cycle_repo import (
 from app.infrastructure.persistence.repositories.performance_dimension_repo import (
     PerformanceDimensionRepository,
 )
+from app.infrastructure.persistence.repositories.performance_summary_repo import (
+    PerformanceSummaryRepository,
+)
+from app.infrastructure.persistence.repositories.permission_repo import (
+    PermissionRepository,
+)
+from app.infrastructure.persistence.repositories.review_session_repo import (
+    ReviewSessionRepository,
+)
+from app.infrastructure.persistence.repositories.reward_policy_repo import (
+    RewardPolicyRepository,
+)
 from app.infrastructure.persistence.repositories.role_dimension_weight_repo import (
     RoleDimensionWeightRepository,
+)
+from app.infrastructure.persistence.repositories.role_permission_repo import (
+    RolePermissionRepository,
 )
 from app.infrastructure.persistence.repositories.role_repo import RoleRepository
 from app.infrastructure.persistence.repositories.user_repo import UserRepository
@@ -132,3 +168,87 @@ async def get_audit_log_repo(
 ) -> AuditLogRepository:
     """Yield audit log repository."""
     return AuditLogRepository(session)
+
+
+async def get_baseline_snapshot_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> BaselineSnapshotRepository:
+    """Yield baseline snapshot repository."""
+    return BaselineSnapshotRepository(session)
+
+
+async def get_behavioral_indicator_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> BehavioralIndicatorRepository:
+    """Yield behavioral indicator repository."""
+    return BehavioralIndicatorRepository(session)
+
+
+async def get_behavioral_score_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> BehavioralScoreRepository:
+    """Yield behavioral score repository."""
+    return BehavioralScoreRepository(session)
+
+
+async def get_performance_summary_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> PerformanceSummaryRepository:
+    """Yield performance summary repository."""
+    return PerformanceSummaryRepository(session)
+
+
+async def get_review_session_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> ReviewSessionRepository:
+    """Yield review session repository."""
+    return ReviewSessionRepository(session)
+
+
+async def get_calibration_session_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> CalibrationSessionRepository:
+    """Yield calibration session repository."""
+    return CalibrationSessionRepository(session)
+
+
+async def get_reward_policy_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> RewardPolicyRepository:
+    """Yield reward policy repository."""
+    return RewardPolicyRepository(session)
+
+
+async def get_permission_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> PermissionRepository:
+    """Yield permission repository."""
+    return PermissionRepository(session)
+
+
+async def get_role_permission_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> RolePermissionRepository:
+    """Yield role-permission repository."""
+    return RolePermissionRepository(session)
+
+
+async def get_notification_rule_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> NotificationRuleRepository:
+    """Yield notification rule repository."""
+    return NotificationRuleRepository(session)
+
+
+async def get_notification_log_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> NotificationLogRepository:
+    """Yield notification log repository."""
+    return NotificationLogRepository(session)
+
+
+async def get_fact_performance_summary_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> FactPerformanceSummaryRepository:
+    """Yield analytics fact repository."""
+    return FactPerformanceSummaryRepository(session)

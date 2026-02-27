@@ -14,6 +14,9 @@ class ObjectiveTemplateCreate(BaseModel):
     dimension_id: str
     kpi_type: str | None = None
     default_weight: Decimal = Decimal("0")
+    min_target: Decimal | None = None
+    max_target: Decimal | None = None
+    requires_baseline_snapshot: bool = False
     is_active: bool = True
 
 
@@ -27,6 +30,9 @@ class ObjectiveTemplateResponse(BaseModel):
     dimension_id: str
     kpi_type: str | None
     default_weight: Decimal
+    min_target: Decimal | None
+    max_target: Decimal | None
+    requires_baseline_snapshot: bool
     is_active: bool
 
     model_config = {"from_attributes": True}

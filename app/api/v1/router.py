@@ -3,9 +3,16 @@
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    analytics,
     audit_logs,
+    baseline_snapshots,
+    behavioral_indicators,
+    behavioral_scores,
+    calibration_sessions,
     departments,
     health,
+    notification_logs,
+    notification_rules,
     objective_evidence,
     objective_scores,
     objective_templates,
@@ -14,13 +21,23 @@ from app.api.v1.endpoints import (
     organizations,
     performance_cycles,
     performance_dimensions,
+    performance_summaries,
+    permissions,
+    review_sessions,
+    reward_policies,
     role_dimension_weights,
+    role_permissions,
     roles,
     users,
 )
 
 api_router = APIRouter()
 api_router.include_router(health.router, prefix="/health", tags=["health"])
+api_router.include_router(
+    analytics.router,
+    prefix="/analytics",
+    tags=["analytics"],
+)
 api_router.include_router(
     organizations.router, prefix="/organizations", tags=["organizations"]
 )
@@ -66,3 +83,58 @@ api_router.include_router(
     tags=["objective-scores"],
 )
 api_router.include_router(audit_logs.router, prefix="/audit-logs", tags=["audit-logs"])
+api_router.include_router(
+    baseline_snapshots.router,
+    prefix="/baseline-snapshots",
+    tags=["baseline-snapshots"],
+)
+api_router.include_router(
+    behavioral_indicators.router,
+    prefix="/behavioral-indicators",
+    tags=["behavioral-indicators"],
+)
+api_router.include_router(
+    behavioral_scores.router,
+    prefix="/behavioral-scores",
+    tags=["behavioral-scores"],
+)
+api_router.include_router(
+    performance_summaries.router,
+    prefix="/performance-summaries",
+    tags=["performance-summaries"],
+)
+api_router.include_router(
+    review_sessions.router,
+    prefix="/review-sessions",
+    tags=["review-sessions"],
+)
+api_router.include_router(
+    calibration_sessions.router,
+    prefix="/calibration-sessions",
+    tags=["calibration-sessions"],
+)
+api_router.include_router(
+    reward_policies.router,
+    prefix="/reward-policies",
+    tags=["reward-policies"],
+)
+api_router.include_router(
+    permissions.router,
+    prefix="/permissions",
+    tags=["permissions"],
+)
+api_router.include_router(
+    role_permissions.router,
+    prefix="/role-permissions",
+    tags=["role-permissions"],
+)
+api_router.include_router(
+    notification_rules.router,
+    prefix="/notification-rules",
+    tags=["notification-rules"],
+)
+api_router.include_router(
+    notification_logs.router,
+    prefix="/notification-logs",
+    tags=["notification-logs"],
+)

@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.persistence.models.organization import Organization
+from app.infrastructure.persistence.persist import persist_and_refresh
 
 
 class OrganizationRepository:
@@ -28,7 +29,4 @@ class OrganizationRepository:
 
     async def add(self, organization: Organization) -> Organization:
         """Persist an organization."""
-        self._session.add(organization)
-        await self._session.flush()
-        await self._session.refresh(organization)
-        return organization
+        return await persist_and_refresh(self._session, organization)
