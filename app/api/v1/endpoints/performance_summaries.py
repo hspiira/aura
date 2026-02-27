@@ -11,19 +11,19 @@ from app.api.v1.dependencies import (
     get_performance_summary_repo,
     require_permission,
 )
-from app.domain.permissions import MANAGE_SUMMARIES
-from app.core.audit import audit_log
-from app.core.auth import CurrentUserIdOptional
 from app.api.v1.helpers import get_one_or_raise
 from app.application.summary import compute_and_save_summary
+from app.core.audit import audit_log
+from app.core.auth import CurrentUserIdOptional
+from app.domain.permissions import MANAGE_SUMMARIES
+from app.infrastructure.persistence.repositories.audit_log_repo import (
+    AuditLogRepository,
+)
 from app.infrastructure.persistence.repositories.behavioral_score_repo import (
     BehavioralScoreRepository,
 )
 from app.infrastructure.persistence.repositories.objective_score_repo import (
     ObjectiveScoreRepository,
-)
-from app.infrastructure.persistence.repositories.audit_log_repo import (
-    AuditLogRepository,
 )
 from app.infrastructure.persistence.repositories.performance_summary_repo import (
     PerformanceSummaryRepository,
@@ -104,7 +104,10 @@ async def compute_summary(
         "performance_summary",
         summary.id,
         "compute",
-        new_value={"user_id": summary.user_id, "performance_cycle_id": summary.performance_cycle_id},
+        new_value={
+            "user_id": summary.user_id,
+            "performance_cycle_id": summary.performance_cycle_id,
+        },
         changed_by=changed_by,
     )
     return PerformanceSummaryResponse.model_validate(summary)

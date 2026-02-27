@@ -33,6 +33,7 @@ from app.infrastructure.persistence.models.objective_template import (
 from app.infrastructure.persistence.models.objective_update import (
     ObjectiveUpdate,
 )
+from app.infrastructure.persistence.models.objective_version import ObjectiveVersion
 from app.infrastructure.persistence.models.organization import Organization
 from app.infrastructure.persistence.models.performance_cycle import (
     PerformanceCycle,
@@ -67,6 +68,7 @@ __all__ = [
     "ObjectiveEvidence",
     "ObjectiveFlag",
     "ObjectiveScore",
+    "ObjectiveVersion",
     "ObjectiveTemplate",
     "ObjectiveUpdate",
     "NotificationLog",

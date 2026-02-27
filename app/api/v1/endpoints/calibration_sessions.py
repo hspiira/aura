@@ -76,7 +76,10 @@ async def create_calibration_session(
         "calibration_session",
         session.id,
         "create",
-        new_value={"performance_cycle_id": session.performance_cycle_id, "department_id": session.department_id},
+        new_value={
+            "performance_cycle_id": session.performance_cycle_id,
+            "department_id": session.department_id,
+        },
         changed_by=changed_by,
     )
     return CalibrationSessionResponse.model_validate(session)

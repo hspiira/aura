@@ -65,4 +65,3 @@ async def emit_event(
                 error_message=error_message,
             )
             await log_repo.add(entry)
-

@@ -94,7 +94,10 @@ async def update_objective_template(
     changed_by: CurrentUserIdOptional,
     _perm: Annotated[None, Depends(require_permission(MANAGE_TEMPLATES))],
 ) -> ObjectiveTemplateResponse:
-    """Update an objective template. Returns 409 if template is in use in a started cycle."""
+    """Update an objective template, creating a new version when safe.
+
+    Returns 409 if template is in use in a started cycle.
+    """
     template = await repo.get_by_id(id)
     if template is None:
         raise ResourceNotFoundException("ObjectiveTemplate", id)
@@ -104,17 +107,23 @@ async def update_objective_template(
             detail="Template is in use in a started cycle and cannot be modified.",
         )
     update_data = payload.model_dump(exclude_unset=True)
-    if update_data:
-        template = await repo.update(template, **update_data)
-        await audit_log(
-            audit_repo,
-            "objective_template",
-            template.id,
-            "update",
-            new_value={"code": template.code, **update_data},
-            changed_by=changed_by,
-        )
-    return ObjectiveTemplateResponse.model_validate(template)
+    if not update_data:
+        return ObjectiveTemplateResponse.model_validate(template)
+
+    new_template = await repo.create_new_version(template, update_data)
+    await audit_log(
+        audit_repo,
+        "objective_template",
+        new_template.id,
+        "update",
+        new_value={
+            "code": new_template.code,
+            **update_data,
+            "version": new_template.version,
+        },
+        changed_by=changed_by,
+    )
+    return ObjectiveTemplateResponse.model_validate(new_template)
 
 
 @router.delete("/{id}", status_code=204)
@@ -125,7 +134,10 @@ async def delete_objective_template(
     changed_by: CurrentUserIdOptional,
     _perm: Annotated[None, Depends(require_permission(MANAGE_TEMPLATES))],
 ) -> None:
-    """Soft-deactivate an objective template. Returns 409 if in use in a started cycle."""
+    """Soft-deactivate an objective template.
+
+    Returns 409 if in use in a started cycle.
+    """
     template = await repo.get_by_id(id)
     if template is None:
         raise ResourceNotFoundException("ObjectiveTemplate", id)

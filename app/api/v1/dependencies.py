@@ -6,7 +6,6 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user_id
-
 from app.infrastructure.persistence.database import get_db_transactional
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
@@ -49,6 +48,9 @@ from app.infrastructure.persistence.repositories.objective_template_repo import 
 )
 from app.infrastructure.persistence.repositories.objective_update_repo import (
     ObjectiveUpdateRepository,
+)
+from app.infrastructure.persistence.repositories.objective_version_repo import (
+    ObjectiveVersionRepository,
 )
 from app.infrastructure.persistence.repositories.organization_repo import (
     OrganizationRepository,
@@ -256,6 +258,13 @@ async def get_fact_performance_summary_repo(
     return FactPerformanceSummaryRepository(session)
 
 
+async def get_objective_version_repo(
+    session: Annotated[AsyncSession, Depends(get_db_transactional)],
+) -> ObjectiveVersionRepository:
+    """Yield objective version repository."""
+    return ObjectiveVersionRepository(session)
+
+
 async def get_current_user_permissions(
     user_id: Annotated[str, Depends(get_current_user_id)],
     user_repo: Annotated[UserRepository, Depends(get_user_repo)],
@@ -283,4 +292,4 @@ def require_permission(code: str):
                 detail=f"Insufficient permission: {code} required",
             )
 
-    return Depends(_check)
+    return _check

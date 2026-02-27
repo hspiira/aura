@@ -13,13 +13,14 @@ from app.api.v1.dependencies import (
     get_objective_score_repo,
     get_objective_template_repo,
     get_objective_update_repo,
+    get_objective_version_repo,
     get_performance_cycle_repo,
     get_performance_dimension_repo,
     get_user_repo,
     require_permission,
 )
-from app.domain.permissions import APPROVE_OBJECTIVES, EDIT_OBJECTIVES
 from app.api.v1.helpers import get_one_or_raise
+from app.application.notification_service import emit_event
 from app.application.objective_validation import run_smart_validation
 from app.core.auth import CurrentUserIdOptional
 from app.domain.exceptions import (
@@ -27,6 +28,7 @@ from app.domain.exceptions import (
     ValidationException,
 )
 from app.domain.objective import ObjectiveStatus, can_transition
+from app.domain.permissions import APPROVE_OBJECTIVES, EDIT_OBJECTIVES
 from app.domain.scoring import compute_score
 from app.infrastructure.persistence.models.objective import Objective
 from app.infrastructure.persistence.models.objective_score import ObjectiveScore
@@ -35,6 +37,12 @@ from app.infrastructure.persistence.repositories.audit_log_repo import (
 )
 from app.infrastructure.persistence.repositories.baseline_snapshot_repo import (
     BaselineSnapshotRepository,
+)
+from app.infrastructure.persistence.repositories.notification_log_repo import (
+    NotificationLogRepository,
+)
+from app.infrastructure.persistence.repositories.notification_rule_repo import (
+    NotificationRuleRepository,
 )
 from app.infrastructure.persistence.repositories.objective_repo import (
     ObjectiveRepository,
@@ -48,21 +56,18 @@ from app.infrastructure.persistence.repositories.objective_template_repo import 
 from app.infrastructure.persistence.repositories.objective_update_repo import (
     ObjectiveUpdateRepository,
 )
+from app.infrastructure.persistence.repositories.objective_version_repo import (
+    ObjectiveVersionRepository,
+)
 from app.infrastructure.persistence.repositories.performance_cycle_repo import (
     PerformanceCycleRepository,
 )
-from app.infrastructure.persistence.repositories.notification_log_repo import (
-    NotificationLogRepository,
-)
-from app.infrastructure.persistence.repositories.notification_rule_repo import (
-    NotificationRuleRepository,
-)
-from app.infrastructure.persistence.repositories.user_repo import UserRepository
-from app.application.notification_service import emit_event
 from app.infrastructure.persistence.repositories.performance_dimension_repo import (
     PerformanceDimensionRepository,
 )
+from app.infrastructure.persistence.repositories.user_repo import UserRepository
 from app.schemas.objective import (
+    ObjectiveAmend,
     ObjectiveCreate,
     ObjectiveResponse,
     ObjectiveUpdateStatus,
@@ -173,6 +178,101 @@ async def validate_objective_by_id(
         baseline_repo,
         dimension_repo,
     )
+
+
+@router.patch("/{id}/amend", response_model=ObjectiveResponse)
+async def amend_objective(
+    id: str,
+    payload: ObjectiveAmend,
+    repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
+    version_repo: Annotated[
+        ObjectiveVersionRepository, Depends(get_objective_version_repo)
+    ],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
+    cycle_repo: Annotated[
+        PerformanceCycleRepository, Depends(get_performance_cycle_repo)
+    ],
+    template_repo: Annotated[
+        ObjectiveTemplateRepository, Depends(get_objective_template_repo)
+    ],
+    baseline_repo: Annotated[
+        BaselineSnapshotRepository, Depends(get_baseline_snapshot_repo)
+    ],
+    dimension_repo: Annotated[
+        PerformanceDimensionRepository, Depends(get_performance_dimension_repo)
+    ],
+    _perm: Annotated[None, Depends(require_permission(EDIT_OBJECTIVES))],
+) -> ObjectiveResponse:
+    """Amend an objective's target/weight with versioned history."""
+    objective = await get_one_or_raise(repo.get_by_id(id), id, "Objective")
+    if objective.locked_at is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Objective is locked; cannot be amended.",
+        )
+
+    current_status = _parse_status(objective.status, ObjectiveStatus.DRAFT)
+    if current_status not in {
+        ObjectiveStatus.APPROVED,
+        ObjectiveStatus.ACTIVE,
+    }:
+        raise HTTPException(
+            status_code=400,
+            detail="Only approved or active objectives can be amended.",
+        )
+
+    existing_versions = await version_repo.list_by_objective(objective.id)
+    next_version = existing_versions[-1].version + 1 if existing_versions else 1
+
+    now = utc_now()
+    await version_repo.add_from_objective(
+        objective=objective,
+        version=next_version,
+        justification=payload.justification,
+        amended_by=changed_by,
+        amended_at=now,
+    )
+
+    if payload.target_value is not None:
+        objective.target_value = payload.target_value
+    if payload.weight is not None:
+        objective.weight = payload.weight
+
+    validation = await run_smart_validation(
+        objective,
+        cycle_repo,
+        template_repo,
+        repo,
+        baseline_repo,
+        dimension_repo,
+        last_achievement_value=None,
+        justification_for_lower_target=payload.justification,
+    )
+    if not validation.valid:
+        raise ValidationException(
+            "SMART validation failed for amendment",
+            errors=validation.errors,
+        )
+
+    objective = await repo.refresh(objective)
+    await audit_repo.add(
+        entity_type="objective",
+        entity_id=objective.id,
+        action="amend",
+        new_value={
+            "target_value": (
+                str(objective.target_value)
+                if objective.target_value is not None
+                else None
+            ),
+            "weight": str(objective.weight),
+            "justification": payload.justification,
+            "version": next_version,
+        },
+        changed_by=changed_by,
+    )
+    return ObjectiveResponse.model_validate(objective)
 
 
 @router.patch("/{id}/status", response_model=ObjectiveResponse)
@@ -290,7 +390,10 @@ async def calculate_objective_score(
         entity_type="objective_score",
         entity_id=score.id,
         action="calculate",
-        new_value={"objective_id": id, "achievement_percentage": str(result.achievement_percentage)},
+        new_value={
+            "objective_id": id,
+            "achievement_percentage": str(result.achievement_percentage),
+        },
         changed_by=changed_by,
     )
     return ObjectiveScoreResponse.model_validate(score)

@@ -87,3 +87,38 @@ class ObjectiveTemplateRepository:
         await self._session.flush()
         await self._session.refresh(template)
         return template
+
+    async def create_new_version(
+        self,
+        base_template: ObjectiveTemplate,
+        updated_fields: dict[str, object],
+    ) -> ObjectiveTemplate:
+        """Create a new version of a template, deactivating the old one.
+
+        The new template keeps the same code and increments the version.
+        """
+        merged: dict[str, object] = {
+            "code": base_template.code,
+            "title": base_template.title,
+            "description": base_template.description,
+            "dimension_id": base_template.dimension_id,
+            "kpi_type": base_template.kpi_type,
+            "default_weight": base_template.default_weight,
+            "min_target": base_template.min_target,
+            "max_target": base_template.max_target,
+            "requires_baseline_snapshot": base_template.requires_baseline_snapshot,
+            "is_active": True,
+            "version": base_template.version + 1,
+        }
+        merged.update(updated_fields)
+
+        new_template = ObjectiveTemplate(**merged)  # type: ignore[arg-type]
+        self._session.add(new_template)
+        await self._session.flush()
+        await self._session.refresh(new_template)
+
+        base_template.is_active = False
+        base_template.superseded_by_id = new_template.id
+        await self._session.flush()
+
+        return new_template

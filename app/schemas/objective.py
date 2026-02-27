@@ -29,6 +29,14 @@ class ObjectiveUpdateStatus(BaseModel):
     status: str
 
 
+class ObjectiveAmend(BaseModel):
+    """Payload to amend an objective's target and/or weight."""
+
+    target_value: Decimal | None = None
+    weight: Decimal | None = None
+    justification: str
+
+
 class ObjectiveResponse(BaseModel):
     """Objective in API responses."""
 

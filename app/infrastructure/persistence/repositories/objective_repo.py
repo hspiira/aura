@@ -66,6 +66,12 @@ class ObjectiveRepository:
         )
         return result.scalar_one_or_none()
 
+    async def refresh(self, objective: Objective) -> Objective:
+        """Flush and refresh an objective after in-place modifications."""
+        await self._session.flush()
+        await self._session.refresh(objective)
+        return objective
+
     async def add(self, objective: Objective) -> Objective:
         """Persist an objective."""
         return await persist_and_refresh(self._session, objective)

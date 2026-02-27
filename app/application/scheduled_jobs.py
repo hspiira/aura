@@ -16,8 +16,15 @@ STALE_FLAG_TYPE = "stale_update"
 
 async def run_objectives_lock_job() -> None:
     """Lock all objectives for cycles whose objectives_lock_date has passed."""
+    from app.application.notification_service import emit_event
     from app.infrastructure.persistence.repositories.audit_log_repo import (
         AuditLogRepository,
+    )
+    from app.infrastructure.persistence.repositories.notification_log_repo import (
+        NotificationLogRepository,
+    )
+    from app.infrastructure.persistence.repositories.notification_rule_repo import (
+        NotificationRuleRepository,
     )
     from app.infrastructure.persistence.repositories.objective_repo import (
         ObjectiveRepository,
@@ -28,14 +35,7 @@ async def run_objectives_lock_job() -> None:
     from app.infrastructure.persistence.repositories.performance_cycle_repo import (
         PerformanceCycleRepository,
     )
-    from app.infrastructure.persistence.repositories.notification_log_repo import (
-        NotificationLogRepository,
-    )
-    from app.infrastructure.persistence.repositories.notification_rule_repo import (
-        NotificationRuleRepository,
-    )
     from app.infrastructure.persistence.repositories.user_repo import UserRepository
-    from app.application.notification_service import emit_event
 
     today = date.today()
     async for session in get_db_transactional():

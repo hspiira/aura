@@ -24,6 +24,7 @@ class ObjectiveTemplate(CuidMixin, TimestampMixin, Base):
     __tablename__ = "objective_templates"
 
     code: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    version: Mapped[int] = mapped_column(nullable=False, default=1)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(String(2000), nullable=True)
     dimension_id: Mapped[str] = mapped_column(
@@ -40,6 +41,10 @@ class ObjectiveTemplate(CuidMixin, TimestampMixin, Base):
         Boolean, default=False, nullable=False
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    superseded_by_id: Mapped[str | None] = mapped_column(
+        ForeignKey("objective_templates.id", ondelete="SET NULL"),
+        nullable=True,
+    )
 
     dimension: Mapped[PerformanceDimension] = relationship(
         "PerformanceDimension",

@@ -13,11 +13,11 @@ from app.api.v1.helpers import get_one_or_raise
 from app.core.audit import audit_log
 from app.core.auth import CurrentUserIdOptional
 from app.infrastructure.persistence.models.behavioral_score import BehavioralScore
-from app.infrastructure.persistence.repositories.behavioral_indicator_repo import (
-    BehavioralIndicatorRepository,
-)
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
+)
+from app.infrastructure.persistence.repositories.behavioral_indicator_repo import (
+    BehavioralIndicatorRepository,
 )
 from app.infrastructure.persistence.repositories.behavioral_score_repo import (
     BehavioralScoreRepository,

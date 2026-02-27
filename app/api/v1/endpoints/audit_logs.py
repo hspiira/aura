@@ -5,11 +5,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.api.v1.dependencies import get_audit_log_repo, require_permission
+from app.domain.permissions import VIEW_AUDIT_LOGS
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
 )
 from app.schemas.audit_log import AuditLogResponse
-from app.domain.permissions import VIEW_AUDIT_LOGS
 
 router = APIRouter()
 

@@ -8,6 +8,7 @@ from app.api.v1.endpoints import (
     baseline_snapshots,
     behavioral_indicators,
     behavioral_scores,
+    calibration_analytics,
     calibration_sessions,
     departments,
     health,
@@ -36,6 +37,11 @@ api_router.include_router(health.router, prefix="/health", tags=["health"])
 api_router.include_router(
     analytics.router,
     prefix="/analytics",
+    tags=["analytics"],
+)
+api_router.include_router(
+    calibration_analytics.router,
+    prefix="/analytics/calibration",
     tags=["analytics"],
 )
 api_router.include_router(

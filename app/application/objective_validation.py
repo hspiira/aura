@@ -60,9 +60,7 @@ async def run_smart_validation(
         )
         has_baseline = baseline is not None
     dimension = await dimension_repo.get_by_id(objective.dimension_id)
-    is_behavioral = (
-        dimension is not None and dimension.name.lower() == "behavioral"
-    )
+    is_behavioral = dimension is not None and dimension.name.lower() == "behavioral"
     is_custom = template is None
 
     result = validate_objective(
