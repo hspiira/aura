@@ -1,0 +1,33 @@
+{
+  "projectName": "mimi",
+  "mode": "file-router",
+  "typescript": true,
+  "packageManager": "npm",
+  "includeExamples": true,
+  "tailwind": true,
+  "addOnOptions": {
+    "drizzle": {
+      "database": "postgresql"
+    }
+  },
+  "envVarValues": {},
+  "git": false,
+  "routerOnly": false,
+  "version": 1,
+  "framework": "react",
+  "chosenAddOns": [
+    "eslint",
+    "nitro",
+    "oRPC",
+    "mcp",
+    "drizzle",
+    "shadcn",
+    "table",
+    "tRPC",
+    "storybook",
+    "tanstack-query",
+    "ai",
+    "events",
+    "store"
+  ]
+}

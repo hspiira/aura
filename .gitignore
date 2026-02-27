@@ -37,6 +37,21 @@ dmypy.json
 # Vercel
 .vercel/
 
+# Frontend (mimi)
+mimi/node_modules/
+mimi/.turbo/
+mimi/.next/
+mimi/.vercel/
+mimi/.storybook-static/
+mimi/dist/
+mimi/build/
+mimi/.cache/
+mimi/coverage/
+mimi/.eslintcache
+mimi/.env
+mimi/.env.*
+!mimi/.env.example
+
 # Editor and OS
 .idea/
 .vscode/
