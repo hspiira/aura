@@ -1,11 +1,13 @@
 """Reward policy endpoints."""
 
+from decimal import Decimal
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.api.v1.dependencies import get_reward_policy_repo
 from app.api.v1.helpers import get_one_or_raise
+from app.domain.exceptions import ResourceNotFoundException
 from app.infrastructure.persistence.repositories.reward_policy_repo import (
     RewardPolicyRepository,
 )
@@ -44,6 +46,23 @@ async def create_reward_policy(
         reward_value=payload.reward_value,
     )
     policy = await repo.add(policy)
+    return RewardPolicyResponse.model_validate(policy)
+
+
+@router.get("/band", response_model=RewardPolicyResponse)
+async def get_reward_policy_band_for_score(
+    score: Annotated[Decimal, Query(description="Performance score to look up")],
+    repo: Annotated[
+        RewardPolicyRepository, Depends(get_reward_policy_repo)
+    ],
+) -> RewardPolicyResponse:
+    """Return the reward policy band that contains the given score (min <= score <= max). 404 if none."""
+    policy = await repo.find_band_for_score(score)
+    if policy is None:
+        raise ResourceNotFoundException(
+            "RewardPolicy",
+            f"band for score {score}",
+        )
     return RewardPolicyResponse.model_validate(policy)
 
 

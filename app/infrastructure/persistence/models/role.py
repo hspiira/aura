@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from app.infrastructure.persistence.models.role_dimension_weight import (
         RoleDimensionWeight,
     )
+    from app.infrastructure.persistence.models.role_permission import RolePermission
     from app.infrastructure.persistence.models.user import User
 
 
@@ -43,4 +44,9 @@ class Role(CuidMixin, TimestampMixin, Base):
         "RoleDimensionWeight",
         back_populates="role",
         foreign_keys="RoleDimensionWeight.role_id",
+    )
+    role_permissions: Mapped[list["RolePermission"]] = relationship(
+        "RolePermission",
+        back_populates="role",
+        foreign_keys="RolePermission.role_id",
     )

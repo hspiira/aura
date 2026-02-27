@@ -30,10 +30,16 @@ from app.infrastructure.persistence.models.performance_cycle import (
 from app.infrastructure.persistence.models.performance_dimension import (
     PerformanceDimension,
 )
+from app.infrastructure.persistence.models.notification_log import NotificationLog
+from app.infrastructure.persistence.models.notification_rule import (
+    NotificationRule,
+)
+from app.infrastructure.persistence.models.permission import Permission
 from app.infrastructure.persistence.models.performance_summary import (
     PerformanceSummary,
 )
 from app.infrastructure.persistence.models.review_session import ReviewSession
+from app.infrastructure.persistence.models.role_permission import RolePermission
 from app.infrastructure.persistence.models.reward_policy import RewardPolicy
 from app.infrastructure.persistence.models.role import Role
 from app.infrastructure.persistence.models.role_dimension_weight import (
@@ -53,7 +59,10 @@ __all__ = [
     "ObjectiveScore",
     "ObjectiveTemplate",
     "ObjectiveUpdate",
+    "NotificationLog",
+    "NotificationRule",
     "Organization",
+    "Permission",
     "PerformanceCycle",
     "PerformanceDimension",
     "PerformanceSummary",
@@ -61,5 +70,6 @@ __all__ = [
     "RewardPolicy",
     "Role",
     "RoleDimensionWeight",
+    "RolePermission",
     "User",
 ]

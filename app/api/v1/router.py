@@ -10,9 +10,13 @@ from app.api.v1.endpoints import (
     calibration_sessions,
     departments,
     health,
+    notification_logs,
+    notification_rules,
     performance_summaries,
+    permissions,
     reward_policies,
     review_sessions,
+    role_permissions,
     objective_evidence,
     objective_scores,
     objective_templates,
@@ -107,4 +111,24 @@ api_router.include_router(
     reward_policies.router,
     prefix="/reward-policies",
     tags=["reward-policies"],
+)
+api_router.include_router(
+    permissions.router,
+    prefix="/permissions",
+    tags=["permissions"],
+)
+api_router.include_router(
+    role_permissions.router,
+    prefix="/role-permissions",
+    tags=["role-permissions"],
+)
+api_router.include_router(
+    notification_rules.router,
+    prefix="/notification-rules",
+    tags=["notification-rules"],
+)
+api_router.include_router(
+    notification_logs.router,
+    prefix="/notification-logs",
+    tags=["notification-logs"],
 )
