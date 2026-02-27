@@ -65,3 +65,22 @@ async def create_user_token(
     await token_repo.add(user_token)
 
     return UserTokenCreateResponse(token=raw_token)
+
+
+@router.post(
+    "/{id}/revoke",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def revoke_user_token(
+    id: str,
+    token_repo: Annotated[UserTokenRepository, Depends(get_user_token_repo)],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_RBAC))],
+) -> None:
+    """Revoke a user token so it can no longer authenticate."""
+    token = await token_repo.get_by_id(id)
+    if token is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Token not found",
+        )
+    await token_repo.revoke(token)

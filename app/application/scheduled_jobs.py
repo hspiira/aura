@@ -14,15 +14,11 @@ STALE_FLAG_TYPE = "stale_update"
 
 async def run_objectives_lock_job() -> None:
     """Lock all objectives for cycles whose objectives_lock_date has passed."""
-    from app.application.notification_service import emit_event
     from app.infrastructure.persistence.repositories.audit_log_repo import (
         AuditLogRepository,
     )
-    from app.infrastructure.persistence.repositories.notification_log_repo import (
-        NotificationLogRepository,
-    )
-    from app.infrastructure.persistence.repositories.notification_rule_repo import (
-        NotificationRuleRepository,
+    from app.infrastructure.persistence.repositories.notification_outbox_repo import (
+        NotificationOutboxRepository,
     )
     from app.infrastructure.persistence.repositories.objective_repo import (
         ObjectiveRepository,
@@ -33,7 +29,6 @@ async def run_objectives_lock_job() -> None:
     from app.infrastructure.persistence.repositories.performance_cycle_repo import (
         PerformanceCycleRepository,
     )
-    from app.infrastructure.persistence.repositories.user_repo import UserRepository
 
     today = utc_now().date()
     async for session in get_db_transactional():
@@ -41,10 +36,7 @@ async def run_objectives_lock_job() -> None:
         objective_repo = ObjectiveRepository(session)
         score_repo = ObjectiveScoreRepository(session)
         audit_repo = AuditLogRepository(session)
-        notification_rule_repo = NotificationRuleRepository(session)
-        notification_log_repo = NotificationLogRepository(session)
-        user_repo = UserRepository(session)
-        users = await user_repo.list_all()
+        outbox_repo = NotificationOutboxRepository(session)
 
         cycles = await cycle_repo.list_cycles_pending_objectives_lock(today)
         for cycle in cycles:
@@ -70,19 +62,15 @@ async def run_objectives_lock_job() -> None:
                     len(to_lock),
                     cycle.id,
                 )
-                # Emit a single objective_locked event per cycle run
-                # with summary context.
-                await emit_event(
+                # Write to transactional outbox — delivery handled by
+                # run_notification_outbox_job for durability.
+                await outbox_repo.add(
                     event_type="objective_locked",
                     context={
                         "performance_cycle_id": cycle.id,
                         "objective_ids": [o.id for o in to_lock],
                         "count": len(to_lock),
                     },
-                    rule_repo=notification_rule_repo,
-                    log_repo=notification_log_repo,
-                    user_repo=user_repo,
-                    pre_fetched_users=users,
                 )
 
 

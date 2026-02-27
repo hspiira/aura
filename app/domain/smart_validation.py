@@ -136,20 +136,3 @@ def validate_objective(
         )
 
     return ValidationResult(valid=len(errors) == 0, errors=errors)
-
-
-def has_baseline_for_user_cycle_template(
-    baseline_snapshots: list[BaselineSnapshotProtocol],
-    user_id: str,
-    performance_cycle_id: str,
-    template_id: str,
-) -> bool:
-    """Return True if a baseline exists for the given user, cycle, and template."""
-    for b in baseline_snapshots:
-        if (
-            b.user_id == user_id
-            and b.performance_cycle_id == performance_cycle_id
-            and b.template_id == template_id
-        ):
-            return True
-    return False

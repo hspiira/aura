@@ -29,6 +29,18 @@ class UserTokenRepository:
         )
         return result.scalar_one_or_none()
 
+    async def get_by_id(self, id: str) -> UserToken | None:
+        """Return a token by its primary key."""
+        result = await self._session.execute(
+            select(UserToken).where(UserToken.id == id)
+        )
+        return result.scalar_one_or_none()
+
+    async def revoke(self, token: UserToken) -> None:
+        """Mark a token as revoked."""
+        token.revoked = True
+        await self._session.flush()
+
     async def add(self, token: UserToken) -> UserToken:
         """Persist a user token."""
         self._session.add(token)

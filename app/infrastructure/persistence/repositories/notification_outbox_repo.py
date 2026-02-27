@@ -1,12 +1,13 @@
 """NotificationOutbox repository."""
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.persistence.models.notification_outbox import NotificationOutbox
+from app.shared.utils.datetime import utc_now
 
 
 class NotificationOutboxRepository:
@@ -30,7 +31,7 @@ class NotificationOutboxRepository:
 
     async def list_pending(self, limit: int = 50) -> list[NotificationOutbox]:
         """Return pending entries that are due for processing."""
-        now = datetime.now(tz=datetime.utcnow().astimezone().tzinfo)
+        now = utc_now()
         result = await self._session.execute(
             select(NotificationOutbox)
             .where(
@@ -63,7 +64,7 @@ class NotificationOutboxRepository:
         retry_after: timedelta,
     ) -> None:
         """Mark an entry as failed and schedule a retry."""
-        next_time = datetime.utcnow().astimezone() + retry_after
+        next_time = utc_now() + retry_after
         await self._session.execute(
             update(NotificationOutbox)
             .where(NotificationOutbox.id == entry.id)

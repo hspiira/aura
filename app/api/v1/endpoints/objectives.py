@@ -80,10 +80,10 @@ router = APIRouter()
 @router.get("", response_model=PageResponse[ObjectiveResponse])
 async def list_objectives(
     repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
 ) -> PageResponse[ObjectiveResponse]:
     """List all objectives."""
-    limit = Query(100, ge=1, le=500)
-    offset = Query(0, ge=0)
     objectives, total = await repo.list_paginated(limit=limit, offset=offset)
     return PageResponse(
         items=[ObjectiveResponse.model_validate(o) for o in objectives],
@@ -318,7 +318,7 @@ async def update_objective_status(
     _perm: Annotated[None, Depends(require_permission(EDIT_OBJECTIVES))],
 ) -> ObjectiveResponse:
     """Transition objective status (lifecycle + SMART when submitting)."""
-    objective = await get_one_or_raise(repo.get_by_id(id), id, "Objective")
+    objective = await get_one_or_raise(repo.get_by_id_for_update(id), id, "Objective")
     if objective.locked_at is not None:
         raise HTTPException(
             status_code=409,

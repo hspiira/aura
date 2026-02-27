@@ -5,10 +5,7 @@ from decimal import Decimal
 
 import pytest
 
-from app.domain.smart_validation import (
-    has_baseline_for_user_cycle_template,
-    validate_objective,
-)
+from app.domain.smart_validation import validate_objective
 from app.infrastructure.persistence.models.baseline_snapshot import (
     BaselineSnapshot,
 )
@@ -263,10 +260,10 @@ async def test_validate_objective_requires_baseline_present(
 
 
 @pytest.mark.asyncio
-async def test_has_baseline_for_user_cycle_template_with_db_baselines(
+async def test_baseline_repo_list_by_user_cycle_filters_correctly(
     db_session, seed_phase1
 ) -> None:
-    """has_baseline_for_user_cycle_template returns True when baseline exists."""
+    """list_by_user_cycle returns baselines only for the given user/cycle."""
     template_repo = ObjectiveTemplateRepository(db_session)
     baseline_repo = BaselineSnapshotRepository(db_session)
 
@@ -295,24 +292,9 @@ async def test_has_baseline_for_user_cycle_template_with_db_baselines(
         seed_phase1["user_id"],
         seed_phase1["performance_cycle_id"],
     )
-    assert (
-        has_baseline_for_user_cycle_template(
-            baselines,
-            seed_phase1["user_id"],
-            seed_phase1["performance_cycle_id"],
-            template.id,
-        )
-        is True
-    )
-    assert (
-        has_baseline_for_user_cycle_template(
-            baselines,
-            seed_phase1["user_id"],
-            seed_phase1["performance_cycle_id"],
-            "other-template-id",
-        )
-        is False
-    )
+    template_ids = {b.template_id for b in baselines}
+    assert template.id in template_ids
+    assert "other-template-id" not in template_ids
 
 
 @pytest.mark.asyncio
