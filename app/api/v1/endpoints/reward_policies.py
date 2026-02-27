@@ -29,6 +29,7 @@ router = APIRouter()
 @router.get("", response_model=list[RewardPolicyResponse])
 async def list_reward_policies(
     repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_REWARD_POLICY))],
 ) -> list[RewardPolicyResponse]:
     """List all reward policy bands."""
     items = await repo.list_all()

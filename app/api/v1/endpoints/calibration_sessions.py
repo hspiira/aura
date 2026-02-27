@@ -35,6 +35,7 @@ async def list_calibration_sessions(
     repo: Annotated[
         CalibrationSessionRepository, Depends(get_calibration_session_repo)
     ],
+    _perm: Annotated[None, Depends(require_permission(RUN_CALIBRATION))],
     performance_cycle_id: str | None = Query(None),
     department_id: str | None = Query(None),
 ) -> list[CalibrationSessionResponse]:

@@ -6,7 +6,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Date, DateTime, ForeignKey, Numeric, String
+from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.persistence.database import Base
@@ -36,6 +36,13 @@ class Objective(CuidMixin, TimestampMixin, Base):
     """Objective: user, cycle, dimension, title, target, weight, status, approval."""
 
     __tablename__ = "objectives"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('draft','submitted','rejected','approved','active',"
+            "'at_risk','completed','under_review','closed')",
+            name="ck_objectives_status",
+        ),
+    )
 
     user_id: Mapped[str] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
@@ -72,6 +79,7 @@ class Objective(CuidMixin, TimestampMixin, Base):
     locked_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    row_version: Mapped[int] = mapped_column(default=0, nullable=False)
 
     user: Mapped["User"] = relationship(
         "User",

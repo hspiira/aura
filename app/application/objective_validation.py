@@ -65,7 +65,7 @@ async def run_smart_validation(
             valid=False,
             errors=["performance dimension not found"],
         )
-    is_behavioral = dimension.name.lower() == "behavioral"
+    is_behavioral = not dimension.is_quantitative
     is_custom = template is None
 
     result = validate_objective(

@@ -4,8 +4,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from app.api.v1.dependencies import get_review_session_repo
+from app.api.v1.dependencies import get_review_session_repo, require_permission
 from app.api.v1.helpers import get_one_or_raise
+from app.domain.permissions import MANAGE_REVIEW_SESSIONS
 from app.infrastructure.persistence.models.review_session import ReviewSession
 from app.infrastructure.persistence.repositories.review_session_repo import (
     ReviewSessionRepository,
@@ -40,6 +41,7 @@ async def list_review_sessions(
 async def create_review_session(
     payload: ReviewSessionCreate,
     repo: Annotated[ReviewSessionRepository, Depends(get_review_session_repo)],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_REVIEW_SESSIONS))],
 ) -> ReviewSessionResponse:
     """Create a review session."""
     session = ReviewSession(

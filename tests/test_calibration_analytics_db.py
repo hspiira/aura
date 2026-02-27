@@ -64,8 +64,8 @@ async def test_calibration_analytics_endpoints_require_permission(
     db_session, seed_phase1, override_db_dependency
 ):
     """Endpoints should be wired and reachable (permission checked by dependency)."""
-    from app.main import app
     from app.infrastructure.persistence.database import get_db_transactional
+    from app.main import app
 
     app.dependency_overrides[get_db_transactional] = override_db_dependency
 

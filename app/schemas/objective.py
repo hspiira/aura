@@ -40,9 +40,7 @@ class ObjectiveAmend(BaseModel):
     @classmethod
     def _validate_amendment(cls, value: str, info):
         if info.data.get("target_value") is None and info.data.get("weight") is None:
-            raise ValueError(
-                "At least one of target_value or weight must be provided"
-            )
+            raise ValueError("At least one of target_value or weight must be provided")
         return value
 
 
@@ -66,5 +64,6 @@ class ObjectiveResponse(BaseModel):
     approved_at: datetime | None
     approved_by: str | None
     locked_at: datetime | None
+    already_locked: bool = False
 
     model_config = {"from_attributes": True}

@@ -64,10 +64,10 @@ async def test_amend_objective_endpoint_creates_version(
     db_session, seed_phase1, override_db_dependency, monkeypatch
 ):
     """PATCH /objectives/{id}/amend should snapshot and update objective."""
-    from app.main import app
     from app.api.v1.dependencies import get_current_user_permissions
     from app.domain.permissions import EDIT_OBJECTIVES
     from app.infrastructure.persistence.database import get_db_transactional
+    from app.main import app
 
     # Override DB dependency
     app.dependency_overrides[get_db_transactional] = override_db_dependency

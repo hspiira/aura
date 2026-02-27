@@ -8,7 +8,6 @@ Create Date: Ensure one flag per type per objective
 
 from collections.abc import Sequence
 
-import sqlalchemy as sa
 from alembic import op
 
 revision: str = "013"
@@ -33,4 +32,3 @@ def downgrade() -> None:
         "objective_flags",
         type_="unique",
     )
-

@@ -18,6 +18,7 @@ from app.infrastructure.persistence.models.fact_performance_summary import (
     FactPerformanceSummary,
 )
 from app.infrastructure.persistence.models.notification_log import NotificationLog
+from app.infrastructure.persistence.models.notification_outbox import NotificationOutbox
 from app.infrastructure.persistence.models.notification_rule import (
     NotificationRule,
 )
@@ -53,6 +54,7 @@ from app.infrastructure.persistence.models.role_dimension_weight import (
 )
 from app.infrastructure.persistence.models.role_permission import RolePermission
 from app.infrastructure.persistence.models.user import User
+from app.infrastructure.persistence.models.user_token import UserToken
 
 __all__ = [
     "AuditLog",
@@ -73,6 +75,7 @@ __all__ = [
     "ObjectiveUpdate",
     "NotificationLog",
     "NotificationRule",
+    "NotificationOutbox",
     "Organization",
     "Permission",
     "PerformanceCycle",
@@ -84,4 +87,5 @@ __all__ = [
     "RoleDimensionWeight",
     "RolePermission",
     "User",
+    "UserToken",
 ]

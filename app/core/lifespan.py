@@ -7,6 +7,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 
 from app.application.scheduled_jobs import (
+    run_notification_outbox_job,
     run_objectives_lock_job,
     run_stale_update_flags_job,
 )
@@ -34,6 +35,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         hour=3,
         minute=0,
         id="stale_update_flags",
+    )
+    scheduler.add_job(
+        run_notification_outbox_job,
+        "interval",
+        minutes=2,
+        id="notification_outbox",
     )
     scheduler.start()
     yield

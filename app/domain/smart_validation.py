@@ -4,15 +4,10 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
+from app.domain.protocols import BaselineSnapshotProtocol, ObjectiveTemplateProtocol
+
 if TYPE_CHECKING:
     from datetime import date
-
-    from app.infrastructure.persistence.models.baseline_snapshot import (
-        BaselineSnapshot,
-    )
-    from app.infrastructure.persistence.models.objective_template import (
-        ObjectiveTemplate,
-    )
 
 
 TITLE_MIN_LENGTH = 10
@@ -39,7 +34,7 @@ def validate_objective(
     end_date: "date",
     cycle_start: "date",
     cycle_end: "date",
-    template: "ObjectiveTemplate | None" = None,
+    template: ObjectiveTemplateProtocol | None = None,
     other_weights_sum: Decimal = Decimal("0"),
     has_baseline_for_template: bool = False,
     last_achievement_value: Decimal | None = None,
@@ -70,8 +65,11 @@ def validate_objective(
                 f"kpi_type must match template kpi_type ({template.kpi_type})"
             )
 
-    requires_target_value = (
-        template is None or (template and template.kpi_type) or kpi_type
+    # Only require target_value for quantitative context:
+    # - template has kpi_type (quantitative template), or
+    # - objective has kpi_type and the dimension is not behavioral.
+    requires_target_value = bool(
+        (template and template.kpi_type) or (kpi_type and not is_behavioral_dimension)
     )
     if target_value is None and requires_target_value:
         errors.append("target_value is required for quantitative objectives")
@@ -141,7 +139,7 @@ def validate_objective(
 
 
 def has_baseline_for_user_cycle_template(
-    baseline_snapshots: list["BaselineSnapshot"],
+    baseline_snapshots: list[BaselineSnapshotProtocol],
     user_id: str,
     performance_cycle_id: str,
     template_id: str,

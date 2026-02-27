@@ -1,9 +1,9 @@
 """Calibration analytics service: distribution and variance by department."""
 
 from collections import Counter, defaultdict
+from collections.abc import Iterable
 from decimal import Decimal
 from math import sqrt
-from collections.abc import Iterable
 
 from pydantic import BaseModel
 

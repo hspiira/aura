@@ -136,7 +136,7 @@ class ObjectiveTemplateRepository:
         }
         merged.update(updated_fields)
 
-        new_template = ObjectiveTemplate(**merged)  # type: ignore[arg-type]
+        new_template = ObjectiveTemplate(**merged)
         self._session.add(new_template)
         await self._session.flush()
         await self._session.refresh(new_template)

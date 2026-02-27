@@ -29,6 +29,7 @@ from app.api.v1.endpoints import (
     role_dimension_weights,
     role_permissions,
     roles,
+    user_tokens,
     users,
 )
 
@@ -143,4 +144,9 @@ api_router.include_router(
     notification_logs.router,
     prefix="/notification-logs",
     tags=["notification-logs"],
+)
+api_router.include_router(
+    user_tokens.router,
+    prefix="/user-tokens",
+    tags=["user-tokens"],
 )
