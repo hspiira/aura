@@ -6,7 +6,9 @@ import {
   Scripts,
 } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
+import { useEffect } from 'react'
 import { AppErrorPage, NotFoundPage } from '#/components/error-pages'
+import { wireApiAuth } from '#/lib/api-auth-wire'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -22,6 +24,9 @@ export const Route = createRootRoute({
 })
 
 function RootComponent() {
+  useEffect(() => {
+    wireApiAuth()
+  }, [])
   return (
     <RootDocument>
       <Outlet />

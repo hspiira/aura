@@ -1,6 +1,6 @@
 """Performance cycle request/response schemas."""
 
-from datetime import date
+from datetime import date, datetime
 
 from pydantic import BaseModel
 
@@ -24,5 +24,7 @@ class PerformanceCycleResponse(BaseModel):
     end_date: date
     status: str
     review_frequency: str | None
+    objectives_lock_date: date | None = None
+    objectives_locked_at: datetime | None = None
 
     model_config = {"from_attributes": True}

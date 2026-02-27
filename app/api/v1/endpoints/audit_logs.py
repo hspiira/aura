@@ -15,6 +15,20 @@ from app.schemas.pagination import PageResponse
 router = APIRouter()
 
 
+@router.get("/recent", response_model=list[AuditLogResponse])
+async def list_recent_audit_logs(
+    repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    _perm: Annotated[None, Depends(require_permission(VIEW_AUDIT_LOGS))],
+    entity_type: str = Query(..., description="Filter by entity type (e.g. objective)"),
+    limit: int = Query(20, ge=1, le=100),
+) -> list[AuditLogResponse]:
+    """List most recent audit entries for an entity type (e.g. dashboard feed)."""
+    entries = await repo.list_recent_by_entity_type(
+        entity_type=entity_type, limit=limit
+    )
+    return [AuditLogResponse.model_validate(e) for e in entries]
+
+
 @router.get("", response_model=PageResponse[AuditLogResponse])
 async def list_audit_logs_for_entity(
     entity_type: str,

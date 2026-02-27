@@ -9,12 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ComponentsRouteImport } from './routes/components'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppPeopleRouteImport } from './routes/_app/people'
+import { Route as AppObjectivesRouteImport } from './routes/_app/objectives'
+import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AppCyclesRouteImport } from './routes/_app/cycles'
+import { Route as AppComponentsRouteImport } from './routes/_app/components'
+import { Route as AppCalibrationRouteImport } from './routes/_app/calibration'
+import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
+import { Route as AppAdminRouteImport } from './routes/_app/admin'
+import { Route as AppObjectivesIdRouteImport } from './routes/_app/objectives.$id'
+import { Route as AppCyclesIdRouteImport } from './routes/_app/cycles.$id'
 
-const ComponentsRoute = ComponentsRouteImport.update({
-  id: '/components',
-  path: '/components',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,40 +37,167 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppPeopleRoute = AppPeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppObjectivesRoute = AppObjectivesRouteImport.update({
+  id: '/objectives',
+  path: '/objectives',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCyclesRoute = AppCyclesRouteImport.update({
+  id: '/cycles',
+  path: '/cycles',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppComponentsRoute = AppComponentsRouteImport.update({
+  id: '/components',
+  path: '/components',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalibrationRoute = AppCalibrationRouteImport.update({
+  id: '/calibration',
+  path: '/calibration',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppObjectivesIdRoute = AppObjectivesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppObjectivesRoute,
+} as any)
+const AppCyclesIdRoute = AppCyclesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppCyclesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/components': typeof ComponentsRoute
+  '/login': typeof LoginRoute
+  '/admin': typeof AppAdminRoute
+  '/analytics': typeof AppAnalyticsRoute
+  '/calibration': typeof AppCalibrationRoute
+  '/components': typeof AppComponentsRoute
+  '/cycles': typeof AppCyclesRouteWithChildren
+  '/dashboard': typeof AppDashboardRoute
+  '/objectives': typeof AppObjectivesRouteWithChildren
+  '/people': typeof AppPeopleRoute
+  '/cycles/$id': typeof AppCyclesIdRoute
+  '/objectives/$id': typeof AppObjectivesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/components': typeof ComponentsRoute
+  '/login': typeof LoginRoute
+  '/admin': typeof AppAdminRoute
+  '/analytics': typeof AppAnalyticsRoute
+  '/calibration': typeof AppCalibrationRoute
+  '/components': typeof AppComponentsRoute
+  '/cycles': typeof AppCyclesRouteWithChildren
+  '/dashboard': typeof AppDashboardRoute
+  '/objectives': typeof AppObjectivesRouteWithChildren
+  '/people': typeof AppPeopleRoute
+  '/cycles/$id': typeof AppCyclesIdRoute
+  '/objectives/$id': typeof AppObjectivesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/components': typeof ComponentsRoute
+  '/_app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_app/admin': typeof AppAdminRoute
+  '/_app/analytics': typeof AppAnalyticsRoute
+  '/_app/calibration': typeof AppCalibrationRoute
+  '/_app/components': typeof AppComponentsRoute
+  '/_app/cycles': typeof AppCyclesRouteWithChildren
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/objectives': typeof AppObjectivesRouteWithChildren
+  '/_app/people': typeof AppPeopleRoute
+  '/_app/cycles/$id': typeof AppCyclesIdRoute
+  '/_app/objectives/$id': typeof AppObjectivesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/components'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/analytics'
+    | '/calibration'
+    | '/components'
+    | '/cycles'
+    | '/dashboard'
+    | '/objectives'
+    | '/people'
+    | '/cycles/$id'
+    | '/objectives/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/components'
-  id: '__root__' | '/' | '/components'
+  to:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/analytics'
+    | '/calibration'
+    | '/components'
+    | '/cycles'
+    | '/dashboard'
+    | '/objectives'
+    | '/people'
+    | '/cycles/$id'
+    | '/objectives/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/login'
+    | '/_app/admin'
+    | '/_app/analytics'
+    | '/_app/calibration'
+    | '/_app/components'
+    | '/_app/cycles'
+    | '/_app/dashboard'
+    | '/_app/objectives'
+    | '/_app/people'
+    | '/_app/cycles/$id'
+    | '/_app/objectives/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ComponentsRoute: typeof ComponentsRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/components': {
-      id: '/components'
-      path: '/components'
-      fullPath: '/components'
-      preLoaderRoute: typeof ComponentsRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -65,12 +207,131 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/people': {
+      id: '/_app/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof AppPeopleRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/objectives': {
+      id: '/_app/objectives'
+      path: '/objectives'
+      fullPath: '/objectives'
+      preLoaderRoute: typeof AppObjectivesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/cycles': {
+      id: '/_app/cycles'
+      path: '/cycles'
+      fullPath: '/cycles'
+      preLoaderRoute: typeof AppCyclesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/components': {
+      id: '/_app/components'
+      path: '/components'
+      fullPath: '/components'
+      preLoaderRoute: typeof AppComponentsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/calibration': {
+      id: '/_app/calibration'
+      path: '/calibration'
+      fullPath: '/calibration'
+      preLoaderRoute: typeof AppCalibrationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/analytics': {
+      id: '/_app/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/objectives/$id': {
+      id: '/_app/objectives/$id'
+      path: '/$id'
+      fullPath: '/objectives/$id'
+      preLoaderRoute: typeof AppObjectivesIdRouteImport
+      parentRoute: typeof AppObjectivesRoute
+    }
+    '/_app/cycles/$id': {
+      id: '/_app/cycles/$id'
+      path: '/$id'
+      fullPath: '/cycles/$id'
+      preLoaderRoute: typeof AppCyclesIdRouteImport
+      parentRoute: typeof AppCyclesRoute
+    }
   }
 }
 
+interface AppCyclesRouteChildren {
+  AppCyclesIdRoute: typeof AppCyclesIdRoute
+}
+
+const AppCyclesRouteChildren: AppCyclesRouteChildren = {
+  AppCyclesIdRoute: AppCyclesIdRoute,
+}
+
+const AppCyclesRouteWithChildren = AppCyclesRoute._addFileChildren(
+  AppCyclesRouteChildren,
+)
+
+interface AppObjectivesRouteChildren {
+  AppObjectivesIdRoute: typeof AppObjectivesIdRoute
+}
+
+const AppObjectivesRouteChildren: AppObjectivesRouteChildren = {
+  AppObjectivesIdRoute: AppObjectivesIdRoute,
+}
+
+const AppObjectivesRouteWithChildren = AppObjectivesRoute._addFileChildren(
+  AppObjectivesRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
+  AppCalibrationRoute: typeof AppCalibrationRoute
+  AppComponentsRoute: typeof AppComponentsRoute
+  AppCyclesRoute: typeof AppCyclesRouteWithChildren
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppObjectivesRoute: typeof AppObjectivesRouteWithChildren
+  AppPeopleRoute: typeof AppPeopleRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
+  AppAnalyticsRoute: AppAnalyticsRoute,
+  AppCalibrationRoute: AppCalibrationRoute,
+  AppComponentsRoute: AppComponentsRoute,
+  AppCyclesRoute: AppCyclesRouteWithChildren,
+  AppDashboardRoute: AppDashboardRoute,
+  AppObjectivesRoute: AppObjectivesRouteWithChildren,
+  AppPeopleRoute: AppPeopleRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ComponentsRoute: ComponentsRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

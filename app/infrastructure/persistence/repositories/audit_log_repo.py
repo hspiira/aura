@@ -27,6 +27,20 @@ class AuditLogRepository:
         )
         return list(result.scalars().all())
 
+    async def list_recent_by_entity_type(
+        self,
+        entity_type: str,
+        limit: int = 20,
+    ) -> list[AuditLog]:
+        """Return most recent audit entries for an entity type (e.g. dashboard feed)."""
+        result = await self._session.execute(
+            select(AuditLog)
+            .where(AuditLog.entity_type == entity_type)
+            .order_by(AuditLog.changed_at.desc())
+            .limit(limit)
+        )
+        return list(result.scalars().all())
+
     async def list_by_entity_paginated(
         self,
         entity_type: str,

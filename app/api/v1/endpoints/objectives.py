@@ -80,11 +80,44 @@ router = APIRouter()
 @router.get("", response_model=PageResponse[ObjectiveResponse])
 async def list_objectives(
     repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
+    user_id: str | None = Query(
+        None, description="Filter by user (e.g. current user for 'my objectives')"
+    ),
+    performance_cycle_id: str | None = Query(
+        None, description="Filter by performance cycle"
+    ),
+    status: str | None = Query(
+        None, description="Filter by status (e.g. draft, active)"
+    ),
+    dimension_id: str | None = Query(
+        None, description="Filter by performance dimension"
+    ),
     limit: int = Query(100, ge=1, le=500),
     offset: int = Query(0, ge=0),
 ) -> PageResponse[ObjectiveResponse]:
-    """List all objectives."""
-    objectives, total = await repo.list_paginated(limit=limit, offset=offset)
+    """List objectives, optionally filtered by user, cycle, status, dimension."""
+    if user_id is not None:
+        objectives = await repo.list_by_user(user_id)
+        if performance_cycle_id is not None:
+            objectives = [
+                o for o in objectives if o.performance_cycle_id == performance_cycle_id
+            ]
+        if status is not None:
+            objectives = [o for o in objectives if o.status == status]
+        if dimension_id is not None:
+            objectives = [o for o in objectives if o.dimension_id == dimension_id]
+        total = len(objectives)
+        objectives = objectives[offset : offset + limit]
+    elif performance_cycle_id is not None:
+        objectives = await repo.list_by_cycle(performance_cycle_id)
+        if status is not None:
+            objectives = [o for o in objectives if o.status == status]
+        if dimension_id is not None:
+            objectives = [o for o in objectives if o.dimension_id == dimension_id]
+        total = len(objectives)
+        objectives = objectives[offset : offset + limit]
+    else:
+        objectives, total = await repo.list_paginated(limit=limit, offset=offset)
     return PageResponse(
         items=[ObjectiveResponse.model_validate(o) for o in objectives],
         total=total,
