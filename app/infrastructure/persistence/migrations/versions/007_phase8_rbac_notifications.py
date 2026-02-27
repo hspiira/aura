@@ -99,6 +99,18 @@ def upgrade() -> None:
             ["roles.id"],
             ondelete="CASCADE",
         ),
+        sa.UniqueConstraint(
+            "event_type",
+            "recipient_role_id",
+            "channel",
+            name="uq_notification_rule_event_role_channel",
+        ),
+    )
+    op.create_index(
+        "ix_notification_rules_event_type",
+        "notification_rules",
+        ["event_type"],
+        unique=False,
     )
     op.create_table(
         "notification_logs",

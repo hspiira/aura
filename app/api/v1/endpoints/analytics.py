@@ -2,7 +2,10 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+import asyncio
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, BackgroundTasks, Depends, Query
 
 from app.api.v1.dependencies import (
     get_fact_performance_summary_repo,
@@ -24,6 +27,38 @@ from app.infrastructure.persistence.repositories.user_repo import UserRepository
 from app.schemas.fact_performance_summary import FactPerformanceSummaryResponse
 
 router = APIRouter()
+
+etl_lock = asyncio.Lock()
+etl_status: dict[str, object] = {
+    "running": False,
+    "last_started_at": None,
+    "last_finished_at": None,
+    "last_upserted": None,
+    "last_error": None,
+}
+
+
+async def _run_fact_etl_job(
+    summary_repo: PerformanceSummaryRepository,
+    user_repo: UserRepository,
+    cycle_repo: PerformanceCycleRepository,
+    fact_repo: FactPerformanceSummaryRepository,
+) -> None:
+    """Run fact ETL under a single-flight lock and record status."""
+    async with etl_lock:
+        etl_status["running"] = True
+        etl_status["last_started_at"] = datetime.now(timezone.utc).isoformat()
+        etl_status["last_error"] = None
+        try:
+            count = await run_fact_performance_summary_etl(
+                summary_repo, user_repo, cycle_repo, fact_repo
+            )
+            etl_status["last_upserted"] = count
+        except Exception as exc:  # pragma: no cover - surfaced via status endpoint
+            etl_status["last_error"] = str(exc)
+        finally:
+            etl_status["running"] = False
+            etl_status["last_finished_at"] = datetime.now(timezone.utc).isoformat()
 
 
 @router.get(
@@ -48,7 +83,7 @@ async def list_fact_performance_summaries(
     return [FactPerformanceSummaryResponse.model_validate(i) for i in items]
 
 
-@router.post("/refresh")
+@router.post("/refresh", status_code=202)
 async def refresh_analytics_etl(
     summary_repo: Annotated[
         PerformanceSummaryRepository, Depends(get_performance_summary_repo)
@@ -61,9 +96,36 @@ async def refresh_analytics_etl(
         FactPerformanceSummaryRepository,
         Depends(get_fact_performance_summary_repo),
     ],
-) -> dict[str, int]:
-    """Run ETL: copy performance_summaries into fact_performance_summary. Returns count."""
-    count = await run_fact_performance_summary_etl(
-        summary_repo, user_repo, cycle_repo, fact_repo
+    background_tasks: BackgroundTasks,
+) -> dict[str, object]:
+    """Start ETL to copy performance_summaries into fact_performance_summary.
+
+    Runs in the background with single-flight semantics; returns quickly with status.
+    """
+    if etl_lock.locked():
+        return {
+            "status": "in_progress",
+            "last_started_at": etl_status["last_started_at"],
+            "last_finished_at": etl_status["last_finished_at"],
+            "last_upserted": etl_status["last_upserted"],
+        }
+
+    background_tasks.add_task(
+        _run_fact_etl_job,
+        summary_repo,
+        user_repo,
+        cycle_repo,
+        fact_repo,
     )
-    return {"upserted": count}
+    return {
+        "status": "accepted",
+        "last_started_at": etl_status["last_started_at"],
+        "last_finished_at": etl_status["last_finished_at"],
+        "last_upserted": etl_status["last_upserted"],
+    }
+
+
+@router.get("/refresh/status")
+async def get_refresh_status() -> dict[str, object]:
+    """Return current state of the analytics ETL refresh job."""
+    return etl_status

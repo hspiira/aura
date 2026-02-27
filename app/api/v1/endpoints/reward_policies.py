@@ -3,7 +3,7 @@
 from decimal import Decimal
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.v1.dependencies import get_reward_policy_repo
 from app.api.v1.helpers import get_one_or_raise
@@ -31,6 +31,17 @@ async def create_reward_policy(
     repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
 ) -> RewardPolicyResponse:
     """Create a reward policy band."""
+    existing = await repo.list_all()
+    has_overlap = any(
+        not (p.max_score < payload.min_score or p.min_score > payload.max_score)
+        for p in existing
+    )
+    if has_overlap:
+        raise HTTPException(
+            409,
+            "reward policy band overlaps an existing band",
+        )
+
     from app.infrastructure.persistence.models.reward_policy import (
         RewardPolicy,
     )

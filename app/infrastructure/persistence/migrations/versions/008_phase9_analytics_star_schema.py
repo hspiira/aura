@@ -80,6 +80,10 @@ def upgrade() -> None:
         sa.Column("year", sa.Integer(), nullable=False),
         sa.Column("quarter", sa.Integer(), nullable=False),
         sa.Column("label", sa.String(length=32), nullable=True),
+        sa.CheckConstraint(
+            "quarter >= 1 AND quarter <= 4",
+            name="ck_dim_time_quarter_1_4",
+        ),
         sa.PrimaryKeyConstraint("year", "quarter"),
     )
 

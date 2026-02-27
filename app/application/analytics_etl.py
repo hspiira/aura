@@ -1,5 +1,7 @@
 """ETL: copy performance_summaries into analytics fact table (star schema)."""
 
+import logging
+
 from app.infrastructure.persistence.models.fact_performance_summary import (
     FactPerformanceSummary,
 )
@@ -14,6 +16,8 @@ from app.infrastructure.persistence.repositories.performance_summary_repo import
 )
 from app.infrastructure.persistence.repositories.user_repo import UserRepository
 
+logger = logging.getLogger(__name__)
+
 
 async def run_fact_performance_summary_etl(
     summary_repo: PerformanceSummaryRepository,
@@ -23,11 +27,26 @@ async def run_fact_performance_summary_etl(
 ) -> int:
     """Copy all performance summaries into fact_performance_summary. Returns count upserted."""
     summaries = await summary_repo.list_all()
+    user_ids = {s.user_id for s in summaries}
+    cycle_ids = {s.performance_cycle_id for s in summaries}
+
+    users = await user_repo.list_all()
+    users_by_id = {u.id: u for u in users if u.id in user_ids}
+
+    cycles = await cycle_repo.list_all()
+    cycles_by_id = {c.id: c for c in cycles if c.id in cycle_ids}
+
     count = 0
     for s in summaries:
-        user = await user_repo.get_by_id(s.user_id)
-        cycle = await cycle_repo.get_by_id(s.performance_cycle_id)
+        user = users_by_id.get(s.user_id)
+        cycle = cycles_by_id.get(s.performance_cycle_id)
         if user is None or cycle is None:
+            logger.warning(
+                "Skipping performance_summary %s: user_id=%s cycle_id=%s (missing user or cycle)",
+                getattr(s, "id", None),
+                s.user_id,
+                s.performance_cycle_id,
+            )
             continue
         cycle_year = cycle.start_date.year
         existing = await fact_repo.get_by_user_cycle(s.user_id, s.performance_cycle_id)

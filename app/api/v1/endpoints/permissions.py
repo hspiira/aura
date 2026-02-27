@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.v1.dependencies import get_permission_repo
 from app.api.v1.helpers import get_one_or_raise
@@ -30,6 +30,13 @@ async def create_permission(
     repo: Annotated[PermissionRepository, Depends(get_permission_repo)],
 ) -> PermissionResponse:
     """Create a permission."""
+    existing = await repo.get_by_code(payload.code)
+    if existing is not None:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Permission with code '{payload.code}' already exists.",
+        )
+
     permission = Permission(
         code=payload.code,
         name=payload.name,

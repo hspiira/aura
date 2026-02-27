@@ -3,6 +3,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy.exc import IntegrityError
 
 from app.api.v1.dependencies import (
     get_permission_repo,
@@ -63,7 +64,15 @@ async def assign_permission_to_role(
         role_id=payload.role_id,
         permission_id=payload.permission_id,
     )
-    rp = await repo.add(rp)
+    try:
+        rp = await repo.add(rp)
+    except IntegrityError:
+        existing = await repo.get_by_role_and_permission(
+            payload.role_id, payload.permission_id
+        )
+        if existing is None:
+            raise
+        return RolePermissionResponse.model_validate(existing)
     return RolePermissionResponse.model_validate(rp)
 
 
