@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppReviewsRouteImport } from './routes/_app/reviews'
 import { Route as AppPeopleRouteImport } from './routes/_app/people'
 import { Route as AppObjectivesRouteImport } from './routes/_app/objectives'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
@@ -20,8 +21,18 @@ import { Route as AppComponentsRouteImport } from './routes/_app/components'
 import { Route as AppCalibrationRouteImport } from './routes/_app/calibration'
 import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
+import { Route as AppAdminIndexRouteImport } from './routes/_app/admin.index'
+import { Route as AppPeopleIdRouteImport } from './routes/_app/people.$id'
 import { Route as AppObjectivesIdRouteImport } from './routes/_app/objectives.$id'
 import { Route as AppCyclesIdRouteImport } from './routes/_app/cycles.$id'
+import { Route as AppAdminUsersRouteImport } from './routes/_app/admin.users'
+import { Route as AppAdminTokensRouteImport } from './routes/_app/admin.tokens'
+import { Route as AppAdminTemplatesRouteImport } from './routes/_app/admin.templates'
+import { Route as AppAdminRolesRouteImport } from './routes/_app/admin.roles'
+import { Route as AppAdminRewardPoliciesRouteImport } from './routes/_app/admin.reward-policies'
+import { Route as AppAdminNotificationsRouteImport } from './routes/_app/admin.notifications'
+import { Route as AppAdminDimensionsRouteImport } from './routes/_app/admin.dimensions'
+import { Route as AppAdminCyclesRouteImport } from './routes/_app/admin.cycles'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -36,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppReviewsRoute = AppReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppPeopleRoute = AppPeopleRouteImport.update({
   id: '/people',
@@ -77,6 +93,16 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppPeopleIdRoute = AppPeopleIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppPeopleRoute,
+} as any)
 const AppObjectivesIdRoute = AppObjectivesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -87,50 +113,122 @@ const AppCyclesIdRoute = AppCyclesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AppCyclesRoute,
 } as any)
+const AppAdminUsersRoute = AppAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminTokensRoute = AppAdminTokensRouteImport.update({
+  id: '/tokens',
+  path: '/tokens',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminTemplatesRoute = AppAdminTemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminRolesRoute = AppAdminRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminRewardPoliciesRoute = AppAdminRewardPoliciesRouteImport.update({
+  id: '/reward-policies',
+  path: '/reward-policies',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminNotificationsRoute = AppAdminNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminDimensionsRoute = AppAdminDimensionsRouteImport.update({
+  id: '/dimensions',
+  path: '/dimensions',
+  getParentRoute: () => AppAdminRoute,
+} as any)
+const AppAdminCyclesRoute = AppAdminCyclesRouteImport.update({
+  id: '/cycles',
+  path: '/cycles',
+  getParentRoute: () => AppAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/admin': typeof AppAdminRoute
+  '/admin': typeof AppAdminRouteWithChildren
   '/analytics': typeof AppAnalyticsRoute
   '/calibration': typeof AppCalibrationRoute
   '/components': typeof AppComponentsRoute
   '/cycles': typeof AppCyclesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/objectives': typeof AppObjectivesRouteWithChildren
-  '/people': typeof AppPeopleRoute
+  '/people': typeof AppPeopleRouteWithChildren
+  '/reviews': typeof AppReviewsRoute
+  '/admin/cycles': typeof AppAdminCyclesRoute
+  '/admin/dimensions': typeof AppAdminDimensionsRoute
+  '/admin/notifications': typeof AppAdminNotificationsRoute
+  '/admin/reward-policies': typeof AppAdminRewardPoliciesRoute
+  '/admin/roles': typeof AppAdminRolesRoute
+  '/admin/templates': typeof AppAdminTemplatesRoute
+  '/admin/tokens': typeof AppAdminTokensRoute
+  '/admin/users': typeof AppAdminUsersRoute
   '/cycles/$id': typeof AppCyclesIdRoute
   '/objectives/$id': typeof AppObjectivesIdRoute
+  '/people/$id': typeof AppPeopleIdRoute
+  '/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/admin': typeof AppAdminRoute
   '/analytics': typeof AppAnalyticsRoute
   '/calibration': typeof AppCalibrationRoute
   '/components': typeof AppComponentsRoute
   '/cycles': typeof AppCyclesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
   '/objectives': typeof AppObjectivesRouteWithChildren
-  '/people': typeof AppPeopleRoute
+  '/people': typeof AppPeopleRouteWithChildren
+  '/reviews': typeof AppReviewsRoute
+  '/admin/cycles': typeof AppAdminCyclesRoute
+  '/admin/dimensions': typeof AppAdminDimensionsRoute
+  '/admin/notifications': typeof AppAdminNotificationsRoute
+  '/admin/reward-policies': typeof AppAdminRewardPoliciesRoute
+  '/admin/roles': typeof AppAdminRolesRoute
+  '/admin/templates': typeof AppAdminTemplatesRoute
+  '/admin/tokens': typeof AppAdminTokensRoute
+  '/admin/users': typeof AppAdminUsersRoute
   '/cycles/$id': typeof AppCyclesIdRoute
   '/objectives/$id': typeof AppObjectivesIdRoute
+  '/people/$id': typeof AppPeopleIdRoute
+  '/admin': typeof AppAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
-  '/_app/admin': typeof AppAdminRoute
+  '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/analytics': typeof AppAnalyticsRoute
   '/_app/calibration': typeof AppCalibrationRoute
   '/_app/components': typeof AppComponentsRoute
   '/_app/cycles': typeof AppCyclesRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/objectives': typeof AppObjectivesRouteWithChildren
-  '/_app/people': typeof AppPeopleRoute
+  '/_app/people': typeof AppPeopleRouteWithChildren
+  '/_app/reviews': typeof AppReviewsRoute
+  '/_app/admin/cycles': typeof AppAdminCyclesRoute
+  '/_app/admin/dimensions': typeof AppAdminDimensionsRoute
+  '/_app/admin/notifications': typeof AppAdminNotificationsRoute
+  '/_app/admin/reward-policies': typeof AppAdminRewardPoliciesRoute
+  '/_app/admin/roles': typeof AppAdminRolesRoute
+  '/_app/admin/templates': typeof AppAdminTemplatesRoute
+  '/_app/admin/tokens': typeof AppAdminTokensRoute
+  '/_app/admin/users': typeof AppAdminUsersRoute
   '/_app/cycles/$id': typeof AppCyclesIdRoute
   '/_app/objectives/$id': typeof AppObjectivesIdRoute
+  '/_app/people/$id': typeof AppPeopleIdRoute
+  '/_app/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -145,13 +243,23 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/objectives'
     | '/people'
+    | '/reviews'
+    | '/admin/cycles'
+    | '/admin/dimensions'
+    | '/admin/notifications'
+    | '/admin/reward-policies'
+    | '/admin/roles'
+    | '/admin/templates'
+    | '/admin/tokens'
+    | '/admin/users'
     | '/cycles/$id'
     | '/objectives/$id'
+    | '/people/$id'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/admin'
     | '/analytics'
     | '/calibration'
     | '/components'
@@ -159,8 +267,19 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/objectives'
     | '/people'
+    | '/reviews'
+    | '/admin/cycles'
+    | '/admin/dimensions'
+    | '/admin/notifications'
+    | '/admin/reward-policies'
+    | '/admin/roles'
+    | '/admin/templates'
+    | '/admin/tokens'
+    | '/admin/users'
     | '/cycles/$id'
     | '/objectives/$id'
+    | '/people/$id'
+    | '/admin'
   id:
     | '__root__'
     | '/'
@@ -174,8 +293,19 @@ export interface FileRouteTypes {
     | '/_app/dashboard'
     | '/_app/objectives'
     | '/_app/people'
+    | '/_app/reviews'
+    | '/_app/admin/cycles'
+    | '/_app/admin/dimensions'
+    | '/_app/admin/notifications'
+    | '/_app/admin/reward-policies'
+    | '/_app/admin/roles'
+    | '/_app/admin/templates'
+    | '/_app/admin/tokens'
+    | '/_app/admin/users'
     | '/_app/cycles/$id'
     | '/_app/objectives/$id'
+    | '/_app/people/$id'
+    | '/_app/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -206,6 +336,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/reviews': {
+      id: '/_app/reviews'
+      path: '/reviews'
+      fullPath: '/reviews'
+      preLoaderRoute: typeof AppReviewsRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/people': {
       id: '/_app/people'
@@ -263,6 +400,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/admin/': {
+      id: '/_app/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AppAdminIndexRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/people/$id': {
+      id: '/_app/people/$id'
+      path: '/$id'
+      fullPath: '/people/$id'
+      preLoaderRoute: typeof AppPeopleIdRouteImport
+      parentRoute: typeof AppPeopleRoute
+    }
     '/_app/objectives/$id': {
       id: '/_app/objectives/$id'
       path: '/$id'
@@ -277,8 +428,92 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCyclesIdRouteImport
       parentRoute: typeof AppCyclesRoute
     }
+    '/_app/admin/users': {
+      id: '/_app/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AppAdminUsersRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/tokens': {
+      id: '/_app/admin/tokens'
+      path: '/tokens'
+      fullPath: '/admin/tokens'
+      preLoaderRoute: typeof AppAdminTokensRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/templates': {
+      id: '/_app/admin/templates'
+      path: '/templates'
+      fullPath: '/admin/templates'
+      preLoaderRoute: typeof AppAdminTemplatesRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/roles': {
+      id: '/_app/admin/roles'
+      path: '/roles'
+      fullPath: '/admin/roles'
+      preLoaderRoute: typeof AppAdminRolesRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/reward-policies': {
+      id: '/_app/admin/reward-policies'
+      path: '/reward-policies'
+      fullPath: '/admin/reward-policies'
+      preLoaderRoute: typeof AppAdminRewardPoliciesRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/notifications': {
+      id: '/_app/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AppAdminNotificationsRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/dimensions': {
+      id: '/_app/admin/dimensions'
+      path: '/dimensions'
+      fullPath: '/admin/dimensions'
+      preLoaderRoute: typeof AppAdminDimensionsRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
+    '/_app/admin/cycles': {
+      id: '/_app/admin/cycles'
+      path: '/cycles'
+      fullPath: '/admin/cycles'
+      preLoaderRoute: typeof AppAdminCyclesRouteImport
+      parentRoute: typeof AppAdminRoute
+    }
   }
 }
+
+interface AppAdminRouteChildren {
+  AppAdminCyclesRoute: typeof AppAdminCyclesRoute
+  AppAdminDimensionsRoute: typeof AppAdminDimensionsRoute
+  AppAdminNotificationsRoute: typeof AppAdminNotificationsRoute
+  AppAdminRewardPoliciesRoute: typeof AppAdminRewardPoliciesRoute
+  AppAdminRolesRoute: typeof AppAdminRolesRoute
+  AppAdminTemplatesRoute: typeof AppAdminTemplatesRoute
+  AppAdminTokensRoute: typeof AppAdminTokensRoute
+  AppAdminUsersRoute: typeof AppAdminUsersRoute
+  AppAdminIndexRoute: typeof AppAdminIndexRoute
+}
+
+const AppAdminRouteChildren: AppAdminRouteChildren = {
+  AppAdminCyclesRoute: AppAdminCyclesRoute,
+  AppAdminDimensionsRoute: AppAdminDimensionsRoute,
+  AppAdminNotificationsRoute: AppAdminNotificationsRoute,
+  AppAdminRewardPoliciesRoute: AppAdminRewardPoliciesRoute,
+  AppAdminRolesRoute: AppAdminRolesRoute,
+  AppAdminTemplatesRoute: AppAdminTemplatesRoute,
+  AppAdminTokensRoute: AppAdminTokensRoute,
+  AppAdminUsersRoute: AppAdminUsersRoute,
+  AppAdminIndexRoute: AppAdminIndexRoute,
+}
+
+const AppAdminRouteWithChildren = AppAdminRoute._addFileChildren(
+  AppAdminRouteChildren,
+)
 
 interface AppCyclesRouteChildren {
   AppCyclesIdRoute: typeof AppCyclesIdRoute
@@ -304,26 +539,40 @@ const AppObjectivesRouteWithChildren = AppObjectivesRoute._addFileChildren(
   AppObjectivesRouteChildren,
 )
 
+interface AppPeopleRouteChildren {
+  AppPeopleIdRoute: typeof AppPeopleIdRoute
+}
+
+const AppPeopleRouteChildren: AppPeopleRouteChildren = {
+  AppPeopleIdRoute: AppPeopleIdRoute,
+}
+
+const AppPeopleRouteWithChildren = AppPeopleRoute._addFileChildren(
+  AppPeopleRouteChildren,
+)
+
 interface AppRouteChildren {
-  AppAdminRoute: typeof AppAdminRoute
+  AppAdminRoute: typeof AppAdminRouteWithChildren
   AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppCalibrationRoute: typeof AppCalibrationRoute
   AppComponentsRoute: typeof AppComponentsRoute
   AppCyclesRoute: typeof AppCyclesRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
   AppObjectivesRoute: typeof AppObjectivesRouteWithChildren
-  AppPeopleRoute: typeof AppPeopleRoute
+  AppPeopleRoute: typeof AppPeopleRouteWithChildren
+  AppReviewsRoute: typeof AppReviewsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppAdminRoute: AppAdminRoute,
+  AppAdminRoute: AppAdminRouteWithChildren,
   AppAnalyticsRoute: AppAnalyticsRoute,
   AppCalibrationRoute: AppCalibrationRoute,
   AppComponentsRoute: AppComponentsRoute,
   AppCyclesRoute: AppCyclesRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
   AppObjectivesRoute: AppObjectivesRouteWithChildren,
-  AppPeopleRoute: AppPeopleRoute,
+  AppPeopleRoute: AppPeopleRouteWithChildren,
+  AppReviewsRoute: AppReviewsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

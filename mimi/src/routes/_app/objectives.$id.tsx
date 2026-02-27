@@ -16,7 +16,7 @@ import {
   objectiveScoreByObjectiveQueryOptions,
   objectiveUpdatesQueryOptions,
 } from '#/lib/queries'
-import { apiPatch, apiPost } from '#/lib/api'
+import { apiPatch } from '#/lib/api'
 import { AmendObjectiveDrawer } from '#/components/objectives/AmendObjectiveDrawer'
 
 export const Route = createFileRoute('/_app/objectives/$id')({
@@ -269,7 +269,7 @@ function ObjectiveDetailPage() {
                   <li key={entry.id} className="text-stone-600">
                     <span className="font-medium text-stone-700">{entry.action}</span>
                     {' · '}
-                    {format(parseISO(entry.changed_at), 'MMM d HH:mm')}
+                    {format(parseISO(entry.created_at), 'MMM d HH:mm')}
                     {entry.changed_by && ` · ${entry.changed_by}`}
                   </li>
                 ))}

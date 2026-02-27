@@ -6,9 +6,12 @@ import {
   Scripts,
 } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
-import { useEffect } from 'react'
 import { AppErrorPage, NotFoundPage } from '#/components/error-pages'
 import { wireApiAuth } from '#/lib/api-auth-wire'
+
+// Wire token getter and 401 handler at module load time — runs before any render,
+// including SSR. The functions are no-ops when window is undefined.
+wireApiAuth()
 
 export const Route = createRootRoute({
   head: () => ({
@@ -24,9 +27,6 @@ export const Route = createRootRoute({
 })
 
 function RootComponent() {
-  useEffect(() => {
-    wireApiAuth()
-  }, [])
   return (
     <RootDocument>
       <Outlet />

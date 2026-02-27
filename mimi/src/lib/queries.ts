@@ -61,6 +61,7 @@ import type {
   UserResponse,
   UserTokenCreateRequest,
   UserTokenCreateResponse,
+  UserTokenResponse,
   ValidateObjectiveResponse,
   VarianceItem,
 } from '#/lib/types'
@@ -175,7 +176,8 @@ export const queryKeys = {
     detail: (id: string) => ['review-sessions', id] as const,
   },
   calibrationSessions: {
-    all: (params?: { performance_cycle_id?: string }) => ['calibration-sessions', params] as const,
+    all: (params?: { performance_cycle_id?: string; department_id?: string }) =>
+      ['calibration-sessions', params] as const,
     detail: (id: string) => ['calibration-sessions', id] as const,
   },
   rewardPolicies: {
@@ -198,7 +200,10 @@ export const queryKeys = {
   notificationLogs: {
     all: (params?: { limit?: number; offset?: number }) => ['notification-logs', params] as const,
   },
-  userTokens: {} as const,
+  userTokens: {
+    all: (params?: { user_id?: string; limit?: number }) =>
+      ['user-tokens', params] as const,
+  },
 }
 
 // ─── Health ──────────────────────────────────────────────────────────────────
@@ -332,6 +337,18 @@ export function meQueryOptions() {
   return queryOptions({
     queryKey: queryKeys.users.me,
     queryFn: () => apiGet<MeResponse>('users/me'),
+  })
+}
+
+export function userTokensQueryOptions(params?: { user_id?: string; limit?: number }) {
+  const search = new URLSearchParams()
+  if (params?.user_id) search.set('user_id', params.user_id)
+  if (params?.limit != null) search.set('limit', String(params.limit))
+  const qs = search.toString()
+  return queryOptions({
+    queryKey: queryKeys.userTokens.all(params),
+    queryFn: () =>
+      apiGet<UserTokenResponse[]>(`user-tokens${qs ? `?${qs}` : ''}`),
   })
 }
 
@@ -522,7 +539,8 @@ export function auditLogsRecentQueryOptions(entityType: string, limit = 20) {
   const search = new URLSearchParams({ entity_type: entityType, limit: String(limit) })
   return queryOptions({
     queryKey: queryKeys.auditLogs.recent(entityType, limit),
-    queryFn: () => apiGet<AuditLogResponse[]>(`audit-logs/recent?${search}`),
+    queryFn: () =>
+      apiGet<PageResponse<AuditLogResponse>>(`audit-logs?${search}`).then((r) => r.items),
     enabled: !!entityType,
   })
 }
@@ -659,9 +677,13 @@ export function reviewSessionDetailQueryOptions(id: string) {
 
 // ─── Calibration sessions ──────────────────────────────────────────────────────
 
-export function calibrationSessionsQueryOptions(params?: { performance_cycle_id?: string }) {
+export function calibrationSessionsQueryOptions(params?: {
+  performance_cycle_id?: string
+  department_id?: string
+}) {
   const search = new URLSearchParams()
   if (params?.performance_cycle_id) search.set('performance_cycle_id', params.performance_cycle_id)
+  if (params?.department_id) search.set('department_id', params.department_id)
   const qs = search.toString()
   return queryOptions({
     queryKey: queryKeys.calibrationSessions.all(params),
@@ -686,10 +708,11 @@ export function rewardPoliciesQueryOptions() {
   })
 }
 
-export function rewardPolicyBandQueryOptions() {
+export function rewardPolicyBandQueryOptions(score: string) {
   return queryOptions({
-    queryKey: queryKeys.rewardPolicies.band,
-    queryFn: () => apiGet<RewardPolicyResponse>('reward-policies/band'),
+    queryKey: [...queryKeys.rewardPolicies.band, score] as const,
+    queryFn: () => apiGet<RewardPolicyResponse>(`reward-policies/band?score=${encodeURIComponent(score)}`),
+    enabled: !!score,
   })
 }
 

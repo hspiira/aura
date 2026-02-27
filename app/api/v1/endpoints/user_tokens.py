@@ -4,7 +4,7 @@ import secrets
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 
 from app.api.v1.dependencies import (
@@ -30,6 +30,31 @@ class UserTokenCreateRequest(BaseModel):
 
 class UserTokenCreateResponse(BaseModel):
     token: str
+
+
+class UserTokenResponse(BaseModel):
+    """Token record (no secret value)."""
+
+    id: str
+    user_id: str
+    description: str | None
+    expires_at: datetime | None
+    revoked: bool
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+@router.get("", response_model=list[UserTokenResponse])
+async def list_user_tokens(
+    token_repo: Annotated[UserTokenRepository, Depends(get_user_token_repo)],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_RBAC))],
+    user_id: str | None = Query(None, description="Filter by user"),
+    limit: int = Query(200, ge=1, le=500),
+) -> list[UserTokenResponse]:
+    """List token records (no secret); filter by user_id when set."""
+    tokens = await token_repo.list_all(user_id=user_id, limit=limit)
+    return [UserTokenResponse.model_validate(t) for t in tokens]
 
 
 @router.post(

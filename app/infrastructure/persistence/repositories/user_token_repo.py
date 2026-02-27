@@ -29,6 +29,16 @@ class UserTokenRepository:
         )
         return result.scalar_one_or_none()
 
+    async def list_all(
+        self, user_id: str | None = None, limit: int = 200
+    ) -> list[UserToken]:
+        """Return tokens, optionally filtered by user_id, newest first."""
+        q = select(UserToken).order_by(UserToken.created_at.desc()).limit(limit)
+        if user_id is not None:
+            q = q.where(UserToken.user_id == user_id)
+        result = await self._session.execute(q)
+        return list(result.scalars().all())
+
     async def get_by_id(self, id: str) -> UserToken | None:
         """Return a token by its primary key."""
         result = await self._session.execute(

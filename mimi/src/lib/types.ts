@@ -30,6 +30,15 @@ export interface UserTokenCreateResponse {
   token: string
 }
 
+export interface UserTokenResponse {
+  id: string
+  user_id: string
+  description: string | null
+  expires_at: string | null
+  revoked: boolean
+  created_at: string
+}
+
 // ─── Users ───────────────────────────────────────────────────────────────────
 
 export interface UserResponse {
@@ -299,7 +308,7 @@ export interface AuditLogResponse {
   old_value: Record<string, unknown> | null
   new_value: Record<string, unknown> | null
   changed_by: string | null
-  changed_at: string
+  created_at: string
 }
 
 // ─── Baseline snapshots ───────────────────────────────────────────────────────

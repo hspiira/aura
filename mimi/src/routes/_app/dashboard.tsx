@@ -18,7 +18,7 @@ import {
   performanceCyclesQueryOptions,
   performanceSummaryByUserCycleQueryOptions,
 } from '#/lib/queries'
-import type { ObjectiveResponse, PerformanceCycleResponse } from '#/lib/types'
+import type { PerformanceCycleResponse } from '#/lib/types'
 import { selectedCycleStore } from '#/stores/selected-cycle'
 
 export const Route = createFileRoute('/_app/dashboard')({
@@ -331,7 +331,7 @@ function DashboardPage() {
                       </span>
                     </p>
                     <p className="mt-0.5 text-[11px] text-stone-400">
-                      {format(parseISO(entry.changed_at), 'MMM d, HH:mm')}
+                      {format(parseISO(entry.created_at), 'MMM d, HH:mm')}
                       {entry.changed_by && ` · by ${entry.changed_by}`}
                     </p>
                   </li>
