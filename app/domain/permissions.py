@@ -1,0 +1,11 @@
+"""Permission code constants for RBAC (must match seeded permissions in DB)."""
+
+APPROVE_OBJECTIVES = "approve_objectives"
+EDIT_OBJECTIVES = "edit_objectives"
+RUN_CALIBRATION = "run_calibration"
+MANAGE_SUMMARIES = "manage_summaries"
+MANAGE_REWARD_POLICY = "manage_reward_policy"
+MANAGE_TEMPLATES = "manage_templates"
+VIEW_AUDIT_LOGS = "view_audit_logs"
+MANAGE_RBAC = "manage_rbac"
+MANAGE_BASELINES = "manage_baselines"

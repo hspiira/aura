@@ -4,9 +4,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.api.v1.dependencies import get_permission_repo
+from app.api.v1.dependencies import get_audit_log_repo, get_permission_repo
 from app.api.v1.helpers import get_one_or_raise
+from app.core.audit import audit_log
+from app.core.auth import CurrentUserIdOptional
 from app.infrastructure.persistence.models.permission import Permission
+from app.infrastructure.persistence.repositories.audit_log_repo import (
+    AuditLogRepository,
+)
 from app.infrastructure.persistence.repositories.permission_repo import (
     PermissionRepository,
 )
@@ -28,6 +33,8 @@ async def list_permissions(
 async def create_permission(
     payload: PermissionCreate,
     repo: Annotated[PermissionRepository, Depends(get_permission_repo)],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
 ) -> PermissionResponse:
     """Create a permission."""
     existing = await repo.get_by_code(payload.code)
@@ -43,6 +50,14 @@ async def create_permission(
         description=payload.description,
     )
     permission = await repo.add(permission)
+    await audit_log(
+        audit_repo,
+        "permission",
+        permission.id,
+        "create",
+        new_value={"code": permission.code},
+        changed_by=changed_by,
+    )
     return PermissionResponse.model_validate(permission)
 
 

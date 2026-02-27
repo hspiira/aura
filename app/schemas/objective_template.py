@@ -20,6 +20,19 @@ class ObjectiveTemplateCreate(BaseModel):
     is_active: bool = True
 
 
+class ObjectiveTemplateUpdate(BaseModel):
+    """Payload to update an objective template (only when not in a started cycle)."""
+
+    title: str | None = None
+    description: str | None = None
+    kpi_type: str | None = None
+    default_weight: Decimal | None = None
+    min_target: Decimal | None = None
+    max_target: Decimal | None = None
+    requires_baseline_snapshot: bool | None = None
+    is_active: bool | None = None
+
+
 class ObjectiveTemplateResponse(BaseModel):
     """Objective template in API responses."""
 

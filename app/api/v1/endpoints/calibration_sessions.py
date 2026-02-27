@@ -4,10 +4,18 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from app.api.v1.dependencies import get_calibration_session_repo
+from app.api.v1.dependencies import (
+    get_audit_log_repo,
+    get_calibration_session_repo,
+)
 from app.api.v1.helpers import get_one_or_raise
+from app.core.audit import audit_log
+from app.core.auth import CurrentUserIdOptional
 from app.infrastructure.persistence.models.calibration_session import (
     CalibrationSession,
+)
+from app.infrastructure.persistence.repositories.audit_log_repo import (
+    AuditLogRepository,
 )
 from app.infrastructure.persistence.repositories.calibration_session_repo import (
     CalibrationSessionRepository,
@@ -48,6 +56,8 @@ async def create_calibration_session(
     repo: Annotated[
         CalibrationSessionRepository, Depends(get_calibration_session_repo)
     ],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
 ) -> CalibrationSessionResponse:
     """Create a calibration session."""
     session = CalibrationSession(
@@ -58,6 +68,14 @@ async def create_calibration_session(
         notes=payload.notes,
     )
     session = await repo.add(session)
+    await audit_log(
+        audit_repo,
+        "calibration_session",
+        session.id,
+        "create",
+        new_value={"performance_cycle_id": session.performance_cycle_id, "department_id": session.department_id},
+        changed_by=changed_by,
+    )
     return CalibrationSessionResponse.model_validate(session)
 
 

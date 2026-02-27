@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     database_url: str = ""
     database_echo: bool = False
 
+    # Auth (optional; for RBAC and audit changed_by)
+    auth_disabled: bool = False
+    api_key: str | None = None
+    auth_default_user_id: str | None = None
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

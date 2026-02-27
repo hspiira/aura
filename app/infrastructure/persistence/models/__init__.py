@@ -25,6 +25,7 @@ from app.infrastructure.persistence.models.objective import Objective
 from app.infrastructure.persistence.models.objective_evidence import (
     ObjectiveEvidence,
 )
+from app.infrastructure.persistence.models.objective_flag import ObjectiveFlag
 from app.infrastructure.persistence.models.objective_score import ObjectiveScore
 from app.infrastructure.persistence.models.objective_template import (
     ObjectiveTemplate,
@@ -64,6 +65,7 @@ __all__ = [
     "FactPerformanceSummary",
     "Objective",
     "ObjectiveEvidence",
+    "ObjectiveFlag",
     "ObjectiveScore",
     "ObjectiveTemplate",
     "ObjectiveUpdate",

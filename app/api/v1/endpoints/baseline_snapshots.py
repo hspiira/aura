@@ -4,10 +4,15 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.api.v1.dependencies import get_baseline_snapshot_repo
+from app.api.v1.dependencies import get_audit_log_repo, get_baseline_snapshot_repo
+from app.core.audit import audit_log
+from app.core.auth import CurrentUserIdOptional
 from app.domain.exceptions import ResourceNotFoundException
 from app.infrastructure.persistence.models.baseline_snapshot import (
     BaselineSnapshot,
+)
+from app.infrastructure.persistence.repositories.audit_log_repo import (
+    AuditLogRepository,
 )
 from app.infrastructure.persistence.repositories.baseline_snapshot_repo import (
     BaselineSnapshotRepository,
@@ -35,6 +40,8 @@ async def list_baseline_snapshots(
 async def create_baseline_snapshot(
     payload: BaselineSnapshotCreate,
     repo: Annotated[BaselineSnapshotRepository, Depends(get_baseline_snapshot_repo)],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
 ) -> BaselineSnapshotResponse:
     """Create a baseline snapshot (immutable once created)."""
     snapshot = BaselineSnapshot(
@@ -46,6 +53,14 @@ async def create_baseline_snapshot(
         data_source=payload.data_source,
     )
     snapshot = await repo.add(snapshot)
+    await audit_log(
+        audit_repo,
+        "baseline_snapshot",
+        snapshot.id,
+        "create",
+        new_value={"user_id": snapshot.user_id, "template_id": snapshot.template_id},
+        changed_by=changed_by,
+    )
     return BaselineSnapshotResponse.model_validate(snapshot)
 
 

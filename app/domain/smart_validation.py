@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 
 TITLE_MIN_LENGTH = 10
 WEIGHT_TOTAL_TARGET = Decimal("100")
+MAX_CUSTOM_WEIGHT = Decimal("30")
+LOWER_TARGET_THRESHOLD = Decimal("0.8")  # new target < 80% of last achievement
 
 
 @dataclass(frozen=True)
@@ -40,12 +42,20 @@ def validate_objective(
     template: "ObjectiveTemplate | None" = None,
     other_weights_sum: Decimal = Decimal("0"),
     has_baseline_for_template: bool = False,
+    last_achievement_value: Decimal | None = None,
+    justification_for_lower_target: str | None = None,
+    is_custom_objective: bool = False,
+    max_custom_weight: Decimal = MAX_CUSTOM_WEIGHT,
+    is_behavioral_dimension: bool = False,
 ) -> ValidationResult:
     """Run SMART validation; returns ValidationResult(valid, errors).
 
     has_baseline_for_template defaults to False so that callers must explicitly
     pass True when a baseline exists; otherwise template.requires_baseline_snapshot
     is enforced (fail closed).
+
+    Anti-gaming: if target < 80%% of last achievement, justification required;
+    custom objectives max weight 30%%; free-text (no template) only for Behavioral.
     """
     errors: list[str] = []
 
@@ -100,6 +110,30 @@ def validate_objective(
         and not has_baseline_for_template
     ):
         errors.append("template requires a baseline snapshot for this user/cycle")
+
+    # Anti-gaming: new target >20% below last achievement requires justification
+    if (
+        last_achievement_value is not None
+        and target_value is not None
+        and last_achievement_value > 0
+        and target_value < last_achievement_value * LOWER_TARGET_THRESHOLD
+    ):
+        if not (justification_for_lower_target or "").strip():
+            errors.append(
+                "target more than 20% below last achievement requires a justification"
+            )
+
+    # Anti-gaming: custom objectives max 30% weight
+    if is_custom_objective and weight > max_custom_weight:
+        errors.append(
+            f"custom objectives may not exceed {max_custom_weight}% weight (current: {weight}%)"
+        )
+
+    # Anti-gaming: free-text (no template) only allowed for Behavioral dimension
+    if not is_behavioral_dimension and template is None:
+        errors.append(
+            "free-text objectives (no template) are only allowed for Behavioral dimension"
+        )
 
     return ValidationResult(valid=len(errors) == 0, errors=errors)
 

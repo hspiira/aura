@@ -3,6 +3,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.infrastructure.persistence.models.permission import Permission
 from app.infrastructure.persistence.models.role_permission import RolePermission
 from app.infrastructure.persistence.persist import persist_and_refresh
 
@@ -17,6 +18,15 @@ class RolePermissionRepository:
         """Return all role-permission links for a role."""
         result = await self._session.execute(
             select(RolePermission).where(RolePermission.role_id == role_id)
+        )
+        return list(result.scalars().all())
+
+    async def list_permission_codes_by_role(self, role_id: str) -> list[str]:
+        """Return permission codes for a role (for RBAC)."""
+        result = await self._session.execute(
+            select(Permission.code)
+            .join(RolePermission, RolePermission.permission_id == Permission.id)
+            .where(RolePermission.role_id == role_id)
         )
         return list(result.scalars().all())
 

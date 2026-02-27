@@ -1,10 +1,16 @@
 """Objective template repository."""
 
+from datetime import date
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.infrastructure.persistence.models.objective import Objective
 from app.infrastructure.persistence.models.objective_template import (
     ObjectiveTemplate,
+)
+from app.infrastructure.persistence.models.performance_cycle import (
+    PerformanceCycle,
 )
 
 
@@ -47,6 +53,37 @@ class ObjectiveTemplateRepository:
     async def add(self, template: ObjectiveTemplate) -> ObjectiveTemplate:
         """Persist a template."""
         self._session.add(template)
+        await self._session.flush()
+        await self._session.refresh(template)
+        return template
+
+    async def has_any_objective_in_started_cycle(
+        self, template_id: str, on_date: date | None = None
+    ) -> bool:
+        """True if any objective using this template is in a cycle already started."""
+        today = on_date or date.today()
+        result = await self._session.execute(
+            select(1)
+            .select_from(Objective)
+            .join(
+                PerformanceCycle,
+                Objective.performance_cycle_id == PerformanceCycle.id,
+            )
+            .where(
+                Objective.template_id == template_id,
+                PerformanceCycle.start_date <= today,
+            )
+            .limit(1)
+        )
+        return result.scalar_one_or_none() is not None
+
+    async def update(
+        self, template: ObjectiveTemplate, **kwargs: object
+    ) -> ObjectiveTemplate:
+        """Update template fields (caller must ensure immutability)."""
+        for key, value in kwargs.items():
+            if hasattr(template, key):
+                setattr(template, key, value)
         await self._session.flush()
         await self._session.refresh(template)
         return template

@@ -6,12 +6,18 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.exc import IntegrityError
 
 from app.api.v1.dependencies import (
+    get_audit_log_repo,
     get_permission_repo,
     get_role_permission_repo,
     get_role_repo,
 )
 from app.api.v1.helpers import get_one_or_raise
+from app.core.audit import audit_log
+from app.core.auth import CurrentUserIdOptional
 from app.infrastructure.persistence.models.role_permission import RolePermission
+from app.infrastructure.persistence.repositories.audit_log_repo import (
+    AuditLogRepository,
+)
 from app.infrastructure.persistence.repositories.permission_repo import (
     PermissionRepository,
 )
@@ -43,6 +49,8 @@ async def assign_permission_to_role(
     repo: Annotated[RolePermissionRepository, Depends(get_role_permission_repo)],
     permission_repo: Annotated[PermissionRepository, Depends(get_permission_repo)],
     role_repo: Annotated[RoleRepository, Depends(get_role_repo)],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
 ) -> RolePermissionResponse:
     """Assign permission to role (idempotent: returns existing if already assigned)."""
     existing = await repo.get_by_role_and_permission(
@@ -73,6 +81,14 @@ async def assign_permission_to_role(
         if existing is None:
             raise
         return RolePermissionResponse.model_validate(existing)
+    await audit_log(
+        audit_repo,
+        "role_permission",
+        rp.id,
+        "assign",
+        new_value={"role_id": rp.role_id, "permission_id": rp.permission_id},
+        changed_by=changed_by,
+    )
     return RolePermissionResponse.model_validate(rp)
 
 
@@ -80,7 +96,17 @@ async def assign_permission_to_role(
 async def remove_role_permission(
     id: str,
     repo: Annotated[RolePermissionRepository, Depends(get_role_permission_repo)],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
 ) -> None:
     """Remove a role-permission assignment by id."""
     rp = await get_one_or_raise(repo.get_by_id(id), id, "RolePermission")
+    await audit_log(
+        audit_repo,
+        "role_permission",
+        id,
+        "remove",
+        old_value={"role_id": rp.role_id, "permission_id": rp.permission_id},
+        changed_by=changed_by,
+    )
     await repo.delete(rp)

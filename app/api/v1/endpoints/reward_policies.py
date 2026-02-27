@@ -5,9 +5,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.api.v1.dependencies import get_reward_policy_repo
+from app.api.v1.dependencies import get_audit_log_repo, get_reward_policy_repo
 from app.api.v1.helpers import get_one_or_raise
+from app.core.audit import audit_log
+from app.core.auth import CurrentUserIdOptional
 from app.domain.exceptions import ResourceNotFoundException
+from app.infrastructure.persistence.repositories.audit_log_repo import (
+    AuditLogRepository,
+)
 from app.infrastructure.persistence.repositories.reward_policy_repo import (
     RewardPolicyRepository,
 )
@@ -29,6 +34,8 @@ async def list_reward_policies(
 async def create_reward_policy(
     payload: RewardPolicyCreate,
     repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
 ) -> RewardPolicyResponse:
     """Create a reward policy band."""
     existing = await repo.list_all()
@@ -53,6 +60,14 @@ async def create_reward_policy(
         reward_value=payload.reward_value,
     )
     policy = await repo.add(policy)
+    await audit_log(
+        audit_repo,
+        "reward_policy",
+        policy.id,
+        "create",
+        new_value={"reward_type": policy.reward_type},
+        changed_by=changed_by,
+    )
     return RewardPolicyResponse.model_validate(policy)
 
 

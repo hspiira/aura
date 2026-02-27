@@ -1,7 +1,10 @@
 """Objective update repository."""
 
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import func
 
 from app.infrastructure.persistence.models.objective_update import ObjectiveUpdate
 
@@ -34,3 +37,13 @@ class ObjectiveUpdateRepository:
         await self._session.flush()
         await self._session.refresh(update)
         return update
+
+    async def get_last_update_at_by_objective(self) -> dict[str, datetime]:
+        """Return mapping of objective_id -> latest update created_at (for staleness)."""
+        result = await self._session.execute(
+            select(
+                ObjectiveUpdate.objective_id,
+                func.max(ObjectiveUpdate.created_at).label("last_at"),
+            ).group_by(ObjectiveUpdate.objective_id)
+        )
+        return {row[0]: row[1] for row in result.all()}

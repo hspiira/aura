@@ -2,8 +2,10 @@
 
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.auth import get_current_user_id
 
 from app.infrastructure.persistence.database import get_db_transactional
 from app.infrastructure.persistence.repositories.audit_log_repo import (
@@ -252,3 +254,33 @@ async def get_fact_performance_summary_repo(
 ) -> FactPerformanceSummaryRepository:
     """Yield analytics fact repository."""
     return FactPerformanceSummaryRepository(session)
+
+
+async def get_current_user_permissions(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    user_repo: Annotated[UserRepository, Depends(get_user_repo)],
+    role_permission_repo: Annotated[
+        RolePermissionRepository, Depends(get_role_permission_repo)
+    ],
+) -> set[str]:
+    """Resolve current user -> role -> permission codes (for RBAC)."""
+    user = await user_repo.get_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=403, detail="User or role not found")
+    codes = await role_permission_repo.list_permission_codes_by_role(user.role_id)
+    return set(codes)
+
+
+def require_permission(code: str):
+    """Return a dependency that raises 403 if current user lacks the permission."""
+
+    async def _check(
+        permissions: Annotated[set[str], Depends(get_current_user_permissions)],
+    ) -> None:
+        if code not in permissions:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Insufficient permission: {code} required",
+            )
+
+    return Depends(_check)
