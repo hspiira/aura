@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy import ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.persistence.database import Base
@@ -18,6 +18,14 @@ class NotificationRule(CuidMixin, TimestampMixin, Base):
     """Rule: when event_type occurs, notify recipient_role via channel with template."""
 
     __tablename__ = "notification_rules"
+    __table_args__ = (
+        UniqueConstraint(
+            "event_type",
+            "recipient_role_id",
+            "channel",
+            name="uq_notification_rule_event_role_channel",
+        ),
+    )
 
     event_type: Mapped[str] = mapped_column(String(64), nullable=False)
     recipient_role_id: Mapped[str] = mapped_column(

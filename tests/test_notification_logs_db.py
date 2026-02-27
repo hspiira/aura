@@ -6,6 +6,7 @@ from app.infrastructure.persistence.models.notification_log import (
     NotificationLog,
 )
 from app.infrastructure.persistence.repositories.notification_log_repo import (
+    MAX_LIMIT,
     NotificationLogRepository,
 )
 
@@ -56,6 +57,44 @@ async def test_notification_log_list_by_event_type(db_session) -> None:
     assert len(listed) == 1
     assert listed[0].id == e1.id
     assert listed[0].event_type == "calibration_scheduled"
+
+
+@pytest.mark.asyncio
+async def test_notification_log_list_all_clamps_limit(db_session) -> None:
+    """list_all clamps limit to [1, MAX_LIMIT]; limit=0 behaves as 1."""
+    repo = NotificationLogRepository(db_session)
+    entry = NotificationLog(
+        event_type="limit_test",
+        recipient_id="u",
+        channel="in_app",
+        status="sent",
+    )
+    await repo.add(entry)
+
+    listed_zero = await repo.list_all(limit=0)
+    assert len(listed_zero) == 1
+    assert listed_zero[0].id == entry.id
+
+    listed_over_cap = await repo.list_all(limit=MAX_LIMIT + 5000)
+    assert len(listed_over_cap) >= 1
+    assert len(listed_over_cap) <= MAX_LIMIT
+
+
+@pytest.mark.asyncio
+async def test_notification_log_list_by_event_type_clamps_limit(db_session) -> None:
+    """list_by_event_type clamps limit to [1, MAX_LIMIT]; limit=0 behaves as 1."""
+    repo = NotificationLogRepository(db_session)
+    entry = NotificationLog(
+        event_type="clamp_test",
+        recipient_id="u",
+        channel="in_app",
+        status="sent",
+    )
+    await repo.add(entry)
+
+    listed_zero = await repo.list_by_event_type("clamp_test", limit=0)
+    assert len(listed_zero) == 1
+    assert listed_zero[0].id == entry.id
 
 
 @pytest.mark.asyncio
