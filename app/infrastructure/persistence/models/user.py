@@ -33,14 +33,8 @@ class User(CuidMixin, TimestampMixin, Base):
         nullable=True,
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    email: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
     password_hash: Mapped[str | None] = mapped_column(String(512), nullable=True)
-    is_active: Mapped[bool] = mapped_column(
-        Boolean,
-        nullable=False,
-        default=True,
-        server_default="true",
-    )
 
     role: Mapped["Role"] = relationship(
         "Role",

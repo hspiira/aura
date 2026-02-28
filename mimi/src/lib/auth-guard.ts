@@ -1,16 +1,30 @@
 /**
  * Auth guard for protected routes: beforeLoad hook that redirects to /login if no token.
- * Use in route options: beforeLoad: requireAuth
+ * On page reload (token lost from memory), attempts a silent refresh via httpOnly cookie
+ * before giving up and redirecting.
  */
 
 import { redirect } from '@tanstack/react-router'
-import { isAuthenticated } from '#/stores/auth'
+import { apiPost } from '#/lib/api'
+import { isAuthenticated, setAccessToken } from '#/stores/auth'
 
-export function requireAuth() {
-  // During SSR, localStorage is unavailable — skip the check and let the
-  // client-side rehydration + re-run of beforeLoad handle it.
-  if (typeof window === 'undefined') return
-  if (!isAuthenticated()) {
-    throw redirect({ to: '/login' })
+interface TokenResponse {
+  access_token: string
+  token_type: string
+  expires_in: number
+}
+
+export async function requireAuth() {
+  if (isAuthenticated()) return
+
+  // Token not in memory (e.g. page reload) — try silent refresh via httpOnly cookie
+  try {
+    const res = await apiPost<TokenResponse>('auth/refresh', undefined, { _skipRefresh: true })
+    setAccessToken(res.access_token)
+    return
+  } catch {
+    // Refresh failed — no valid session
   }
+
+  throw redirect({ to: '/login' })
 }

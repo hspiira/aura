@@ -18,7 +18,20 @@ export interface HealthResponse {
   status: string
 }
 
-// ─── User tokens (auth) ───────────────────────────────────────────────────────
+// ─── Auth (JWT) ─────────────────────────────────────────────────────────────
+
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface TokenResponse {
+  access_token: string
+  token_type: string
+  expires_in: number
+}
+
+// ─── User tokens (API keys / M2M) ────────────────────────────────────────────
 
 export interface UserTokenCreateRequest {
   user_id: string

@@ -1,24 +1,20 @@
-"""Seed an Admin user with all permissions and a login token.
+"""Seed an Admin user with all permissions and a password.
 
 Run from repo root with DATABASE_URL set:
 
     uv run python -m app.scripts.seed_admin
 
-Prints the one-time login token; use it on /login to sign in as Admin.
-If the Admin user already exists (email admin@example.com), only a new token is issued.
-
-The default admin is also ensured on app startup (lifespan): name "Admin",
-email admin@example.com, password adminpass. Log in via POST /api/v1/auth/login.
+If the Admin user already exists (email admin@example.com), only the password is updated.
+Default password: admin (change immediately in production).
 """
 
 import asyncio
-import secrets
 import sys
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.auth_service import hash_password
+from app.core.password import hash_password
 from app.domain import permissions as perm_module
 from app.infrastructure.persistence import database as db_module
 from app.infrastructure.persistence.models.department import Department
@@ -27,16 +23,12 @@ from app.infrastructure.persistence.models.permission import Permission
 from app.infrastructure.persistence.models.role import Role
 from app.infrastructure.persistence.models.role_permission import RolePermission
 from app.infrastructure.persistence.models.user import User
-from app.infrastructure.persistence.models.user_token import UserToken
 from app.infrastructure.persistence.repositories.permission_repo import (
     PermissionRepository,
 )
-from app.infrastructure.persistence.repositories.user_token_repo import (
-    UserTokenRepository,
-)
 
-ADMIN_EMAIL = "admin@aura.com"
-ADMIN_PASSWORD = "adminpass"
+ADMIN_EMAIL = "admin@example.com"
+DEFAULT_PASSWORD = "admin"
 
 
 def _all_permission_codes() -> list[str]:
@@ -134,7 +126,7 @@ async def ensure_admin_user() -> None:
 
 
 async def seed_admin() -> None:
-    """Create org, dept, Admin role (all perms), Admin user, and one token."""
+    """Create org, dept, Admin role (all perms), Admin user with password."""
     db_module._ensure_engine()
     if db_module.AsyncSessionLocal is None:
         print("DATABASE_URL not set. Set it in .env or environment.", file=sys.stderr)
@@ -143,13 +135,15 @@ async def seed_admin() -> None:
     async with db_module.AsyncSessionLocal() as session:
         async with session.begin():
             perm_repo = PermissionRepository(session)
-            token_repo = UserTokenRepository(session)
 
             permission_by_code = await _ensure_permissions(perm_repo)
             existing_admin = await _find_admin_user(session)
 
             if existing_admin is not None:
                 user = existing_admin
+                # Update password hash if user already exists
+                user.password_hash = hash_password(DEFAULT_PASSWORD)
+                await session.flush()
             else:
                 org = Organization(name="Aura")
                 session.add(org)
@@ -186,30 +180,19 @@ async def seed_admin() -> None:
                     supervisor_id=None,
                     name="Admin",
                     email=ADMIN_EMAIL,
-                    password_hash=hash_password(ADMIN_PASSWORD),
+                    password_hash=hash_password(DEFAULT_PASSWORD),
                 )
                 session.add(user)
                 await session.flush()
                 await session.refresh(user)
 
-            raw_token = secrets.token_urlsafe(32)
-            token_hash = UserTokenRepository.hash_token(raw_token)
-            user_token = UserToken(
-                user_id=user.id,
-                token_hash=token_hash,
-                description="Seed admin token",
-                expires_at=None,
-                revoked=False,
-            )
-            await token_repo.add(user_token)
-
-    print("Admin user and token created successfully.")
+    print("Admin user created/updated successfully.")
     print()
-    print("Login token (use once on /login; store securely):")
+    print(f"  Email:    {ADMIN_EMAIL}")
+    print(f"  Password: {DEFAULT_PASSWORD}")
     print()
-    print(raw_token)
-    print()
-    print("Then open your app at /login and paste this token to sign in as Admin.")
+    print("Sign in at /login with these credentials.")
+    print("Change the password immediately in production.")
 
 
 def main() -> None:

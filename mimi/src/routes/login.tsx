@@ -1,14 +1,13 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
-import { ApiError, apiGet, apiPost } from '#/lib/api'
-import type { LoginResponse, PageResponse, UserResponse } from '#/lib/types'
-import { setAuth } from '#/stores/auth'
-import { AuthPageLayout } from '#/components/auth/AuthPageLayout'
-import { Button } from '#/components/ui/button'
+import { ApiError, apiPost } from '#/lib/api'
+import { setAccessToken } from '#/stores/auth'
 
-const inputClass =
-  'w-full rounded-md bg-stone-800 border border-stone-600 text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-500 px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed'
+interface TokenResponse {
+  access_token: string
+  token_type: string
+  expires_in: number
+}
 
 export const Route = createFileRoute('/login')({
   component: LoginPage,
@@ -16,11 +15,8 @@ export const Route = createFileRoute('/login')({
 
 function LoginPage() {
   const navigate = useNavigate()
-  const [mode, setMode] = useState<'password' | 'token'>('password')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [token, setToken] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -53,21 +49,23 @@ function LoginPage() {
 
   async function handleTokenLogin(e: React.FormEvent) {
     e.preventDefault()
-    const value = token.trim()
-    if (!value) {
-      setError('Enter your token.')
+    if (!email.trim() || !password) {
+      setError('Enter your email and password.')
       return
     }
     setError(null)
     setLoading(true)
     try {
-      await apiGet<PageResponse<UserResponse>>('users?limit=1', { token: value })
-      setAuth(value, null)
-      navigate({ to: '/reviews' })
+      const res = await apiPost<TokenResponse, { email: string; password: string }>(
+        'auth/login',
+        { email: email.trim(), password },
+      )
+      setAccessToken(res.access_token)
+      navigate({ to: '/dashboard' })
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 401
-          ? 'Invalid or expired token.'
+          ? 'Invalid email or password.'
           : 'Something went wrong. Try again.',
       )
     } finally {
@@ -86,10 +84,47 @@ function LoginPage() {
           <h1 className="text-2xl font-bold text-center mb-6 text-stone-100">
             Sign In
           </h1>
+          <p className="mt-1 text-[13px] text-stone-500">
+            Sign in with your email and password.
+          </p>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-950/40 border border-red-800/50 rounded-md">
-              <p className="text-sm text-red-300">{error}</p>
+          <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-[13px] font-medium text-stone-700 mb-1">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  setError(null)
+                }}
+                placeholder="you@company.com"
+                className="w-full rounded-sm border border-stone-300 bg-stone-50/50 px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-600/60 focus:outline-none focus:ring-1 focus:ring-amber-600/40"
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-[13px] font-medium text-stone-700 mb-1">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setError(null)
+                }}
+                placeholder="Enter your password"
+                className="w-full rounded-sm border border-stone-300 bg-stone-50/50 px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-600/60 focus:outline-none focus:ring-1 focus:ring-amber-600/40"
+                disabled={loading}
+              />
             </div>
           )}
 
@@ -231,7 +266,7 @@ function LoginPage() {
               className="w-full rounded-md border border-stone-600 bg-stone-800/50 px-4 py-2.5 text-sm font-medium text-stone-500 cursor-not-allowed opacity-70"
               title="SSO coming soon"
             >
-              Continue with SSO (coming soon)
+              {loading ? 'Signing in…' : 'Sign in'}
             </button>
           </div>
 
