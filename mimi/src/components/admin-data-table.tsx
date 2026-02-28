@@ -5,8 +5,10 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableHeader,
+  TableHeaderRow,
   TableRow,
 } from '#/components/ui/table'
 import { TablePagination } from '#/components/ui/table-pagination'
@@ -14,6 +16,8 @@ import { cn } from '#/lib/utils'
 
 export interface AdminDataTableColumn<T> {
   id: string
+  /** Optional icon for the header (e.g. Lucide icon). Shown in the standard table header style. */
+  icon?: React.ReactNode
   header: React.ReactNode
   cell: (row: T) => React.ReactNode
   className?: string
@@ -43,23 +47,25 @@ export function AdminDataTable<T>({
   className,
 }: AdminDataTableProps<T>) {
   return (
-    <div
-      className={cn(
-        'overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm',
-        className,
-      )}
-    >
+    <TableContainer className={className}>
       <Table className="text-sm">
         <TableHeader>
-          <TableRow className="border-b border-stone-200 bg-stone-50/80">
-            {columns.map((col) => (
-              <TableHead key={col.id} className={cn('px-4 py-3 text-left', col.className)}>
+          <TableHeaderRow>
+            {columns.map((col, i) => (
+              <TableHead
+                key={col.id}
+                icon={col.icon}
+                className={cn(
+                  i === columns.length - 1 && 'border-r-0',
+                  col.className,
+                )}
+              >
                 {col.header}
               </TableHead>
             ))}
-          </TableRow>
+          </TableHeaderRow>
         </TableHeader>
-        <TableBody className="divide-y divide-stone-100">
+        <TableBody>
           {rows.length === 0 ? (
             <TableRow>
               <TableCell
@@ -71,9 +77,15 @@ export function AdminDataTable<T>({
             </TableRow>
           ) : (
             rows.map((row, index) => (
-              <TableRow key={index} className="hover:bg-stone-50/50">
-                {columns.map((col) => (
-                  <TableCell key={col.id} className={cn('px-4 py-3', col.className)}>
+              <TableRow key={index}>
+                {columns.map((col, i) => (
+                  <TableCell
+                    key={col.id}
+                    className={cn(
+                      i === columns.length - 1 && 'border-r-0',
+                      col.className,
+                    )}
+                  >
                     {col.cell(row)}
                   </TableCell>
                 ))}
@@ -89,7 +101,7 @@ export function AdminDataTable<T>({
         onPageChange={onPageChange}
         onPageSizeChange={onPageSizeChange}
       />
-    </div>
+    </TableContainer>
   )
 }
 

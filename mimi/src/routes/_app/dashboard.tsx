@@ -2,8 +2,25 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQueries, useQuery } from '@tanstack/react-query'
 import { useStore } from '@tanstack/react-store'
 import { format, parseISO } from 'date-fns'
-import { ArrowRight } from 'lucide-react'
+import {
+  ArrowRight,
+  Award,
+  BarChart3,
+  CircleDot,
+  FileText,
+  Percent,
+} from 'lucide-react'
 import { useEffect, useMemo } from 'react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
 import {
   auditLogsRecentQueryOptions,
   meQueryOptions,
@@ -245,36 +262,42 @@ function DashboardPage() {
               </p>
             )}
             {objectives.length > 0 && (
-              <div className="mt-3 overflow-hidden rounded-xl border border-stone-200">
-                <table className="w-full min-w-0 text-sm">
-                  <thead>
-                    <tr className="border-b border-stone-200 bg-stone-50/80">
-                      <th className="px-3 py-2 text-left font-medium text-stone-700">
+              <TableContainer className="mt-3">
+                <Table className="min-w-0">
+                  <TableHeader>
+                    <TableHeaderRow>
+                      <TableHead icon={<FileText className="size-3" />}>
                         Title
-                      </th>
-                      <th className="px-3 py-2 text-left font-medium text-stone-700">
+                      </TableHead>
+                      <TableHead icon={<CircleDot className="size-3" />}>
                         Status
-                      </th>
-                      <th className="px-3 py-2 text-right font-medium text-stone-700">
+                      </TableHead>
+                      <TableHead
+                        className="text-right"
+                        icon={<Percent className="size-3" />}
+                      >
                         Weight%
-                      </th>
-                      <th className="px-3 py-2 text-left font-medium text-stone-700">
+                      </TableHead>
+                      <TableHead icon={<BarChart3 className="size-3" />}>
                         Progress
-                      </th>
-                      <th className="px-3 py-2 text-right font-medium text-stone-700">
+                      </TableHead>
+                      <TableHead
+                        className="border-r-0 text-right"
+                        icon={<Award className="size-3" />}
+                      >
                         Score
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-stone-100">
+                      </TableHead>
+                    </TableHeaderRow>
+                  </TableHeader>
+                  <TableBody>
                     {objectives.map((obj) => {
                       const score = scoresByObjectiveId[obj.id]
                       const achievement = score
                         ? Math.min(100, Number(score.achievement))
                         : 0
                       return (
-                        <tr key={obj.id} className="hover:bg-stone-50/50">
-                          <td className="px-3 py-2">
+                        <TableRow key={obj.id}>
+                          <TableCell>
                             <Link
                               to="/objectives/$id"
                               params={{ id: obj.id }}
@@ -282,34 +305,34 @@ function DashboardPage() {
                             >
                               {obj.title}
                             </Link>
-                          </td>
-                          <td className="px-3 py-2">
+                          </TableCell>
+                          <TableCell>
                             <span
                               className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(obj.status)}`}
                             >
                               {obj.status.replace(/_/g, ' ')}
                             </span>
-                          </td>
-                          <td className="px-3 py-2 text-right">
+                          </TableCell>
+                          <TableCell className="text-right">
                             {weightPct(obj)}%
-                          </td>
-                          <td className="px-3 py-2">
+                          </TableCell>
+                          <TableCell>
                             <div className="h-1.5 w-20 min-w-[5rem] overflow-hidden rounded-full bg-stone-100">
                               <div
                                 className="h-full rounded-full bg-amber-500/70"
                                 style={{ width: `${achievement}%` }}
                               />
                             </div>
-                          </td>
-                          <td className="px-3 py-2 text-right font-medium text-stone-700">
+                          </TableCell>
+                          <TableCell className="border-r-0 text-right font-medium text-stone-700">
                             {score ? `${score.achievement}%` : '—'}
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       )
                     })}
-                  </tbody>
-                </table>
-              </div>
+                  </TableBody>
+                </Table>
+              </TableContainer>
             )}
             {objectives.length > 0 && (
               <Link

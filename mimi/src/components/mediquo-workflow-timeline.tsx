@@ -4,7 +4,7 @@ import {
   FileText,
   Home,
   Percent,
-  Pencil,
+  SquarePen,
   User,
   GitBranch,
   Check,
@@ -61,7 +61,7 @@ const steps = [
     title: 'UI Design System',
     description:
       'Designed a flexible UI system with clean layouts and a calm visual tone.',
-    icon: Pencil,
+    icon: SquarePen,
     dark: false,
     tools: [
       { label: 'Figma', bg: 'bg-red-500', letter: 'F' },

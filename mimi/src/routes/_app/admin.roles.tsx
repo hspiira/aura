@@ -2,12 +2,26 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Fragment, useState } from 'react'
 import {
+  Building2,
   ChevronDown,
   ChevronRight,
-  Pencil,
+  Layers,
+  SquarePen,
   Plus,
+  Shield,
   Trash2,
+  UserCog,
 } from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
 import {
   rolesQueryOptions,
   departmentsQueryOptions,
@@ -124,33 +138,41 @@ function AdminRolesPage() {
         )}
       </div>
 
-      <div className="overflow-hidden border border-stone-200 bg-white">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-stone-200 bg-stone-50/80">
-              <th className="w-8 px-2 py-2" aria-label="Expand" />
-              <th className="px-3 py-2 text-left font-semibold text-stone-700">
+      <TableContainer>
+        <Table>
+          <TableHeader>
+            <TableHeaderRow>
+              <TableHead
+                className="w-8"
+                icon={<ChevronRight className="size-3" />}
+              >
+                <span className="sr-only">Expand</span>
+              </TableHead>
+              <TableHead icon={<Shield className="size-3" />}>
                 Role name
-              </th>
-              <th className="px-3 py-2 text-left font-semibold text-stone-700">
+              </TableHead>
+              <TableHead icon={<Building2 className="size-3" />}>
                 Department
-              </th>
-              <th className="px-3 py-2 text-left font-semibold text-stone-700">
-                Level
-              </th>
-              <th className="px-3 py-2 text-left font-semibold text-stone-700">
+              </TableHead>
+              <TableHead icon={<Layers className="size-3" />}>Level</TableHead>
+              <TableHead icon={<UserCog className="size-3" />}>
                 Is managerial
-              </th>
+              </TableHead>
               {canManageRbac && (
-                <th className="w-12 px-2 py-2" aria-label="Edit" />
+                <TableHead
+                  className="w-12 border-r-0"
+                  icon={<SquarePen className="size-3" />}
+                >
+                  <span className="sr-only">Edit</span>
+                </TableHead>
               )}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-stone-100">
+            </TableHeaderRow>
+          </TableHeader>
+          <TableBody>
             {roles.map((role) => (
               <Fragment key={role.id}>
-                <tr className="hover:bg-stone-50/50">
-                  <td className="px-2 py-2">
+                <TableRow>
+                  <TableCell className="w-8">
                     <button
                       type="button"
                       onClick={() =>
@@ -167,17 +189,17 @@ function AdminRolesPage() {
                         <ChevronRight className="size-4" />
                       )}
                     </button>
-                  </td>
-                  <td className="px-3 py-2 font-medium text-stone-900">
+                  </TableCell>
+                  <TableCell className="font-medium text-stone-900">
                     {role.name}
-                  </td>
-                  <td className="px-3 py-2 text-stone-600">
+                  </TableCell>
+                  <TableCell className="text-stone-600">
                     {departmentById[role.department_id] ?? role.department_id}
-                  </td>
-                  <td className="px-3 py-2 text-stone-600">
+                  </TableCell>
+                  <TableCell className="text-stone-600">
                     {role.level ?? '—'}
-                  </td>
-                  <td className="px-3 py-2">
+                  </TableCell>
+                  <TableCell>
                     {role.is_managerial ? (
                       <span className="bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
                         Yes
@@ -185,38 +207,38 @@ function AdminRolesPage() {
                     ) : (
                       <span className="text-stone-400">No</span>
                     )}
-                  </td>
+                  </TableCell>
                   {canManageRbac && (
-                    <td className="px-2 py-2">
+                    <TableCell className="border-r-0">
                       <button
                         type="button"
                         onClick={() => openEdit(role)}
                         className="inline-flex items-center justify-center text-stone-400 hover:text-amber-600"
                         aria-label={`Edit ${role.name}`}
                       >
-                        <Pencil className="size-4" />
+                        <SquarePen className="size-4" />
                       </button>
-                    </td>
+                    </TableCell>
                   )}
-                </tr>
+                </TableRow>
                 {expandedRoleId === role.id && (
-                  <tr>
-                    <td
+                  <TableRow>
+                    <TableCell
                       colSpan={canManageRbac ? 6 : 5}
-                      className="bg-stone-50/50 p-0"
+                      className="border-r-0 bg-stone-50/50 p-0"
                     >
                       <RoleDetails
                         roleId={role.id}
                         canManageRbac={canManageRbac}
                       />
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 )}
               </Fragment>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       {createOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

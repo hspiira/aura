@@ -7,7 +7,7 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
-  Pencil,
+  SquarePen,
   Plus,
   RefreshCw,
   Target,
@@ -215,7 +215,7 @@ function ObjectiveDetailPage() {
             onClick={() => setAmendOpen(true)}
             className="inline-flex items-center gap-2 border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
           >
-            <Pencil className="size-4" />
+            <SquarePen className="size-4" />
             Amend
           </button>
         )}

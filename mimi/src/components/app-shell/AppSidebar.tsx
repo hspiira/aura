@@ -29,8 +29,8 @@ export function AppSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   const sidebarContent = (
-    <div className="flex h-full flex-col border-r border-stone-200/80 bg-white">
-      <div className="flex h-12 shrink-0 items-center border-b border-stone-200/80 px-3">
+    <div className="flex h-full flex-col bg-white">
+      <div className="flex h-12 shrink-0 items-center border-b border-stone-200/60 px-3">
         {!isMobile && (
           <button
             type="button"
@@ -90,7 +90,7 @@ export function AppSidebar() {
             <SheetHeader className="sr-only">
               <SheetTitle>Navigation</SheetTitle>
             </SheetHeader>
-            <div className="flex h-full flex-col border-r border-stone-200/80 bg-white">
+            <div className="flex h-full flex-col bg-white">
               <nav className="flex-1 space-y-0.5 overflow-auto p-2 pt-4" aria-label="Main">
                 {items.map((item) => {
                   const href = typeof item.to === 'string' ? item.to : (item.to as { to: string }).to
@@ -123,7 +123,7 @@ export function AppSidebar() {
 
   return (
     <aside
-      className="hidden shrink-0 flex-col border-r border-stone-200/80 bg-white transition-[width] duration-200 md:flex"
+      className="hidden shrink-0 flex-col border-r border-stone-200/60 bg-white transition-[width] duration-200 md:flex"
       style={{ width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED }}
     >
       {sidebarContent}

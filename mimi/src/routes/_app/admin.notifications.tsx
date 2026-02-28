@@ -2,12 +2,16 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import {
+  AlertCircle,
   Bell,
+  CheckCircle,
+  Clock,
   FileText,
-  Pencil,
+  SquarePen,
   Plus,
   Send,
   Trash2,
+  User,
   UserCircle2,
 } from 'lucide-react'
 import {
@@ -27,8 +31,10 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableHeader,
+  TableHeaderRow,
   TableRow,
 } from '#/components/ui/table'
 import type {
@@ -201,14 +207,8 @@ function AdminNotificationsPage() {
           columns={[
             {
               id: 'event',
-              header: (
-                <div className="flex items-center gap-1.5">
-                  <Bell className="size-3.5 text-stone-500" />
-                  <span className="text-xs font-semibold text-stone-700">
-                    Event type
-                  </span>
-                </div>
-              ),
+              icon: <Bell className="size-3" />,
+              header: 'Event type',
               cell: (r) => (
                 <span className="font-medium text-stone-900">
                   {r.event_type}
@@ -217,14 +217,8 @@ function AdminNotificationsPage() {
             },
             {
               id: 'role',
-              header: (
-                <div className="flex items-center gap-1.5">
-                  <UserCircle2 className="size-3.5 text-stone-500" />
-                  <span className="text-xs font-semibold text-stone-700">
-                    Recipient role
-                  </span>
-                </div>
-              ),
+              icon: <UserCircle2 className="size-3" />,
+              header: 'Recipient role',
               cell: (r) => (
                 <span className="text-stone-600">
                   {roleById[r.recipient_role_id]?.name ?? r.recipient_role_id}
@@ -233,28 +227,16 @@ function AdminNotificationsPage() {
             },
             {
               id: 'channel',
-              header: (
-                <div className="flex items-center gap-1.5">
-                  <Send className="size-3.5 text-stone-500" />
-                  <span className="text-xs font-semibold text-stone-700">
-                    Channel
-                  </span>
-                </div>
-              ),
+              icon: <Send className="size-3" />,
+              header: 'Channel',
               cell: (r) => (
                 <span className="text-stone-600">{r.channel}</span>
               ),
             },
             {
               id: 'template',
-              header: (
-                <div className="flex items-center gap-1.5">
-                  <FileText className="size-3.5 text-stone-500" />
-                  <span className="text-xs font-semibold text-stone-700">
-                    Template body
-                  </span>
-                </div>
-              ),
+              icon: <FileText className="size-3" />,
+              header: 'Template body',
               cell: (r) => (
                 <span
                   className="max-w-xs truncate text-stone-500"
@@ -268,7 +250,8 @@ function AdminNotificationsPage() {
               ? [
                   {
                     id: 'actions' as const,
-                    header: <span className="sr-only">Edit / Delete</span>,
+                    icon: <SquarePen className="size-3" />,
+                    header: 'Edit / Delete',
                     cell: (r: NotificationRuleResponse) => (
                       <div className="flex items-center gap-1">
                         <button
@@ -277,7 +260,7 @@ function AdminNotificationsPage() {
                           className="rounded p-1 text-stone-400 hover:bg-stone-100 hover:text-amber-600"
                           aria-label={`Edit rule ${r.event_type}`}
                         >
-                          <Pencil className="size-4" />
+                          <SquarePen className="size-4" />
                         </button>
                         {deleteConfirmId === r.id ? (
                           <span className="flex items-center gap-1 text-xs">
@@ -331,82 +314,85 @@ function AdminNotificationsPage() {
           <h2 className="mb-3 text-base font-semibold text-stone-900">
             Notification logs
           </h2>
-          <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
-          <Table className="text-sm">
-            <TableHeader>
-              <TableRow className="border-b border-stone-200 bg-stone-50/80">
-                <TableHead className="px-4 py-3 text-left text-xs font-semibold text-stone-700">
-                  Event type
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-semibold text-stone-700">
-                  Recipient
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-semibold text-stone-700">
-                  Channel
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-semibold text-stone-700">
-                  Status
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-semibold text-stone-700">
-                  Sent at
-                </TableHead>
-                <TableHead className="px-4 py-3 text-left text-xs font-semibold text-stone-700">
-                  Error message
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody className="divide-y divide-stone-100">
-              {logItems.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="py-8 text-center text-sm text-stone-400"
+          <TableContainer>
+            <Table className="text-sm">
+              <TableHeader>
+                <TableHeaderRow>
+                  <TableHead icon={<Bell className="size-3" />}>
+                    Event type
+                  </TableHead>
+                  <TableHead icon={<User className="size-3" />}>
+                    Recipient
+                  </TableHead>
+                  <TableHead icon={<Send className="size-3" />}>
+                    Channel
+                  </TableHead>
+                  <TableHead icon={<CheckCircle className="size-3" />}>
+                    Status
+                  </TableHead>
+                  <TableHead icon={<Clock className="size-3" />}>
+                    Sent at
+                  </TableHead>
+                  <TableHead
+                    icon={<AlertCircle className="size-3" />}
+                    className="border-r-0"
                   >
-                    No log entries.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                logItems.map((log: NotificationLogResponse) => (
-                  <TableRow
-                    key={log.id}
-                    className={
-                      log.status === 'failed' || log.status === 'error'
-                        ? 'bg-red-50'
-                        : 'hover:bg-stone-50/50'
-                    }
-                  >
-                    <TableCell className="px-4 py-3 font-medium text-stone-900">
-                      {log.event_type}
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-stone-600">
-                      {log.recipient_name ?? log.recipient_id ?? '—'}
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-stone-600">
-                      {log.channel}
-                    </TableCell>
-                    <TableCell className="px-4 py-3">
-                      <span
-                        className={
-                          log.status === 'sent'
-                            ? 'rounded bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800'
-                            : 'rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800'
-                        }
-                      >
-                        {log.status === 'sent' ? 'Sent' : 'Failed'}
-                      </span>
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-stone-600">
-                      {formatSentAt(log.sent_at)}
-                    </TableCell>
-                    <TableCell className="px-4 py-3 text-stone-600">
-                      {log.error_message ?? '—'}
+                    Error message
+                  </TableHead>
+                </TableHeaderRow>
+              </TableHeader>
+              <TableBody>
+                {logItems.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="py-8 text-center text-sm text-stone-400"
+                    >
+                      No log entries.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-          </div>
+                ) : (
+                  logItems.map((log: NotificationLogResponse) => (
+                    <TableRow
+                      key={log.id}
+                      className={
+                        log.status === 'failed' || log.status === 'error'
+                          ? 'bg-red-50'
+                          : undefined
+                      }
+                    >
+                      <TableCell className="font-medium text-stone-900">
+                        {log.event_type}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {log.recipient_name ?? log.recipient_id ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {log.channel}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={
+                            log.status === 'sent'
+                              ? 'rounded bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800'
+                              : 'rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800'
+                          }
+                        >
+                          {log.status === 'sent' ? 'Sent' : 'Failed'}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {formatSentAt(log.sent_at)}
+                      </TableCell>
+                      <TableCell className="border-r-0 text-stone-600">
+                        {log.error_message ?? '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </section>
       )}
 

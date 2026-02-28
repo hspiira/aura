@@ -1,13 +1,30 @@
 import { createFileRoute, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
-import { ArrowRight } from 'lucide-react'
+import {
+  ArrowRight,
+  Building2,
+  Mail,
+  Shield,
+  User,
+  UserCheck,
+} from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
+import { TablePagination } from '#/components/ui/table-pagination'
 import {
   departmentsQueryOptions,
   rolesQueryOptions,
   usersQueryOptions,
 } from '#/lib/queries'
-import { TablePagination } from '#/components/ui/table-pagination'
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
 
@@ -105,50 +122,46 @@ function PeoplePage() {
             />
           </div>
 
-          <div className="overflow-hidden border border-stone-200 bg-white">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[520px] text-sm">
-                <thead>
-                  <tr className="border-b border-stone-200 bg-stone-50/80">
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      User
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Email
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Role
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Department
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Supervisor
-                    </th>
-                    <th className="w-20 px-4 py-3 text-right font-semibold text-stone-700">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {pageUsers.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={6}
-                        className="px-4 py-8 text-center text-sm text-stone-500"
-                      >
-                        No users found.
-                      </td>
-                    </tr>
-                  ) : (
-                    pageUsers.map((u) => (
-                      <tr key={u.id} className="hover:bg-stone-50/50">
-                        <td className="px-4 py-3">
-                          <Link
-                            to="/people/$id"
-                            params={{ id: u.id }}
-                            className="flex items-center gap-2 hover:opacity-90"
-                          >
+          <TableContainer>
+            <Table className="min-w-[520px]">
+              <TableHeader>
+                <TableHeaderRow>
+                  <TableHead icon={<User className="size-3" />}>User</TableHead>
+                  <TableHead icon={<Mail className="size-3" />}>Email</TableHead>
+                  <TableHead icon={<Shield className="size-3" />}>Role</TableHead>
+                  <TableHead icon={<Building2 className="size-3" />}>
+                    Department
+                  </TableHead>
+                  <TableHead icon={<UserCheck className="size-3" />}>
+                    Supervisor
+                  </TableHead>
+                  <TableHead
+                    className="w-20 border-r-0 text-right"
+                    icon={<ArrowRight className="size-3" />}
+                  >
+                    Actions
+                  </TableHead>
+                </TableHeaderRow>
+              </TableHeader>
+              <TableBody>
+                {pageUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="border-r-0 py-8 text-center text-sm text-stone-500"
+                    >
+                      No users found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  pageUsers.map((u) => (
+                    <TableRow key={u.id}>
+                      <TableCell>
+                        <Link
+                          to="/people/$id"
+                          params={{ id: u.id }}
+                          className="flex items-center gap-2 hover:opacity-90"
+                        >
                           <span
                             className="flex size-8 shrink-0 items-center justify-center rounded-full bg-stone-200 text-xs font-medium text-stone-700"
                             aria-hidden
@@ -159,37 +172,36 @@ function PeoplePage() {
                             {u.name}
                           </span>
                         </Link>
-                        </td>
-                        <td className="px-4 py-3 text-stone-600">
-                          {u.email ?? '—'}
-                        </td>
-                        <td className="px-4 py-3 text-stone-600">
-                          {roleById.get(u.role_id) ?? u.role_id}
-                        </td>
-                        <td className="px-4 py-3 text-stone-600">
-                          {departmentById.get(u.department_id) ?? u.department_id}
-                        </td>
-                        <td className="px-4 py-3 text-stone-600">
-                          {u.supervisor_id
-                            ? userNameById.get(u.supervisor_id) ?? u.supervisor_id
-                            : '—'}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <Link
-                            to="/people/$id"
-                            params={{ id: u.id }}
-                            className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 hover:text-amber-700"
-                          >
-                            View
-                            <ArrowRight className="size-4" />
-                          </Link>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {u.email ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {roleById.get(u.role_id) ?? u.role_id}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {departmentById.get(u.department_id) ?? u.department_id}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {u.supervisor_id
+                          ? userNameById.get(u.supervisor_id) ?? u.supervisor_id
+                          : '—'}
+                      </TableCell>
+                      <TableCell className="border-r-0 text-right">
+                        <Link
+                          to="/people/$id"
+                          params={{ id: u.id }}
+                          className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 hover:text-amber-700"
+                        >
+                          View
+                          <ArrowRight className="size-4" />
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
             <TablePagination
               page={page}
               pageSize={pageSize}
@@ -198,7 +210,7 @@ function PeoplePage() {
               onPageSizeChange={handlePageSizeChange}
               pageSizeOptions={PAGE_SIZE_OPTIONS}
             />
-          </div>
+          </TableContainer>
         </>
       )}
       <Outlet />

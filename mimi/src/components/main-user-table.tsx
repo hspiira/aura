@@ -3,11 +3,16 @@
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import {
-  ChevronDown,
+  Activity,
+  Building2,
   Hash,
-  Pencil,
+  Mail,
+  SquarePen,
+  Shield,
   SquareArrowOutUpRight,
   User as UserIcon,
+  UserCircle2,
+  Users,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
 import { Checkbox } from '#/components/ui/checkbox'
@@ -15,8 +20,10 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableHeader,
+  TableHeaderRow,
   TableRow,
 } from '#/components/ui/table'
 import { cn } from '#/lib/utils'
@@ -179,60 +186,63 @@ export function MainUserTable({
   }
 
   return (
-    <div
-      className={cn(
-        'w-full overflow-hidden border border-stone-200 bg-white',
-        className,
-      )}
-    >
+    <TableContainer className={className}>
       <Table className="text-sm">
         <TableHeader>
-          <TableRow className="border-stone-200 bg-stone-50/80 hover:bg-stone-50/80">
-            <TableHead className="h-9 min-w-[220px] border-r border-stone-200 px-3 py-1.5">
+          <TableHeaderRow>
+            <TableHead className="min-w-[220px]">
               <div className="flex items-center gap-1.5">
                 <Checkbox
                   className="size-3.5 border-stone-300"
                   aria-label="Select all"
                 />
+                <span className="flex size-5 shrink-0 items-center justify-center border border-stone-300 bg-white text-stone-500 [&_svg]:size-3">
+                  <UserIcon className="size-3" />
+                </span>
                 <span className="text-xs font-semibold text-stone-700">User</span>
               </div>
             </TableHead>
             {(!isPeople || showUserId) && (
-              <TableHead className="h-9 border-r border-stone-200 px-3 py-1.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="flex size-5 items-center justify-center border border-stone-300 bg-white text-stone-500">
-                    <Hash className="size-3" />
-                  </span>
-                  <span className="text-xs font-semibold text-stone-700">User ID</span>
-                </div>
-              </TableHead>
+              <TableHead icon={<Hash className="size-3" />}>User ID</TableHead>
             )}
-            <TableHead className="h-9 border-r border-stone-200 px-3 py-1.5">
-              <div className="flex items-center gap-1.5">
-                <ChevronDown className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">{col3Label}</span>
-              </div>
+            <TableHead
+              icon={
+                isPeople ? (
+                  <Shield className="size-3" />
+                ) : (
+                  <Users className="size-3" />
+                )
+              }
+            >
+              {col3Label}
             </TableHead>
-            <TableHead className="h-9 border-r border-stone-200 px-3 py-1.5">
-              <div className="flex items-center gap-1.5">
-                <ChevronDown className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">{col4Label}</span>
-              </div>
+            <TableHead
+              icon={
+                isPeople ? (
+                  <Building2 className="size-3" />
+                ) : (
+                  <Activity className="size-3" />
+                )
+              }
+              className={!isPeople ? 'border-r-0' : undefined}
+            >
+              {col4Label}
             </TableHead>
             {isPeople && (
               <>
-                <TableHead className="h-9 border-r border-stone-200 px-3 py-1.5">
-                  <span className="text-xs font-semibold text-stone-700">Email</span>
+                <TableHead icon={<Mail className="size-3" />}>Email</TableHead>
+                <TableHead icon={<UserCircle2 className="size-3" />}>
+                  Supervisor
                 </TableHead>
-                <TableHead className="h-9 border-r border-stone-200 px-3 py-1.5">
-                  <span className="text-xs font-semibold text-stone-700">Supervisor</span>
-                </TableHead>
-                <TableHead className="h-9 w-10 px-3 py-1.5">
+                <TableHead
+                  icon={<SquarePen className="size-3" />}
+                  className="w-10 border-r-0"
+                >
                   <span className="sr-only">{onEdit ? 'Edit' : 'View'}</span>
                 </TableHead>
               </>
             )}
-          </TableRow>
+          </TableHeaderRow>
         </TableHeader>
         <TableBody>
           {isPeople
@@ -243,11 +253,8 @@ export function MainUserTable({
                   ? supervisorById?.[row.supervisor_id] ?? row.supervisor_id
                   : null
                 return (
-                  <TableRow
-                    key={row.id}
-                    className="border-stone-200 bg-white hover:bg-stone-50/50"
-                  >
-                    <TableCell className="min-w-[220px] border-r border-stone-200 px-3 py-1.5">
+                  <TableRow key={row.id}>
+                    <TableCell className="min-w-[220px]">
                       <div className="flex items-center gap-2">
                         <Checkbox
                           className="size-3.5 shrink-0 border-stone-300"
@@ -271,23 +278,23 @@ export function MainUserTable({
                       </div>
                     </TableCell>
                     {showUserId && (
-                      <TableCell className="border-r border-stone-200 px-3 py-1.5 font-mono text-xs text-stone-600">
+                      <TableCell className="font-mono text-xs text-stone-600">
                         {row.id}
                       </TableCell>
                     )}
-                    <TableCell className="border-r border-stone-200 px-3 py-1.5">
+                    <TableCell>
                       <Pill className={rolePillClass(roleName)}>{roleName}</Pill>
                     </TableCell>
-                    <TableCell className="border-r border-stone-200 px-3 py-1.5">
+                    <TableCell>
                       <Pill className={departmentPillClass}>{deptName}</Pill>
                     </TableCell>
-                    <TableCell className="border-r border-stone-200 px-3 py-1.5 text-xs text-stone-600">
+                    <TableCell className="text-xs text-stone-600">
                       {row.email ?? '—'}
                     </TableCell>
-                    <TableCell className="border-r border-stone-200 px-3 py-1.5 text-xs text-stone-600">
+                    <TableCell className="text-xs text-stone-600">
                       {supervisorName ?? '—'}
                     </TableCell>
-                    <TableCell className="w-10 px-3 py-1.5">
+                    <TableCell className="w-10 border-r-0">
                       {onEdit ? (
                         <button
                           type="button"
@@ -295,7 +302,7 @@ export function MainUserTable({
                           className="inline-flex items-center justify-center text-stone-400 hover:text-amber-600"
                           aria-label={`Edit ${row.name}`}
                         >
-                          <Pencil className="size-4" />
+                          <SquarePen className="size-4" />
                         </button>
                       ) : (
                         <Link
@@ -312,11 +319,8 @@ export function MainUserTable({
                 )
               })
             : (displayData as MainUserTableRow[]).map((row) => (
-                <TableRow
-                  key={row.id}
-                  className="border-stone-200 bg-white hover:bg-stone-50/50"
-                >
-                  <TableCell className="min-w-[220px] border-r border-stone-200 px-3 py-1.5">
+                <TableRow key={row.id}>
+                  <TableCell className="min-w-[220px]">
                     <div className="flex items-center gap-2">
                       <Checkbox
                         className="size-3.5 shrink-0 border-stone-300"
@@ -333,15 +337,15 @@ export function MainUserTable({
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell className="border-r border-stone-200 px-3 py-1.5 font-mono text-xs text-stone-600">
+                  <TableCell className="font-mono text-xs text-stone-600">
                     {row.id}
                   </TableCell>
-                  <TableCell className="border-r border-stone-200 px-3 py-1.5">
+                  <TableCell>
                     <Pill className={userTypePillClass[row.userType]}>
                       {row.userType}
                     </Pill>
                   </TableCell>
-                  <TableCell className="px-3 py-1.5">
+                  <TableCell className="border-r-0">
                     <Pill className={engagementPillClass[row.engagementScore]}>
                       {row.engagementScore}
                     </Pill>
@@ -368,6 +372,6 @@ export function MainUserTable({
         onPageChange={goToPage}
         onPageSizeChange={handlePageSizeChange}
       />
-    </div>
+    </TableContainer>
   )
 }

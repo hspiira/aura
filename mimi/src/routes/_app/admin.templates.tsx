@@ -2,13 +2,16 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import {
-  FileText,
-  Layers3,
   Activity,
+  CheckSquare,
+  FileText,
+  Hash,
+  Layers3,
   Percent,
-  Pencil,
+  SquarePen,
   Plus,
   Target,
+  ToggleRight,
 } from 'lucide-react'
 import {
   meQueryOptions,
@@ -215,35 +218,24 @@ function AdminTemplatesPage() {
         columns={[
           {
             id: 'code',
-            header: (
-              <span className="text-xs font-semibold text-stone-700">Code</span>
-            ),
+            icon: <Hash className="size-3" />,
+            header: 'Code',
             cell: (t) => (
               <span className="font-mono text-sm text-stone-800">{t.code}</span>
             ),
           },
           {
             id: 'title',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <FileText className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">Title</span>
-              </div>
-            ),
+            icon: <FileText className="size-3" />,
+            header: 'Title',
             cell: (t) => (
               <span className="font-medium text-stone-900">{t.title}</span>
             ),
           },
           {
             id: 'dimension',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Layers3 className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Dimension
-                </span>
-              </div>
-            ),
+            icon: <Layers3 className="size-3" />,
+            header: 'Dimension',
             cell: (t) => (
               <span className="text-stone-600">
                 {dimensionById[t.dimension_id] ?? t.dimension_id}
@@ -252,28 +244,16 @@ function AdminTemplatesPage() {
           },
           {
             id: 'kpi_type',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Activity className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  KPI type
-                </span>
-              </div>
-            ),
+            icon: <Activity className="size-3" />,
+            header: 'KPI type',
             cell: (t) => (
               <span className="text-stone-600">{t.kpi_type ?? '—'}</span>
             ),
           },
           {
             id: 'default_weight',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Percent className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Default weight%
-                </span>
-              </div>
-            ),
+            icon: <Percent className="size-3" />,
+            header: 'Default weight%',
             cell: (t) => (
               <span className="text-stone-600">
                 {weightDisplay(t.default_weight)}
@@ -282,14 +262,8 @@ function AdminTemplatesPage() {
           },
           {
             id: 'min_max',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Target className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Min/Max target
-                </span>
-              </div>
-            ),
+            icon: <Target className="size-3" />,
+            header: 'Min/Max target',
             cell: (t) => (
               <span className="text-stone-600">
                 {t.min_target != null || t.max_target != null
@@ -300,11 +274,8 @@ function AdminTemplatesPage() {
           },
           {
             id: 'requires_baseline',
-            header: (
-              <span className="text-xs font-semibold text-stone-700">
-                Requires baseline
-              </span>
-            ),
+            icon: <CheckSquare className="size-3" />,
+            header: 'Requires baseline',
             cell: (t) => (
               <span className="text-stone-600">
                 {t.requires_baseline_snapshot ? 'Yes' : 'No'}
@@ -313,9 +284,8 @@ function AdminTemplatesPage() {
           },
           {
             id: 'active',
-            header: (
-              <span className="text-xs font-semibold text-stone-700">Active</span>
-            ),
+            icon: <ToggleRight className="size-3" />,
+            header: 'Active',
             cell: (t) => (
               <span
                 className={
@@ -354,7 +324,7 @@ function AdminTemplatesPage() {
                         className="inline-flex items-center justify-center text-stone-400 hover:text-amber-600"
                         aria-label={`Edit ${t.title}`}
                       >
-                        <Pencil className="size-4" />
+                        <SquarePen className="size-4" />
                       </button>
                     </div>
                   ),

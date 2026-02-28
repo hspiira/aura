@@ -2,7 +2,27 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState, useMemo } from 'react'
 import { format, parseISO } from 'date-fns'
-import { Download, RefreshCw } from 'lucide-react'
+import {
+  Building2,
+  Download,
+  RefreshCw,
+  User,
+  Calendar,
+  BarChart3,
+  Award,
+  Clock,
+  AlertTriangle,
+} from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
 import {
   analyticsFactSummariesQueryOptions,
   analyticsRefreshStatusQueryOptions,
@@ -212,30 +232,43 @@ function AnalyticsPage() {
           ) : variance.length === 0 ? (
             <p className="text-sm text-stone-500">No variance data.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-stone-200 text-left">
-                    <th className="pb-2 font-semibold text-stone-700">Department</th>
-                    <th className="pb-2 font-semibold text-stone-700">Mean score</th>
-                    <th className="pb-2 font-semibold text-stone-700">Std dev</th>
-                    <th className="pb-2 font-semibold text-stone-700">Outlier</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {variance.map((v) => (
-                    <tr
-                      key={v.department_id}
-                      className={v.is_outlier ? 'bg-red-50 hover:bg-red-100/50' : 'hover:bg-stone-50/50'}
+            <TableContainer>
+              <Table>
+                <TableHeader>
+                  <TableHeaderRow>
+                    <TableHead icon={<Building2 className="size-3" />}>
+                      Department
+                    </TableHead>
+                    <TableHead icon={<BarChart3 className="size-3" />}>
+                      Mean score
+                    </TableHead>
+                    <TableHead icon={<BarChart3 className="size-3" />}>
+                      Std dev
+                    </TableHead>
+                    <TableHead
+                      className="border-r-0"
+                      icon={<AlertTriangle className="size-3" />}
                     >
-                      <td className="py-2 text-stone-800">
+                      Outlier
+                    </TableHead>
+                  </TableHeaderRow>
+                </TableHeader>
+                <TableBody>
+                  {variance.map((v) => (
+                    <TableRow
+                      key={v.department_id}
+                      className={v.is_outlier ? 'bg-red-50 hover:bg-red-100/50' : undefined}
+                    >
+                      <TableCell className="text-stone-800">
                         {departmentById[v.department_id] ?? v.department_id}
-                      </td>
-                      <td className="py-2 font-medium text-stone-800">
+                      </TableCell>
+                      <TableCell className="font-medium text-stone-800">
                         {v.mean_score.toFixed(2)}
-                      </td>
-                      <td className="py-2 text-stone-600">{v.std_dev.toFixed(2)}</td>
-                      <td className="py-2">
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {v.std_dev.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="border-r-0">
                         {v.is_outlier ? (
                           <span className="bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                             Yes
@@ -243,12 +276,12 @@ function AnalyticsPage() {
                         ) : (
                           <span className="text-stone-400">—</span>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </section>
       </div>
@@ -272,42 +305,71 @@ function AnalyticsPage() {
           <p className="text-sm text-stone-500">No fact rows. Run ETL refresh.</p>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-stone-200 text-left">
-                    <th className="pb-2 font-semibold text-stone-700">User</th>
-                    <th className="pb-2 font-semibold text-stone-700">Department</th>
-                    <th className="pb-2 font-semibold text-stone-700">Year</th>
-                    <th className="pb-2 font-semibold text-stone-700">Quant.</th>
-                    <th className="pb-2 font-semibold text-stone-700">Behavioral</th>
-                    <th className="pb-2 font-semibold text-stone-700">Final</th>
-                    <th className="pb-2 font-semibold text-stone-700">Rating</th>
-                    <th className="pb-2 font-semibold text-stone-700">ETL at</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
+            <TableContainer>
+              <Table>
+                <TableHeader>
+                  <TableHeaderRow>
+                    <TableHead icon={<User className="size-3" />}>
+                      User
+                    </TableHead>
+                    <TableHead icon={<Building2 className="size-3" />}>
+                      Department
+                    </TableHead>
+                    <TableHead icon={<Calendar className="size-3" />}>
+                      Year
+                    </TableHead>
+                    <TableHead icon={<BarChart3 className="size-3" />}>
+                      Quant.
+                    </TableHead>
+                    <TableHead icon={<BarChart3 className="size-3" />}>
+                      Behavioral
+                    </TableHead>
+                    <TableHead icon={<Award className="size-3" />}>
+                      Final
+                    </TableHead>
+                    <TableHead icon={<Award className="size-3" />}>
+                      Rating
+                    </TableHead>
+                    <TableHead
+                      className="border-r-0"
+                      icon={<Clock className="size-3" />}
+                    >
+                      ETL at
+                    </TableHead>
+                  </TableHeaderRow>
+                </TableHeader>
+                <TableBody>
                   {paginatedFacts.map((r) => (
-                    <tr key={r.id} className="hover:bg-stone-50/50">
-                      <td className="py-2 text-stone-800">
+                    <TableRow key={r.id}>
+                      <TableCell className="text-stone-800">
                         {userById[r.user_id] ?? r.user_id}
-                      </td>
-                      <td className="py-2 text-stone-600">
+                      </TableCell>
+                      <TableCell className="text-stone-600">
                         {departmentById[r.department_id] ?? r.department_id}
-                      </td>
-                      <td className="py-2 text-stone-600">{r.cycle_year}</td>
-                      <td className="py-2 text-stone-800">{r.quantitative_score ?? '—'}</td>
-                      <td className="py-2 text-stone-800">{r.behavioral_score ?? '—'}</td>
-                      <td className="py-2 text-stone-800">{r.final_score ?? '—'}</td>
-                      <td className="py-2 text-stone-800">{r.rating_band ?? '—'}</td>
-                      <td className="py-2 text-stone-500 text-xs">
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {r.cycle_year}
+                      </TableCell>
+                      <TableCell className="text-stone-800">
+                        {r.quantitative_score ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-stone-800">
+                        {r.behavioral_score ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-stone-800">
+                        {r.final_score ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-stone-800">
+                        {r.rating_band ?? '—'}
+                      </TableCell>
+                      <TableCell className="border-r-0 text-xs text-stone-500">
                         {format(parseISO(r.etl_at), 'MMM d HH:mm')}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </TableContainer>
             {totalPages > 1 && (
               <div className="mt-3 flex items-center justify-between border-t border-stone-100 pt-3">
                 <p className="text-xs text-stone-500">

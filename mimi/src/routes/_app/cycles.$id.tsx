@@ -1,8 +1,26 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQueries, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { format, parseISO } from 'date-fns'
-import { ArrowLeft, Lock, Target } from 'lucide-react'
+import {
+  ArrowLeft,
+  Box,
+  CircleDot,
+  FileText,
+  Lock,
+  Target,
+  User,
+} from 'lucide-react'
 import { useMemo, useState } from 'react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
 import {
   meQueryOptions,
   mutations,
@@ -285,39 +303,42 @@ function CycleDetailPage() {
                 No objectives in this cycle.
               </p>
             ) : (
-              <div className="overflow-hidden border border-stone-200">
-                <table className="w-full min-w-[520px] text-sm">
-                  <thead>
-                    <tr className="border-b border-stone-200 bg-stone-50/80">
-                      <th className="px-4 py-3 text-left font-semibold text-stone-700">
+              <TableContainer>
+                <Table className="min-w-[520px]">
+                  <TableHeader>
+                    <TableHeaderRow>
+                      <TableHead icon={<FileText className="size-3" />}>
                         Title
-                      </th>
-                      <th className="px-4 py-3 text-left font-semibold text-stone-700">
+                      </TableHead>
+                      <TableHead icon={<User className="size-3" />}>
                         Owner
-                      </th>
-                      <th className="px-4 py-3 text-left font-semibold text-stone-700">
+                      </TableHead>
+                      <TableHead icon={<Box className="size-3" />}>
                         Dimension
-                      </th>
-                      <th className="px-4 py-3 text-left font-semibold text-stone-700">
+                      </TableHead>
+                      <TableHead icon={<CircleDot className="size-3" />}>
                         Status
-                      </th>
-                      <th className="px-4 py-3 text-right font-semibold text-stone-700">
+                      </TableHead>
+                      <TableHead
+                        className="text-right"
+                        icon={<Target className="size-3" />}
+                      >
                         Weight%
-                      </th>
-                      <th className="px-4 py-3 text-left font-semibold text-stone-700">
+                      </TableHead>
+                      <TableHead
+                        className="border-r-0"
+                        icon={<Lock className="size-3" />}
+                      >
                         Locked
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-stone-100">
+                      </TableHead>
+                    </TableHeaderRow>
+                  </TableHeader>
+                  <TableBody>
                     {filteredObjectives.map((obj) => {
                       const locked = !!obj.locked_at || !!obj.already_locked
                       return (
-                        <tr
-                          key={obj.id}
-                          className="hover:bg-stone-50/50"
-                        >
-                          <td className="px-4 py-3">
+                        <TableRow key={obj.id}>
+                          <TableCell>
                             <Link
                               to="/objectives/$id"
                               params={{ id: obj.id }}
@@ -325,24 +346,24 @@ function CycleDetailPage() {
                             >
                               {obj.title}
                             </Link>
-                          </td>
-                          <td className="px-4 py-3 text-stone-600">
+                          </TableCell>
+                          <TableCell className="text-stone-600">
                             {userNameById.get(obj.user_id) ?? obj.user_id}
-                          </td>
-                          <td className="px-4 py-3 text-stone-600">
+                          </TableCell>
+                          <TableCell className="text-stone-600">
                             {dimensionNameById.get(obj.dimension_id) ?? '—'}
-                          </td>
-                          <td className="px-4 py-3">
+                          </TableCell>
+                          <TableCell>
                             <span
                               className={`px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(obj.status)}`}
                             >
                               {obj.status.replace(/_/g, ' ')}
                             </span>
-                          </td>
-                          <td className="px-4 py-3 text-right text-stone-600">
+                          </TableCell>
+                          <TableCell className="text-right text-stone-600">
                             {weightDisplay(obj.weight)}
-                          </td>
-                          <td className="px-4 py-3">
+                          </TableCell>
+                          <TableCell className="border-r-0">
                             {locked ? (
                               <span className="inline-flex items-center gap-1 text-stone-500">
                                 <Lock className="size-3.5" />
@@ -361,13 +382,13 @@ function CycleDetailPage() {
                             ) : (
                               '—'
                             )}
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       )
                     })}
-                  </tbody>
-                </table>
-              </div>
+                  </TableBody>
+                </Table>
+              </TableContainer>
             )}
           </section>
         </div>

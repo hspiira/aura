@@ -2,7 +2,15 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
-import { Calendar, Hash, Lock, Pencil, Plus } from 'lucide-react'
+import {
+  Calendar,
+  Hash,
+  Lock,
+  SquarePen,
+  Plus,
+  Repeat,
+  CircleDot,
+} from 'lucide-react'
 import { AdminDataTable } from '#/components/admin-data-table'
 import {
   meQueryOptions,
@@ -160,24 +168,16 @@ function AdminCyclesPage() {
         columns={[
           {
             id: 'name',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Hash className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">Name</span>
-              </div>
-            ),
+            icon: <Hash className="size-3" />,
+            header: 'Name',
             cell: (c) => (
               <span className="font-medium text-stone-900">{c.name}</span>
             ),
           },
           {
             id: 'dates',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Calendar className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">Dates</span>
-              </div>
-            ),
+            icon: <Calendar className="size-3" />,
+            header: 'Dates',
             cell: (c) => (
               <span className="text-stone-600">
                 {format(parseISO(c.start_date), 'MMM d')} –{' '}
@@ -187,9 +187,8 @@ function AdminCyclesPage() {
           },
           {
             id: 'status',
-            header: (
-              <span className="text-xs font-semibold text-stone-700">Status</span>
-            ),
+            icon: <CircleDot className="size-3" />,
+            header: 'Status',
             cell: (c) => (
               <span
                 className={`px-2 py-0.5 text-xs capitalize ${statusBadgeClass(c.status)}`}
@@ -200,11 +199,8 @@ function AdminCyclesPage() {
           },
           {
             id: 'review_frequency',
-            header: (
-              <span className="text-xs font-semibold text-stone-700">
-                Review frequency
-              </span>
-            ),
+            icon: <Repeat className="size-3" />,
+            header: 'Review frequency',
             cell: (c) => (
               <span className="text-stone-600">
                 {c.review_frequency ?? '—'}
@@ -213,14 +209,8 @@ function AdminCyclesPage() {
           },
           {
             id: 'lock_date',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Lock className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Lock date
-                </span>
-              </div>
-            ),
+            icon: <Lock className="size-3" />,
+            header: 'Lock date',
             cell: (c) => (
               <span className="text-stone-600">
                 {c.objectives_lock_date
@@ -233,7 +223,8 @@ function AdminCyclesPage() {
             ? [
                 {
                   id: 'actions' as const,
-                  header: <span className="sr-only">Edit</span>,
+                  icon: <SquarePen className="size-3" />,
+                  header: 'Edit',
                   cell: (c: PerformanceCycleResponse) => (
                     <button
                       type="button"
@@ -241,7 +232,7 @@ function AdminCyclesPage() {
                       className="inline-flex items-center justify-center text-stone-400 hover:text-amber-600"
                       aria-label={`Edit ${c.name}`}
                     >
-                      <Pencil className="size-4" />
+                      <SquarePen className="size-4" />
                     </button>
                   ),
                 },

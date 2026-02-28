@@ -11,7 +11,27 @@ import { EDIT_OBJECTIVES, hasPermission } from '#/lib/permissions'
 import { useStore } from '@tanstack/react-store'
 import { selectedCycleStore, setSelectedCycleId } from '#/stores/selected-cycle'
 import { meQueryOptions } from '#/lib/queries'
-import { Lock, Plus } from 'lucide-react'
+import {
+  ArrowRight,
+  Award,
+  BarChart3,
+  Box,
+  CircleDot,
+  FileText,
+  Lock,
+  Percent,
+  Plus,
+} from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
 import { NewObjectiveModal } from '#/components/objectives/NewObjectiveModal'
 
 export const Route = createFileRoute('/_app/objectives')({
@@ -198,125 +218,129 @@ function ObjectivesPage() {
               </div>
 
               {/* Table */}
-              <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[640px] text-sm">
-                    <thead>
-                      <tr className="border-b border-stone-200 bg-stone-50/80">
-                        <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                          Title
-                        </th>
-                        <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                          Dimension
-                        </th>
-                        <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                          Status
-                        </th>
-                        <th className="px-4 py-3 text-right font-semibold text-stone-700">
-                          Weight%
-                        </th>
-                        <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                          Progress
-                        </th>
-                        <th className="px-4 py-3 text-right font-semibold text-stone-700">
-                          Score
-                        </th>
-                        <th className="px-4 py-3 text-right font-semibold text-stone-700">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-stone-100">
-                      {objectives.length === 0 && (
-                        <tr>
-                          <td
-                            colSpan={7}
-                            className="px-4 py-8 text-center text-stone-500"
-                          >
-                            No objectives match the filters.
-                          </td>
-                        </tr>
-                      )}
-                      {objectives.map((obj) => {
-                        const achievement = scoreByObjId[obj.id]
-                        const isLoading = scoreLoadingByObjId[obj.id]
-                        const pct = achievement
-                          ? Math.min(100, Number(achievement))
-                          : 0
-                        const locked =
-                          !!obj.locked_at || !!obj.already_locked
-                        const dimensionName =
-                          dimensionByName.get(obj.dimension_id) ?? '—'
-                        return (
-                          <tr
-                            key={obj.id}
-                            className="hover:bg-stone-50/50"
-                          >
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-1.5">
-                                <Link
-                                  to="/objectives/$id"
-                                  params={{ id: obj.id }}
-                                  className="font-medium text-stone-900 underline decoration-stone-300 underline-offset-2 hover:decoration-amber-500"
-                                >
-                                  {obj.title}
-                                </Link>
-                                {locked && (
-                                  <span
-                                    className="inline-flex items-center gap-0.5 text-stone-400"
-                                    title="Locked"
-                                  >
-                                    <Lock className="size-3.5" />
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-stone-600">
-                              {dimensionName}
-                            </td>
-                            <td className="px-4 py-3">
-                              <span
-                                className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(obj.status)}`}
-                              >
-                                {obj.status.replace(/_/g, ' ')}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-right text-stone-600">
-                              {weightDisplay(obj.weight)}
-                            </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-2">
-                                <div className="h-1.5 w-20 min-w-[5rem] overflow-hidden rounded-full bg-stone-100">
-                                  <div
-                                    className="h-full rounded-full bg-amber-500/70"
-                                    style={{ width: `${pct}%` }}
-                                  />
-                                </div>
-                                <span className="text-xs text-stone-500">
-                                  {achievement != null
-                                    ? `${achievement}%`
-                                    : '—'}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right font-medium text-stone-800">
-                              {isLoading ? '—' : achievement ?? '—'}
-                            </td>
-                            <td className="px-4 py-3 text-right">
+              <TableContainer>
+                <Table className="min-w-[640px]">
+                  <TableHeader>
+                    <TableHeaderRow>
+                      <TableHead icon={<FileText className="size-3" />}>
+                        Title
+                      </TableHead>
+                      <TableHead icon={<Box className="size-3" />}>
+                        Dimension
+                      </TableHead>
+                      <TableHead icon={<CircleDot className="size-3" />}>
+                        Status
+                      </TableHead>
+                      <TableHead
+                        className="text-right"
+                        icon={<Percent className="size-3" />}
+                      >
+                        Weight%
+                      </TableHead>
+                      <TableHead icon={<BarChart3 className="size-3" />}>
+                        Progress
+                      </TableHead>
+                      <TableHead
+                        className="text-right"
+                        icon={<Award className="size-3" />}
+                      >
+                        Score
+                      </TableHead>
+                      <TableHead
+                        className="border-r-0 text-right"
+                        icon={<ArrowRight className="size-3" />}
+                      >
+                        Actions
+                      </TableHead>
+                    </TableHeaderRow>
+                  </TableHeader>
+                  <TableBody>
+                    {objectives.length === 0 && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={7}
+                          className="border-r-0 py-8 text-center text-stone-500"
+                        >
+                          No objectives match the filters.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {objectives.map((obj) => {
+                      const achievement = scoreByObjId[obj.id]
+                      const isLoading = scoreLoadingByObjId[obj.id]
+                      const pct = achievement
+                        ? Math.min(100, Number(achievement))
+                        : 0
+                      const locked =
+                        !!obj.locked_at || !!obj.already_locked
+                      const dimensionName =
+                        dimensionByName.get(obj.dimension_id) ?? '—'
+                      return (
+                        <TableRow key={obj.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-1.5">
                               <Link
                                 to="/objectives/$id"
                                 params={{ id: obj.id }}
-                                className="text-sm font-medium text-amber-600 hover:text-amber-700"
+                                className="font-medium text-stone-900 underline decoration-stone-300 underline-offset-2 hover:decoration-amber-500"
                               >
-                                View →
+                                {obj.title}
                               </Link>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                              {locked && (
+                                <span
+                                  className="inline-flex items-center gap-0.5 text-stone-400"
+                                  title="Locked"
+                                >
+                                  <Lock className="size-3.5" />
+                                </span>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-stone-600">
+                            {dimensionName}
+                          </TableCell>
+                          <TableCell>
+                            <span
+                              className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(obj.status)}`}
+                            >
+                              {obj.status.replace(/_/g, ' ')}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right text-stone-600">
+                            {weightDisplay(obj.weight)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <div className="h-1.5 w-20 min-w-[5rem] overflow-hidden rounded-full bg-stone-100">
+                                <div
+                                  className="h-full rounded-full bg-amber-500/70"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                              <span className="text-xs text-stone-500">
+                                {achievement != null
+                                  ? `${achievement}%`
+                                  : '—'}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right font-medium text-stone-800">
+                            {isLoading ? '—' : achievement ?? '—'}
+                          </TableCell>
+                          <TableCell className="border-r-0 text-right">
+                            <Link
+                              to="/objectives/$id"
+                              params={{ id: obj.id }}
+                              className="text-sm font-medium text-amber-600 hover:text-amber-700"
+                            >
+                              View →
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
                 {/* Row count */}
                 <div className="border-t border-stone-100 px-4 py-2 text-xs text-stone-500">
                   Showing {objectives.length} objective
@@ -330,7 +354,7 @@ function ObjectivesPage() {
                     Total weight: {Math.round(totalWeight)}%
                   </div>
                 )}
-              </div>
+              </TableContainer>
 
               <NewObjectiveModal
                 open={newModalOpen}

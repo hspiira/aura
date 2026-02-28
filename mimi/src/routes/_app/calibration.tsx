@@ -2,7 +2,24 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
-import { Plus } from 'lucide-react'
+import {
+  Building2,
+  Calendar,
+  FileText,
+  Plus,
+  User,
+  AlertTriangle,
+} from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
 import {
   calibrationDistributionQueryOptions,
   calibrationSessionsQueryOptions,
@@ -198,30 +215,43 @@ function CalibrationPage() {
           ) : variance.length === 0 ? (
             <p className="text-sm text-stone-500">No variance data.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-stone-200 text-left">
-                    <th className="pb-2 font-semibold text-stone-700">Department</th>
-                    <th className="pb-2 font-semibold text-stone-700">Mean score</th>
-                    <th className="pb-2 font-semibold text-stone-700">Std dev</th>
-                    <th className="pb-2 font-semibold text-stone-700">Outlier</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {variance.map((v) => (
-                    <tr
-                      key={v.department_id}
-                      className={v.is_outlier ? 'bg-red-50 hover:bg-red-100/50' : 'hover:bg-stone-50/50'}
+            <TableContainer>
+              <Table>
+                <TableHeader>
+                  <TableHeaderRow>
+                    <TableHead icon={<Building2 className="size-3" />}>
+                      Department
+                    </TableHead>
+                    <TableHead icon={<FileText className="size-3" />}>
+                      Mean score
+                    </TableHead>
+                    <TableHead icon={<FileText className="size-3" />}>
+                      Std dev
+                    </TableHead>
+                    <TableHead
+                      className="border-r-0"
+                      icon={<AlertTriangle className="size-3" />}
                     >
-                      <td className="py-2 text-stone-800">
+                      Outlier
+                    </TableHead>
+                  </TableHeaderRow>
+                </TableHeader>
+                <TableBody>
+                  {variance.map((v) => (
+                    <TableRow
+                      key={v.department_id}
+                      className={v.is_outlier ? 'bg-red-50 hover:bg-red-100/50' : undefined}
+                    >
+                      <TableCell className="text-stone-800">
                         {departmentById[v.department_id] ?? v.department_id}
-                      </td>
-                      <td className="py-2 font-medium text-stone-800">
+                      </TableCell>
+                      <TableCell className="font-medium text-stone-800">
                         {v.mean_score.toFixed(2)}
-                      </td>
-                      <td className="py-2 text-stone-600">{v.std_dev.toFixed(2)}</td>
-                      <td className="py-2">
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {v.std_dev.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="border-r-0">
                         {v.is_outlier ? (
                           <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                             Yes
@@ -229,12 +259,12 @@ function CalibrationPage() {
                         ) : (
                           <span className="text-stone-400">—</span>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </section>
       </div>
@@ -246,38 +276,56 @@ function CalibrationPage() {
         ) : sessions.length === 0 ? (
           <p className="text-sm text-stone-500">No sessions for this filter.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-stone-200 text-left">
-                  <th className="pb-2 font-semibold text-stone-700">Cycle</th>
-                  <th className="pb-2 font-semibold text-stone-700">Department</th>
-                  <th className="pb-2 font-semibold text-stone-700">Conducted by</th>
-                  <th className="pb-2 font-semibold text-stone-700">Conducted at</th>
-                  <th className="pb-2 font-semibold text-stone-700">Notes</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-stone-100">
+          <TableContainer>
+            <Table>
+              <TableHeader>
+                <TableHeaderRow>
+                  <TableHead icon={<Calendar className="size-3" />}>
+                    Cycle
+                  </TableHead>
+                  <TableHead icon={<Building2 className="size-3" />}>
+                    Department
+                  </TableHead>
+                  <TableHead icon={<User className="size-3" />}>
+                    Conducted by
+                  </TableHead>
+                  <TableHead icon={<Calendar className="size-3" />}>
+                    Conducted at
+                  </TableHead>
+                  <TableHead
+                    className="border-r-0"
+                    icon={<FileText className="size-3" />}
+                  >
+                    Notes
+                  </TableHead>
+                </TableHeaderRow>
+              </TableHeader>
+              <TableBody>
                 {sessions.map((s) => (
-                  <tr key={s.id} className="hover:bg-stone-50/50">
-                    <td className="py-2 text-stone-600">{cycles.find((c) => c.id === s.performance_cycle_id)?.name ?? s.performance_cycle_id}</td>
-                    <td className="py-2 text-stone-800">
+                  <TableRow key={s.id}>
+                    <TableCell className="text-stone-600">
+                      {cycles.find((c) => c.id === s.performance_cycle_id)?.name ?? s.performance_cycle_id}
+                    </TableCell>
+                    <TableCell className="text-stone-800">
                       {departmentById[s.department_id] ?? s.department_id}
-                    </td>
-                    <td className="py-2 text-stone-800">
+                    </TableCell>
+                    <TableCell className="text-stone-800">
                       {userById[s.conducted_by_id] ?? s.conducted_by_id}
-                    </td>
-                    <td className="py-2 text-stone-600">
+                    </TableCell>
+                    <TableCell className="text-stone-600">
                       {format(parseISO(s.conducted_at), 'MMM d, yyyy HH:mm')}
-                    </td>
-                    <td className="max-w-[12rem] truncate py-2 text-stone-600" title={s.notes ?? undefined}>
+                    </TableCell>
+                    <TableCell
+                      className="max-w-[12rem] truncate border-r-0 text-stone-600"
+                      title={s.notes ?? undefined}
+                    >
                       {s.notes ?? '—'}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </section>
 

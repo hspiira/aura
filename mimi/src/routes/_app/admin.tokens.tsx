@@ -1,7 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Copy, Plus, User, FileText, Clock, Trash2 } from 'lucide-react'
+import {
+  CalendarClock,
+  Clock,
+  Copy,
+  FileText,
+  MoreVertical,
+  Plus,
+  Trash2,
+  User,
+} from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import {
   meQueryOptions,
@@ -111,12 +120,8 @@ function AdminTokensPage() {
         columns={[
           {
             id: 'user',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <User className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">User</span>
-              </div>
-            ),
+            icon: <User className="size-3" />,
+            header: 'User',
             cell: (t) => (
               <span className="font-medium text-stone-900">
                 {userById[t.user_id] ?? t.user_id}
@@ -125,25 +130,16 @@ function AdminTokensPage() {
           },
           {
             id: 'description',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <FileText className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Description
-                </span>
-              </div>
-            ),
+            icon: <FileText className="size-3" />,
+            header: 'Description',
             cell: (t) => (
               <span className="text-stone-600">{t.description ?? '—'}</span>
             ),
           },
           {
             id: 'expires_at',
-            header: (
-              <span className="text-xs font-semibold text-stone-700">
-                Expires at
-              </span>
-            ),
+            icon: <CalendarClock className="size-3" />,
+            header: 'Expires at',
             cell: (t) => (
               <span className="text-stone-600">
                 {t.revoked
@@ -156,14 +152,8 @@ function AdminTokensPage() {
           },
           {
             id: 'created',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Clock className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Created at
-                </span>
-              </div>
-            ),
+            icon: <Clock className="size-3" />,
+            header: 'Created at',
             cell: (t) => (
               <span className="text-stone-600">
                 {format(parseISO(t.created_at), 'MMM d, yyyy HH:mm')}
@@ -174,7 +164,8 @@ function AdminTokensPage() {
             ? [
                 {
                   id: 'actions' as const,
-                  header: <span className="sr-only">Actions</span>,
+                  icon: <MoreVertical className="size-3" />,
+                  header: 'Actions',
                   cell: (t: UserTokenResponse) => (
                     <div className="w-20">
                       {!t.revoked &&

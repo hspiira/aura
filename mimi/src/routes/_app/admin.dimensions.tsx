@@ -1,7 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Percent, Pencil, Plus, SlidersHorizontal } from 'lucide-react'
+import {
+  BarChart2,
+  Percent,
+  Plus,
+  SlidersHorizontal,
+  SquarePen,
+} from 'lucide-react'
 import {
   meQueryOptions,
   mutations,
@@ -140,25 +146,16 @@ function AdminDimensionsPage() {
         columns={[
           {
             id: 'name',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <SlidersHorizontal className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Name
-                </span>
-              </div>
-            ),
+            icon: <SlidersHorizontal className="size-3" />,
+            header: 'Name',
             cell: (d) => (
               <span className="font-medium text-stone-900">{d.name}</span>
             ),
           },
           {
             id: 'is_quantitative',
-            header: (
-              <span className="text-xs font-semibold text-stone-700">
-                Is quantitative
-              </span>
-            ),
+            icon: <BarChart2 className="size-3" />,
+            header: 'Is quantitative',
             cell: (d) => (
               <span
                 className={
@@ -173,14 +170,8 @@ function AdminDimensionsPage() {
           },
           {
             id: 'default_weight_pct',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Percent className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Default weight%
-                </span>
-              </div>
-            ),
+            icon: <Percent className="size-3" />,
+            header: 'Default weight%',
             cell: (d) => (
               <span className="text-stone-600">
                 {weightDisplay(d.default_weight_pct)}
@@ -191,7 +182,8 @@ function AdminDimensionsPage() {
             ? [
                 {
                   id: 'actions' as const,
-                  header: <span className="sr-only">Edit</span>,
+                  icon: <SquarePen className="size-3" />,
+                  header: 'Edit',
                   cell: (d: PerformanceDimensionResponse) => (
                     <button
                       type="button"
@@ -199,7 +191,7 @@ function AdminDimensionsPage() {
                       className="inline-flex items-center justify-center text-stone-400 hover:text-amber-600"
                       aria-label={`Edit ${d.name}`}
                     >
-                      <Pencil className="size-4" />
+                      <SquarePen className="size-4" />
                     </button>
                   ),
                 },

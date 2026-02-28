@@ -2,7 +2,26 @@ import { createFileRoute, Link, Outlet, useRouterState } from '@tanstack/react-r
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { format, parseISO } from 'date-fns'
-import { ArrowRight, Plus } from 'lucide-react'
+import {
+  ArrowRight,
+  Calendar,
+  CalendarClock,
+  CircleDot,
+  FileType,
+  Plus,
+  User,
+  UserCheck,
+} from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
 import {
   mutations,
   performanceCyclesQueryOptions,
@@ -205,105 +224,103 @@ function ReviewsPage() {
             </label>
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[600px] text-sm">
-                <thead>
-                  <tr className="border-b border-stone-200 bg-stone-50/80">
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Employee
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Reviewer
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Cycle
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Type
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Status
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-stone-700">
-                      Scheduled
-                    </th>
-                    <th className="w-20 px-4 py-3 text-right font-semibold text-stone-700">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {filteredSessions.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={7}
-                        className="px-4 py-8 text-center text-sm text-stone-500"
-                      >
-                        No review sessions.
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredSessions.map((row) => (
-                      <tr
-                        key={row.id}
-                        className="hover:bg-stone-50/50"
-                      >
-                        <td className="px-4 py-3">
-                          <Link
-                            to="/reviews/$id"
-                            params={{ id: row.id }}
-                            className="font-medium text-stone-900 underline decoration-stone-300 underline-offset-2 hover:decoration-amber-500"
-                          >
-                            {userByName.get(row.user_id) ?? row.user_id}
-                          </Link>
-                        </td>
-                        <td className="px-4 py-3 text-stone-600">
-                          {userByName.get(row.reviewer_id) ?? row.reviewer_id}
-                        </td>
-                        <td className="px-4 py-3 text-stone-600">
-                          {cycleByName.get(row.performance_cycle_id) ??
-                            row.performance_cycle_id}
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`rounded px-2 py-0.5 text-xs font-medium ${typeBadgeClass(row.session_type)}`}
-                          >
-                            {SESSION_TYPE_LABELS[row.session_type]}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`rounded px-2 py-0.5 text-xs font-medium ${statusBadgeClass(row.status)}`}
-                          >
-                            {STATUS_LABELS[row.status]}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-stone-600">
-                          {row.scheduled_at
-                            ? format(
-                                parseISO(row.scheduled_at),
-                                'MMM d, yyyy HH:mm',
-                              )
-                            : '—'}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          <Link
-                            to="/reviews/$id"
-                            params={{ id: row.id }}
-                            className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 hover:text-amber-700"
-                          >
-                            View
-                            <ArrowRight className="size-4" />
-                          </Link>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <TableContainer>
+            <Table className="min-w-[600px]">
+              <TableHeader>
+                <TableHeaderRow>
+                  <TableHead icon={<User className="size-3" />}>
+                    Employee
+                  </TableHead>
+                  <TableHead icon={<UserCheck className="size-3" />}>
+                    Reviewer
+                  </TableHead>
+                  <TableHead icon={<Calendar className="size-3" />}>
+                    Cycle
+                  </TableHead>
+                  <TableHead icon={<FileType className="size-3" />}>
+                    Type
+                  </TableHead>
+                  <TableHead icon={<CircleDot className="size-3" />}>
+                    Status
+                  </TableHead>
+                  <TableHead icon={<CalendarClock className="size-3" />}>
+                    Scheduled
+                  </TableHead>
+                  <TableHead
+                    className="w-20 border-r-0 text-right"
+                    icon={<ArrowRight className="size-3" />}
+                  >
+                    Actions
+                  </TableHead>
+                </TableHeaderRow>
+              </TableHeader>
+              <TableBody>
+                {filteredSessions.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      className="border-r-0 py-8 text-center text-sm text-stone-500"
+                    >
+                      No review sessions.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredSessions.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell>
+                        <Link
+                          to="/reviews/$id"
+                          params={{ id: row.id }}
+                          className="font-medium text-stone-900 underline decoration-stone-300 underline-offset-2 hover:decoration-amber-500"
+                        >
+                          {userByName.get(row.user_id) ?? row.user_id}
+                        </Link>
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {userByName.get(row.reviewer_id) ?? row.reviewer_id}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {cycleByName.get(row.performance_cycle_id) ??
+                          row.performance_cycle_id}
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`rounded px-2 py-0.5 text-xs font-medium ${typeBadgeClass(row.session_type)}`}
+                        >
+                          {SESSION_TYPE_LABELS[row.session_type]}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span
+                          className={`rounded px-2 py-0.5 text-xs font-medium ${statusBadgeClass(row.status)}`}
+                        >
+                          {STATUS_LABELS[row.status]}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {row.scheduled_at
+                          ? format(
+                              parseISO(row.scheduled_at),
+                              'MMM d, yyyy HH:mm',
+                            )
+                          : '—'}
+                      </TableCell>
+                      <TableCell className="border-r-0 text-right">
+                        <Link
+                          to="/reviews/$id"
+                          params={{ id: row.id }}
+                          className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 hover:text-amber-700"
+                        >
+                          View
+                          <ArrowRight className="size-4" />
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </>
       )}
       <Outlet />

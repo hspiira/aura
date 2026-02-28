@@ -6,7 +6,7 @@ import {
   ArrowUp01,
   DollarSign,
   Gift,
-  Pencil,
+  SquarePen,
   Plus,
   Trash2,
 } from 'lucide-react'
@@ -198,54 +198,30 @@ function AdminRewardPoliciesPage() {
         columns={[
           {
             id: 'min',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <ArrowDown01 className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Min score
-                </span>
-              </div>
-            ),
+            icon: <ArrowDown01 className="size-3" />,
+            header: 'Min score',
             cell: (p) => (
               <span className="font-medium text-stone-900">{p.min_score}</span>
             ),
           },
           {
             id: 'max',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <ArrowUp01 className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Max score
-                </span>
-              </div>
-            ),
+            icon: <ArrowUp01 className="size-3" />,
+            header: 'Max score',
             cell: (p) => <span className="text-stone-800">{p.max_score}</span>,
           },
           {
             id: 'type',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <Gift className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Reward type
-                </span>
-              </div>
-            ),
+            icon: <Gift className="size-3" />,
+            header: 'Reward type',
             cell: (p) => (
               <span className="text-stone-600">{p.reward_type}</span>
             ),
           },
           {
             id: 'value',
-            header: (
-              <div className="flex items-center gap-1.5">
-                <DollarSign className="size-3.5 text-stone-500" />
-                <span className="text-xs font-semibold text-stone-700">
-                  Reward value
-                </span>
-              </div>
-            ),
+            icon: <DollarSign className="size-3" />,
+            header: 'Reward value',
             cell: (p) => (
               <span className="text-stone-600">{p.reward_value}</span>
             ),
@@ -254,7 +230,8 @@ function AdminRewardPoliciesPage() {
             ? [
                 {
                   id: 'actions' as const,
-                  header: <span className="sr-only">Edit / Delete</span>,
+                  icon: <SquarePen className="size-3" />,
+                  header: 'Edit / Delete',
                   cell: (p: RewardPolicyResponse) => (
                     <div className="flex items-center gap-1">
                       <button
@@ -263,7 +240,7 @@ function AdminRewardPoliciesPage() {
                         className="p-1 text-stone-400 hover:bg-stone-100 hover:text-amber-600"
                         aria-label={`Edit ${p.reward_type}`}
                       >
-                        <Pencil className="size-4" />
+                        <SquarePen className="size-4" />
                       </button>
                       {deleteConfirmId === p.id ? (
                         <span className="flex items-center gap-1 text-xs">
