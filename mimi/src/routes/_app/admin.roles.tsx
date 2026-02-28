@@ -427,14 +427,14 @@ function RoleDetails({
   const [addPermId, setAddPermId] = useState('')
   const [removePermConfirm, setRemovePermConfirm] = useState<string | null>(null)
 
-  const { data: weights = [] } = useQuery(
-    roleDimensionWeightsQueryOptions({ role_id: roleId }),
-    { enabled: !!roleId },
-  )
-  const { data: rolePerms = [] } = useQuery(
-    rolePermissionsQueryOptions({ role_id: roleId }),
-    { enabled: !!roleId },
-  )
+  const { data: weights = [] } = useQuery({
+    ...roleDimensionWeightsQueryOptions({ role_id: roleId }),
+    enabled: !!roleId,
+  })
+  const { data: rolePerms = [] } = useQuery({
+    ...rolePermissionsQueryOptions({ role_id: roleId }),
+    enabled: !!roleId,
+  })
   const { data: dimensions = [] } = useQuery(
     performanceDimensionsQueryOptions(),
   )
@@ -648,7 +648,7 @@ function RoleDetails({
                   className="flex items-center justify-between rounded-lg border border-stone-100 bg-white px-3 py-2"
                 >
                   <span className="text-sm text-stone-800">
-                    {permById[rp.permission_id]?.code ?? permById[rp.permission_id]?.title ?? rp.permission_id}
+                    {permById[rp.permission_id]?.code ?? permById[rp.permission_id]?.name ?? rp.permission_id}
                   </span>
                   {canManageRbac && (
                     removePermConfirm === rp.id ? (
@@ -694,7 +694,7 @@ function RoleDetails({
                 <option value="">Add permission…</option>
                 {unassignedPermIds.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.code ?? p.title}
+                    {p.code ?? p.name}
                   </option>
                 ))}
               </select>

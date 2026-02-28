@@ -78,10 +78,9 @@ function UserProfilePage() {
     enabled: !!effectiveCycleId,
   })
   const { data: indicators = [] } = useQuery(behavioralIndicatorsQueryOptions())
-  const { data: performanceSummary } = useQuery(
-    performanceSummaryByUserCycleQueryOptions(id, effectiveCycleId),
-    { enabled: !!effectiveCycleId },
-  )
+  const { data: performanceSummary } = useQuery({
+    ...performanceSummaryByUserCycleQueryOptions(id, effectiveCycleId),
+  })
 
   const objectives = objectivesData?.items ?? []
   const scoreQueries = useQueries({
@@ -443,10 +442,9 @@ function TeamMemberCard({
   name: string
   cycleId: string
 }) {
-  const { data: summary } = useQuery(
-    performanceSummaryByUserCycleQueryOptions(userId, cycleId),
-    { enabled: !!cycleId },
-  )
+  const { data: summary } = useQuery({
+    ...performanceSummaryByUserCycleQueryOptions(userId, cycleId),
+  })
   return (
     <Link
       to="/people/$id"

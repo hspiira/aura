@@ -76,13 +76,12 @@ function ReviewSessionDetailPage() {
     [cycles],
   )
 
-  const { data: summary } = useQuery(
-    performanceSummaryByUserCycleQueryOptions(
+  const { data: summary } = useQuery({
+    ...performanceSummaryByUserCycleQueryOptions(
       session?.user_id ?? '',
       session?.performance_cycle_id ?? '',
     ),
-    { enabled: !!session?.user_id && !!session?.performance_cycle_id },
-  )
+  })
 
   const updateStatusMutation = useMutation({
     mutationFn: (status: ReviewSessionStatus) =>

@@ -54,15 +54,12 @@ function CalibrationPage() {
       performance_cycle_id: effectiveCycleId || undefined,
       department_id: departmentId || undefined,
     }),
-    { enabled: !!effectiveCycleId },
   )
   const { data: distribution = [] } = useQuery(
     calibrationDistributionQueryOptions(effectiveCycleId, departmentId || undefined),
-    { enabled: !!effectiveCycleId },
   )
   const { data: variance = [] } = useQuery(
     calibrationVarianceQueryOptions(effectiveCycleId, departmentId || undefined),
-    { enabled: !!effectiveCycleId },
   )
 
   const createMutation = useMutation({

@@ -39,26 +39,25 @@ function AnalyticsPage() {
       })()
     : undefined
 
-  const { data: refreshStatus } = useQuery(analyticsRefreshStatusQueryOptions(), {
+  const { data: refreshStatus } = useQuery({
+    ...analyticsRefreshStatusQueryOptions(),
     refetchInterval: (query) =>
       (query.state.data as { running?: boolean })?.running ? 2000 : false,
   })
   const { data: distribution = [] } = useQuery(
     calibrationDistributionQueryOptions(effectiveCycleId, departmentId || undefined),
-    { enabled: !!effectiveCycleId },
   )
   const { data: variance = [] } = useQuery(
     calibrationVarianceQueryOptions(effectiveCycleId, departmentId || undefined),
-    { enabled: !!effectiveCycleId },
   )
-  const { data: factRows = [] } = useQuery(
-    analyticsFactSummariesQueryOptions({
+  const { data: factRows = [] } = useQuery({
+    ...analyticsFactSummariesQueryOptions({
       cycle_year: cycleYear,
       department_id: departmentId || undefined,
       limit: 2000,
     }),
-    { enabled: cycleYear != null },
-  )
+    enabled: cycleYear != null,
+  })
   const departmentById = useMemo(
     () => Object.fromEntries(departments.map((d) => [d.id, d.name])),
     [departments],

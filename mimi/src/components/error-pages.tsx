@@ -6,7 +6,7 @@
  *   - NO rounded corners
  *   - NO box shadows
  *   - h-screen / overflow-hidden — zero scrolling
- *   - DM Mono display; code number is a full-bleed background watermark
+ *   - Cascadia Code (project mono) for display; code number is a full-bleed background watermark
  */
 
 import { useRouter } from '@tanstack/react-router'
@@ -23,10 +23,7 @@ interface ErrorShellProps {
 
 function ErrorShell({ code, headline, subline, detail, actions }: ErrorShellProps) {
   return (
-    <div
-      className="relative h-screen overflow-hidden bg-stone-950 text-stone-50"
-      style={{ fontFamily: "'DM Mono', 'Cascadia Code', monospace" }}
-    >
+    <div className="relative h-screen overflow-hidden bg-stone-950 font-mono text-stone-50">
       {/* ── background grid ───────────────────────────────────────────── */}
       <div
         aria-hidden="true"
@@ -41,12 +38,11 @@ function ErrorShell({ code, headline, subline, detail, actions }: ErrorShellProp
       {/* ── giant watermark code ──────────────────────────────────────── */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
+        className="pointer-events-none absolute inset-0 flex items-center justify-center select-none font-mono"
       >
         <span
+          className="font-bold"
           style={{
-            fontFamily: "'DM Mono', monospace",
-            fontWeight: 700,
             fontSize: 'clamp(12rem, 40vw, 36rem)',
             letterSpacing: '-0.06em',
             lineHeight: 1,

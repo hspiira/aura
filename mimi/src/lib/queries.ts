@@ -259,6 +259,7 @@ export function calibrationDistributionQueryOptions(cycleId: string, departmentI
   return queryOptions({
     queryKey: queryKeys.calibrationAnalytics.distribution(cycleId, departmentId),
     queryFn: () => apiGet<DistributionBucket[]>(`analytics/calibration/distribution?${search}`),
+    enabled: !!cycleId,
   })
 }
 
@@ -268,6 +269,7 @@ export function calibrationVarianceQueryOptions(cycleId: string, departmentId?: 
   return queryOptions({
     queryKey: queryKeys.calibrationAnalytics.variance(cycleId, departmentId),
     queryFn: () => apiGet<VarianceItem[]>(`analytics/calibration/variance?${search}`),
+    enabled: !!cycleId,
   })
 }
 
@@ -654,7 +656,18 @@ export function performanceSummaryByUserCycleQueryOptions(userId: string, cycleI
   const search = new URLSearchParams({ user_id: userId, performance_cycle_id: cycleId })
   return queryOptions({
     queryKey: queryKeys.performanceSummaries.byUserCycle(userId, cycleId),
-    queryFn: () => apiGet<PerformanceSummaryResponse>(`performance-summaries/by-user-cycle?${search}`),
+    queryFn: async (): Promise<PerformanceSummaryResponse | null> => {
+      try {
+        return await apiGet<PerformanceSummaryResponse>(
+          `performance-summaries/by-user-cycle?${search}`,
+        )
+      } catch (err) {
+        if (err && typeof err === 'object' && 'status' in err && (err as { status: number }).status === 404) {
+          return null
+        }
+        throw err
+      }
+    },
     enabled: !!userId && !!cycleId,
   })
 }
@@ -704,6 +717,7 @@ export function calibrationSessionsQueryOptions(params?: {
   return queryOptions({
     queryKey: queryKeys.calibrationSessions.all(params),
     queryFn: () => apiGet<CalibrationSessionResponse[]>(`calibration-sessions${qs ? `?${qs}` : ''}`),
+    enabled: !!params?.performance_cycle_id,
   })
 }
 

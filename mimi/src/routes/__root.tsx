@@ -4,22 +4,37 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Scripts,
-  useRouter,
 } from '@tanstack/react-router'
 import { QueryClientProvider } from '@tanstack/react-query'
-import type { QueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { AppErrorPage, NotFoundPage } from '#/components/error-pages'
 import { wireApiAuth } from '#/lib/api-auth-wire'
+import { queryClient } from '#/lib/query-client'
 import { authStore, setAuth } from '#/stores/auth'
+
+/** Renders children only after client mount. Avoids running useQuery during SSR (Nitro bundle has duplicate query-core, causing "defaultQueryOptions is not a function"). */
+function ClientOnly({
+  children,
+  fallback = null,
+}: {
+  children: ReactNode
+  fallback?: ReactNode
+}) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  if (!mounted) return fallback
+  return children
+}
 
 // Wire token getter and 401 handler at module load time — runs before any render,
 // including SSR. The functions are no-ops when window is undefined.
 wireApiAuth()
 
 export const Route = createRootRouteWithContext<{
-  queryClient: QueryClient
+  queryClient?: import('@tanstack/react-query').QueryClient
 }>()({
   head: () => ({
     meta: [
@@ -34,13 +49,6 @@ export const Route = createRootRouteWithContext<{
 })
 
 function RootComponent() {
-  const router = useRouter()
-  const queryClient = (router.options as { context?: { queryClient: QueryClient } })
-    .context?.queryClient
-  if (!queryClient) {
-    throw new Error('Root route context must include queryClient')
-  }
-
   // Rehydrate auth from localStorage after client mount (SSR may have left store empty)
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -60,7 +68,15 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <RootDocument>
-        <Outlet />
+        <ClientOnly
+          fallback={
+            <div className="flex min-h-screen items-center justify-center bg-stone-50 text-stone-500">
+              Loading…
+            </div>
+          }
+        >
+          <Outlet />
+        </ClientOnly>
       </RootDocument>
     </QueryClientProvider>
   )
@@ -73,10 +89,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap"
-          rel="stylesheet"
-        />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
           rel="stylesheet"

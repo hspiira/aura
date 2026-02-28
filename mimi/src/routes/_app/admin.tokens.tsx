@@ -11,7 +11,10 @@ import {
 } from '#/lib/queries'
 import { AdminDataTable } from '#/components/admin-data-table'
 import { hasPermission, MANAGE_RBAC, MANAGE_USERS } from '#/lib/permissions'
-import type { UserTokenCreateRequest } from '#/lib/types'
+import type {
+  UserTokenCreateRequest,
+  UserTokenResponse,
+} from '#/lib/types'
 
 export const Route = createFileRoute('/_app/admin/tokens')({
   component: AdminTokensPage,
@@ -172,7 +175,7 @@ function AdminTokensPage() {
                 {
                   id: 'actions' as const,
                   header: <span className="sr-only">Actions</span>,
-                  cell: (t) => (
+                  cell: (t: UserTokenResponse) => (
                     <div className="w-20">
                       {!t.revoked &&
                         (revokeConfirmId === t.id ? (

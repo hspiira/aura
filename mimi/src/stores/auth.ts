@@ -49,6 +49,17 @@ const initialState = readPersisted()
 
 export const authStore = new Store<AuthState>(initialState)
 
+/** Sync from localStorage once on first read in the browser (SSR may have left store empty). */
+function rehydrateOnce(): void {
+  if (typeof window === 'undefined') return
+  const state = authStore.state
+  if (state.token !== null) return
+  const persisted = readPersisted()
+  if (persisted.token !== null) {
+    authStore.setState(() => ({ token: persisted.token, userId: persisted.userId }))
+  }
+}
+
 export function setAuth(token: string, userId: string | null = null) {
   authStore.setState(() => ({ token, userId }))
   persist({ token, userId })
@@ -60,6 +71,7 @@ export function clearAuth() {
 }
 
 export function getToken(): string | null {
+  rehydrateOnce()
   return authStore.state.token
 }
 
@@ -68,6 +80,7 @@ export function getUserId(): string | null {
 }
 
 export function isAuthenticated(): boolean {
+  rehydrateOnce()
   const state = authStore.state
   return state.token !== null && state.token.length > 0
 }

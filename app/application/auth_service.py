@@ -3,14 +3,12 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING
 
 from argon2 import PasswordHasher
 
-if TYPE_CHECKING:
-    from app.infrastructure.persistence.repositories.user_token_repo import (
-        UserTokenRepository,
-    )
+from app.infrastructure.persistence.repositories.user_token_repo import (
+    UserTokenRepository,
+)
 
 _ph = PasswordHasher()
 
@@ -35,7 +33,7 @@ async def issue_user_token(
     description: str | None,
     *,
     expires_in: timedelta | None = None,
-    repo: "UserTokenRepository",
+    repo: UserTokenRepository,
 ) -> str:
     """Create a new opaque UserToken for the given user and return the raw token.
 
