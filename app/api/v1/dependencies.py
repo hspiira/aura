@@ -1,10 +1,12 @@
 """API v1 dependency injection (composition root)."""
 
-from typing import Annotated
+from collections.abc import Awaitable, Callable
+from typing import Annotated, TypeVar
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.auth import get_current_user_id
 from app.infrastructure.persistence.database import get_db_transactional
 from app.infrastructure.persistence.repositories.audit_log_repo import (
     AuditLogRepository,
@@ -30,6 +32,9 @@ from app.infrastructure.persistence.repositories.fact_performance_summary_repo i
 from app.infrastructure.persistence.repositories.notification_log_repo import (
     NotificationLogRepository,
 )
+from app.infrastructure.persistence.repositories.notification_outbox_repo import (
+    NotificationOutboxRepository,
+)
 from app.infrastructure.persistence.repositories.notification_rule_repo import (
     NotificationRuleRepository,
 )
@@ -47,6 +52,9 @@ from app.infrastructure.persistence.repositories.objective_template_repo import 
 )
 from app.infrastructure.persistence.repositories.objective_update_repo import (
     ObjectiveUpdateRepository,
+)
+from app.infrastructure.persistence.repositories.objective_version_repo import (
+    ObjectiveVersionRepository,
 )
 from app.infrastructure.persistence.repositories.organization_repo import (
     OrganizationRepository,
@@ -77,178 +85,80 @@ from app.infrastructure.persistence.repositories.role_permission_repo import (
 )
 from app.infrastructure.persistence.repositories.role_repo import RoleRepository
 from app.infrastructure.persistence.repositories.user_repo import UserRepository
+from app.infrastructure.persistence.repositories.user_token_repo import (
+    UserTokenRepository,
+)
+
+_R = TypeVar("_R", bound=object)
 
 
-async def get_organization_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> OrganizationRepository:
-    """Yield organization repository."""
-    return OrganizationRepository(session)
+def _repo_dep(repo_cls: type[_R]) -> Callable[..., Awaitable[_R]]:
+    """Generate a FastAPI dependency that instantiates repo_cls with a DB session."""
+
+    async def _factory(
+        session: Annotated[AsyncSession, Depends(get_db_transactional)],
+    ) -> _R:
+        return repo_cls(session)  # type: ignore[call-arg]
+
+    _factory.__name__ = f"get_{repo_cls.__name__.lower()}"
+    return _factory
 
 
-async def get_department_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> DepartmentRepository:
-    """Yield department repository."""
-    return DepartmentRepository(session)
+get_organization_repo = _repo_dep(OrganizationRepository)
+get_department_repo = _repo_dep(DepartmentRepository)
+get_role_repo = _repo_dep(RoleRepository)
+get_user_repo = _repo_dep(UserRepository)
+get_performance_cycle_repo = _repo_dep(PerformanceCycleRepository)
+get_performance_dimension_repo = _repo_dep(PerformanceDimensionRepository)
+get_role_dimension_weight_repo = _repo_dep(RoleDimensionWeightRepository)
+get_objective_template_repo = _repo_dep(ObjectiveTemplateRepository)
+get_objective_repo = _repo_dep(ObjectiveRepository)
+get_objective_update_repo = _repo_dep(ObjectiveUpdateRepository)
+get_objective_evidence_repo = _repo_dep(ObjectiveEvidenceRepository)
+get_objective_score_repo = _repo_dep(ObjectiveScoreRepository)
+get_audit_log_repo = _repo_dep(AuditLogRepository)
+get_baseline_snapshot_repo = _repo_dep(BaselineSnapshotRepository)
+get_behavioral_indicator_repo = _repo_dep(BehavioralIndicatorRepository)
+get_behavioral_score_repo = _repo_dep(BehavioralScoreRepository)
+get_performance_summary_repo = _repo_dep(PerformanceSummaryRepository)
+get_review_session_repo = _repo_dep(ReviewSessionRepository)
+get_calibration_session_repo = _repo_dep(CalibrationSessionRepository)
+get_reward_policy_repo = _repo_dep(RewardPolicyRepository)
+get_permission_repo = _repo_dep(PermissionRepository)
+get_role_permission_repo = _repo_dep(RolePermissionRepository)
+get_notification_rule_repo = _repo_dep(NotificationRuleRepository)
+get_notification_log_repo = _repo_dep(NotificationLogRepository)
+get_fact_performance_summary_repo = _repo_dep(FactPerformanceSummaryRepository)
+get_objective_version_repo = _repo_dep(ObjectiveVersionRepository)
+get_user_token_repo = _repo_dep(UserTokenRepository)
+get_notification_outbox_repo = _repo_dep(NotificationOutboxRepository)
 
 
-async def get_role_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> RoleRepository:
-    """Yield role repository."""
-    return RoleRepository(session)
+async def get_current_user_permissions(
+    user_id: Annotated[str, Depends(get_current_user_id)],
+    user_repo: Annotated[UserRepository, Depends(get_user_repo)],
+    role_permission_repo: Annotated[
+        RolePermissionRepository, Depends(get_role_permission_repo)
+    ],
+) -> set[str]:
+    """Resolve current user -> role -> permission codes (for RBAC)."""
+    user = await user_repo.get_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=403, detail="User or role not found")
+    codes = await role_permission_repo.list_permission_codes_by_role(user.role_id)
+    return set(codes)
 
 
-async def get_user_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> UserRepository:
-    """Yield user repository."""
-    return UserRepository(session)
+def require_permission(code: str):
+    """Return a dependency that raises 403 if current user lacks the permission."""
 
+    async def _check(
+        permissions: Annotated[set[str], Depends(get_current_user_permissions)],
+    ) -> None:
+        if code not in permissions:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Insufficient permission: {code} required",
+            )
 
-async def get_performance_cycle_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> PerformanceCycleRepository:
-    """Yield performance cycle repository."""
-    return PerformanceCycleRepository(session)
-
-
-async def get_performance_dimension_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> PerformanceDimensionRepository:
-    """Yield performance dimension repository."""
-    return PerformanceDimensionRepository(session)
-
-
-async def get_role_dimension_weight_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> RoleDimensionWeightRepository:
-    """Yield role dimension weight repository."""
-    return RoleDimensionWeightRepository(session)
-
-
-async def get_objective_template_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> ObjectiveTemplateRepository:
-    """Yield objective template repository."""
-    return ObjectiveTemplateRepository(session)
-
-
-async def get_objective_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> ObjectiveRepository:
-    """Yield objective repository."""
-    return ObjectiveRepository(session)
-
-
-async def get_objective_update_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> ObjectiveUpdateRepository:
-    """Yield objective update repository."""
-    return ObjectiveUpdateRepository(session)
-
-
-async def get_objective_evidence_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> ObjectiveEvidenceRepository:
-    """Yield objective evidence repository."""
-    return ObjectiveEvidenceRepository(session)
-
-
-async def get_objective_score_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> ObjectiveScoreRepository:
-    """Yield objective score repository."""
-    return ObjectiveScoreRepository(session)
-
-
-async def get_audit_log_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> AuditLogRepository:
-    """Yield audit log repository."""
-    return AuditLogRepository(session)
-
-
-async def get_baseline_snapshot_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> BaselineSnapshotRepository:
-    """Yield baseline snapshot repository."""
-    return BaselineSnapshotRepository(session)
-
-
-async def get_behavioral_indicator_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> BehavioralIndicatorRepository:
-    """Yield behavioral indicator repository."""
-    return BehavioralIndicatorRepository(session)
-
-
-async def get_behavioral_score_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> BehavioralScoreRepository:
-    """Yield behavioral score repository."""
-    return BehavioralScoreRepository(session)
-
-
-async def get_performance_summary_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> PerformanceSummaryRepository:
-    """Yield performance summary repository."""
-    return PerformanceSummaryRepository(session)
-
-
-async def get_review_session_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> ReviewSessionRepository:
-    """Yield review session repository."""
-    return ReviewSessionRepository(session)
-
-
-async def get_calibration_session_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> CalibrationSessionRepository:
-    """Yield calibration session repository."""
-    return CalibrationSessionRepository(session)
-
-
-async def get_reward_policy_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> RewardPolicyRepository:
-    """Yield reward policy repository."""
-    return RewardPolicyRepository(session)
-
-
-async def get_permission_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> PermissionRepository:
-    """Yield permission repository."""
-    return PermissionRepository(session)
-
-
-async def get_role_permission_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> RolePermissionRepository:
-    """Yield role-permission repository."""
-    return RolePermissionRepository(session)
-
-
-async def get_notification_rule_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> NotificationRuleRepository:
-    """Yield notification rule repository."""
-    return NotificationRuleRepository(session)
-
-
-async def get_notification_log_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> NotificationLogRepository:
-    """Yield notification log repository."""
-    return NotificationLogRepository(session)
-
-
-async def get_fact_performance_summary_repo(
-    session: Annotated[AsyncSession, Depends(get_db_transactional)],
-) -> FactPerformanceSummaryRepository:
-    """Yield analytics fact repository."""
-    return FactPerformanceSummaryRepository(session)
+    return _check

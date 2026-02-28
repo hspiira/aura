@@ -1,5 +1,7 @@
 """Performance cycle repository."""
 
+from datetime import date, datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -29,6 +31,28 @@ class PerformanceCycleRepository:
     async def add(self, cycle: PerformanceCycle) -> PerformanceCycle:
         """Persist a performance cycle."""
         self._session.add(cycle)
+        await self._session.flush()
+        await self._session.refresh(cycle)
+        return cycle
+
+    async def list_cycles_pending_objectives_lock(
+        self, on_date: date
+    ) -> list[PerformanceCycle]:
+        """Return cycles where objectives_lock_date <= on_date and not yet locked."""
+        result = await self._session.execute(
+            select(PerformanceCycle).where(
+                PerformanceCycle.objectives_lock_date.isnot(None),
+                PerformanceCycle.objectives_lock_date <= on_date,
+                PerformanceCycle.objectives_locked_at.is_(None),
+            )
+        )
+        return list(result.scalars().all())
+
+    async def set_objectives_locked_at(
+        self, cycle: PerformanceCycle, locked_at: datetime
+    ) -> PerformanceCycle:
+        """Mark cycle as having run objectives lock job."""
+        cycle.objectives_locked_at = locked_at
         await self._session.flush()
         await self._session.refresh(cycle)
         return cycle

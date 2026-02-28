@@ -5,12 +5,20 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
 from app.api.v1.dependencies import (
+    get_audit_log_repo,
     get_behavioral_score_repo,
     get_objective_score_repo,
     get_performance_summary_repo,
+    require_permission,
 )
 from app.api.v1.helpers import get_one_or_raise
 from app.application.summary import compute_and_save_summary
+from app.core.audit import audit_log
+from app.core.auth import CurrentUserIdOptional
+from app.domain.permissions import MANAGE_SUMMARIES
+from app.infrastructure.persistence.repositories.audit_log_repo import (
+    AuditLogRepository,
+)
 from app.infrastructure.persistence.repositories.behavioral_score_repo import (
     BehavioralScoreRepository,
 )
@@ -79,6 +87,9 @@ async def compute_summary(
     summary_repo: Annotated[
         PerformanceSummaryRepository, Depends(get_performance_summary_repo)
     ],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_SUMMARIES))],
 ) -> PerformanceSummaryResponse:
     """Compute quant/behavioral/final scores and create or update summary."""
     summary = await compute_and_save_summary(
@@ -87,6 +98,14 @@ async def compute_summary(
         objective_score_repo,
         behavioral_score_repo,
         summary_repo,
+    )
+    await audit_log(
+        audit_repo,
+        "performance_summary",
+        summary.id,
+        "compute",
+        new_value={"computed": True},
+        changed_by=changed_by,
     )
     return PerformanceSummaryResponse.model_validate(summary)
 
@@ -110,6 +129,9 @@ async def update_performance_summary(
     repo: Annotated[
         PerformanceSummaryRepository, Depends(get_performance_summary_repo)
     ],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_SUMMARIES))],
 ) -> PerformanceSummaryResponse:
     """Update rating band, comments, and/or hr_approved."""
     summary = await get_one_or_raise(repo.get_by_id(id), id, "PerformanceSummary")
@@ -119,5 +141,16 @@ async def update_performance_summary(
         manager_comment=payload.manager_comment,
         employee_comment=payload.employee_comment,
         hr_approved=payload.hr_approved,
+    )
+    await audit_log(
+        audit_repo,
+        "performance_summary",
+        id,
+        "update_metadata",
+        new_value={
+            "final_rating_band": payload.final_rating_band,
+            "hr_approved": payload.hr_approved,
+        },
+        changed_by=changed_by,
     )
     return PerformanceSummaryResponse.model_validate(summary)

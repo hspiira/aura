@@ -52,6 +52,14 @@ class TransitionViolationException(AuraException):
         )
 
 
+class ConflictException(AuraException):
+    """Raised when a concurrent modification is detected (optimistic lock conflict)."""
+
+    def __init__(self, message: str, entity_type: str, entity_id: str) -> None:
+        details = {"entity_type": entity_type, "entity_id": entity_id}
+        super().__init__(message, "CONFLICT", details)
+
+
 class SqlNotConfiguredException(AuraException):
     """Raised when an operation requires a database that is not configured."""
 

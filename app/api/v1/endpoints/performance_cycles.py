@@ -4,8 +4,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.api.v1.dependencies import get_performance_cycle_repo
+from app.api.v1.dependencies import get_performance_cycle_repo, require_permission
 from app.domain.exceptions import ResourceNotFoundException
+from app.domain.permissions import MANAGE_CYCLES
 from app.infrastructure.persistence.models.performance_cycle import PerformanceCycle
 from app.infrastructure.persistence.repositories.performance_cycle_repo import (
     PerformanceCycleRepository,
@@ -31,6 +32,7 @@ async def list_performance_cycles(
 async def create_performance_cycle(
     payload: PerformanceCycleCreate,
     repo: Annotated[PerformanceCycleRepository, Depends(get_performance_cycle_repo)],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_CYCLES))],
 ) -> PerformanceCycleResponse:
     """Create a performance cycle."""
     cycle = PerformanceCycle(

@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.api.v1.dependencies import get_objective_update_repo
 from app.domain.exceptions import ResourceNotFoundException
@@ -14,18 +14,30 @@ from app.schemas.objective_update import (
     ObjectiveUpdateCreate,
     ObjectiveUpdateResponse,
 )
+from app.schemas.pagination import PageResponse
 
 router = APIRouter()
 
 
-@router.get("", response_model=list[ObjectiveUpdateResponse])
+@router.get("", response_model=PageResponse[ObjectiveUpdateResponse])
 async def list_updates_for_objective(
     objective_id: str,
     repo: Annotated[ObjectiveUpdateRepository, Depends(get_objective_update_repo)],
-) -> list[ObjectiveUpdateResponse]:
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+) -> PageResponse[ObjectiveUpdateResponse]:
     """List progress updates for an objective."""
-    updates = await repo.list_by_objective(objective_id)
-    return [ObjectiveUpdateResponse.model_validate(u) for u in updates]
+    updates, total = await repo.list_paginated(
+        objective_id=objective_id,
+        limit=limit,
+        offset=offset,
+    )
+    return PageResponse(
+        items=[ObjectiveUpdateResponse.model_validate(u) for u in updates],
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.post("", response_model=ObjectiveUpdateResponse, status_code=201)

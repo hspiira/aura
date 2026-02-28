@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.persistence.models.audit_log import AuditLog
@@ -26,6 +26,49 @@ class AuditLogRepository:
             .order_by(AuditLog.changed_at.desc())
         )
         return list(result.scalars().all())
+
+    async def list_recent_by_entity_type(
+        self,
+        entity_type: str,
+        limit: int = 20,
+    ) -> list[AuditLog]:
+        """Return most recent audit entries for an entity type (e.g. dashboard feed)."""
+        result = await self._session.execute(
+            select(AuditLog)
+            .where(AuditLog.entity_type == entity_type)
+            .order_by(AuditLog.changed_at.desc())
+            .limit(limit)
+        )
+        return list(result.scalars().all())
+
+    async def list_by_entity_paginated(
+        self,
+        entity_type: str,
+        entity_id: str,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> tuple[list[AuditLog], int]:
+        """Return page of audit entries for an entity and total count."""
+        count_result = await self._session.execute(
+            select(func.count())
+            .select_from(AuditLog)
+            .where(
+                AuditLog.entity_type == entity_type,
+                AuditLog.entity_id == entity_id,
+            )
+        )
+        total = count_result.scalar_one()
+        result = await self._session.execute(
+            select(AuditLog)
+            .where(
+                AuditLog.entity_type == entity_type,
+                AuditLog.entity_id == entity_id,
+            )
+            .order_by(AuditLog.changed_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return list(result.scalars().all()), total
 
     async def add(
         self,

@@ -34,6 +34,24 @@ class FactPerformanceSummaryRepository:
         result = await self._session.execute(q)
         return list(result.scalars().all())
 
+    async def list_for_cycle(
+        self,
+        performance_cycle_id: str,
+        department_id: str | None = None,
+        limit: int = 1000,
+    ) -> list[FactPerformanceSummary]:
+        """Return fact rows for a specific cycle (and optional department)."""
+        q = (
+            select(FactPerformanceSummary)
+            .where(FactPerformanceSummary.performance_cycle_id == performance_cycle_id)
+            .order_by(FactPerformanceSummary.etl_at.desc())
+        )
+        if department_id is not None:
+            q = q.where(FactPerformanceSummary.department_id == department_id)
+        q = q.limit(limit)
+        result = await self._session.execute(q)
+        return list(result.scalars().all())
+
     async def get_by_user_cycle(
         self, user_id: str, performance_cycle_id: str
     ) -> FactPerformanceSummary | None:

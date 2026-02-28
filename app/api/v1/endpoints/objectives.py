@@ -2,24 +2,31 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.v1.dependencies import (
     get_audit_log_repo,
     get_baseline_snapshot_repo,
+    get_notification_outbox_repo,
     get_objective_repo,
     get_objective_score_repo,
     get_objective_template_repo,
     get_objective_update_repo,
+    get_objective_version_repo,
     get_performance_cycle_repo,
+    get_performance_dimension_repo,
+    require_permission,
 )
 from app.api.v1.helpers import get_one_or_raise
 from app.application.objective_validation import run_smart_validation
+from app.core.auth import CurrentUserIdOptional
 from app.domain.exceptions import (
+    ConflictException,
     TransitionViolationException,
     ValidationException,
 )
 from app.domain.objective import ObjectiveStatus, can_transition
+from app.domain.permissions import APPROVE_OBJECTIVES, EDIT_OBJECTIVES
 from app.domain.scoring import compute_score
 from app.infrastructure.persistence.models.objective import Objective
 from app.infrastructure.persistence.models.objective_score import ObjectiveScore
@@ -28,6 +35,9 @@ from app.infrastructure.persistence.repositories.audit_log_repo import (
 )
 from app.infrastructure.persistence.repositories.baseline_snapshot_repo import (
     BaselineSnapshotRepository,
+)
+from app.infrastructure.persistence.repositories.notification_outbox_repo import (
+    NotificationOutboxRepository,
 )
 from app.infrastructure.persistence.repositories.objective_repo import (
     ObjectiveRepository,
@@ -41,10 +51,17 @@ from app.infrastructure.persistence.repositories.objective_template_repo import 
 from app.infrastructure.persistence.repositories.objective_update_repo import (
     ObjectiveUpdateRepository,
 )
+from app.infrastructure.persistence.repositories.objective_version_repo import (
+    ObjectiveVersionRepository,
+)
 from app.infrastructure.persistence.repositories.performance_cycle_repo import (
     PerformanceCycleRepository,
 )
+from app.infrastructure.persistence.repositories.performance_dimension_repo import (
+    PerformanceDimensionRepository,
+)
 from app.schemas.objective import (
+    ObjectiveAmend,
     ObjectiveCreate,
     ObjectiveResponse,
     ObjectiveUpdateStatus,
@@ -54,18 +71,59 @@ from app.schemas.objective_validation import (
     ValidateObjectiveRequest,
     ValidateObjectiveResponse,
 )
+from app.schemas.pagination import PageResponse
 from app.shared.utils.datetime import utc_now
 
 router = APIRouter()
 
 
-@router.get("", response_model=list[ObjectiveResponse])
+@router.get("", response_model=PageResponse[ObjectiveResponse])
 async def list_objectives(
     repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
-) -> list[ObjectiveResponse]:
-    """List all objectives."""
-    objectives = await repo.list_all()
-    return [ObjectiveResponse.model_validate(o) for o in objectives]
+    user_id: str | None = Query(
+        None, description="Filter by user (e.g. current user for 'my objectives')"
+    ),
+    performance_cycle_id: str | None = Query(
+        None, description="Filter by performance cycle"
+    ),
+    status: str | None = Query(
+        None, description="Filter by status (e.g. draft, active)"
+    ),
+    dimension_id: str | None = Query(
+        None, description="Filter by performance dimension"
+    ),
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+) -> PageResponse[ObjectiveResponse]:
+    """List objectives, optionally filtered by user, cycle, status, dimension."""
+    if user_id is not None:
+        objectives = await repo.list_by_user(user_id)
+        if performance_cycle_id is not None:
+            objectives = [
+                o for o in objectives if o.performance_cycle_id == performance_cycle_id
+            ]
+        if status is not None:
+            objectives = [o for o in objectives if o.status == status]
+        if dimension_id is not None:
+            objectives = [o for o in objectives if o.dimension_id == dimension_id]
+        total = len(objectives)
+        objectives = objectives[offset : offset + limit]
+    elif performance_cycle_id is not None:
+        objectives = await repo.list_by_cycle(performance_cycle_id)
+        if status is not None:
+            objectives = [o for o in objectives if o.status == status]
+        if dimension_id is not None:
+            objectives = [o for o in objectives if o.dimension_id == dimension_id]
+        total = len(objectives)
+        objectives = objectives[offset : offset + limit]
+    else:
+        objectives, total = await repo.list_paginated(limit=limit, offset=offset)
+    return PageResponse(
+        items=[ObjectiveResponse.model_validate(o) for o in objectives],
+        total=total,
+        limit=limit,
+        offset=offset,
+    )
 
 
 @router.post("", response_model=ObjectiveResponse, status_code=201)
@@ -73,6 +131,8 @@ async def create_objective(
     payload: ObjectiveCreate,
     repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(EDIT_OBJECTIVES))],
 ) -> ObjectiveResponse:
     """Create an objective (status draft)."""
     objective = Objective(
@@ -95,19 +155,24 @@ async def create_objective(
         entity_id=objective.id,
         action="create",
         new_value={"title": objective.title, "status": objective.status},
+        changed_by=changed_by,
     )
     return ObjectiveResponse.model_validate(objective)
 
 
 def _parse_status(value: str, default: ObjectiveStatus | None) -> ObjectiveStatus:
-    """Parse status string; return default if invalid, else raise when default None."""
+    """Parse status string; return default for outbound invalids, else raise."""
     try:
         return ObjectiveStatus(value.lower())
     except ValueError:
         if default is not None:
+            # Only use default when interpreting outbound/loose inputs.
             return default
         raise TransitionViolationException(
-            f"Invalid status: {value}", "", value
+            "Objective has unrecognised status "
+            f"'{value}' in database. Manual intervention required.",
+            value,
+            "",
         ) from None
 
 
@@ -134,6 +199,9 @@ async def validate_objective_by_id(
     baseline_repo: Annotated[
         BaselineSnapshotRepository, Depends(get_baseline_snapshot_repo)
     ],
+    dimension_repo: Annotated[
+        PerformanceDimensionRepository, Depends(get_performance_dimension_repo)
+    ],
 ) -> ValidateObjectiveResponse:
     """Run SMART validation for an existing objective."""
     objective = await get_one_or_raise(
@@ -142,16 +210,25 @@ async def validate_objective_by_id(
         "Objective",
     )
     return await run_smart_validation(
-        objective, cycle_repo, template_repo, repo, baseline_repo
+        objective,
+        cycle_repo,
+        template_repo,
+        repo,
+        baseline_repo,
+        dimension_repo,
     )
 
 
-@router.patch("/{id}/status", response_model=ObjectiveResponse)
-async def update_objective_status(
+@router.patch("/{id}/amend", response_model=ObjectiveResponse)
+async def amend_objective(
     id: str,
-    payload: ObjectiveUpdateStatus,
+    payload: ObjectiveAmend,
     repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
+    version_repo: Annotated[
+        ObjectiveVersionRepository, Depends(get_objective_version_repo)
+    ],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
     cycle_repo: Annotated[
         PerformanceCycleRepository, Depends(get_performance_cycle_repo)
     ],
@@ -161,10 +238,126 @@ async def update_objective_status(
     baseline_repo: Annotated[
         BaselineSnapshotRepository, Depends(get_baseline_snapshot_repo)
     ],
+    dimension_repo: Annotated[
+        PerformanceDimensionRepository, Depends(get_performance_dimension_repo)
+    ],
+    _perm: Annotated[None, Depends(require_permission(EDIT_OBJECTIVES))],
+) -> ObjectiveResponse:
+    """Amend an objective's target/weight with versioned history."""
+    objective = await get_one_or_raise(repo.get_by_id_for_update(id), id, "Objective")
+    if objective.locked_at is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Objective is locked; cannot be amended.",
+        )
+
+    current_status = _parse_status(objective.status, ObjectiveStatus.DRAFT)
+    if current_status not in {
+        ObjectiveStatus.APPROVED,
+        ObjectiveStatus.ACTIVE,
+    }:
+        raise HTTPException(
+            status_code=400,
+            detail="Only approved or active objectives can be amended.",
+        )
+
+    # Reject no-op amendments where neither target_value nor weight changes.
+    effective_target = (
+        objective.target_value if payload.target_value is None else payload.target_value
+    )
+    effective_weight = objective.weight if payload.weight is None else payload.weight
+    if (
+        effective_target == objective.target_value
+        and effective_weight == objective.weight
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="At least one of target_value or weight must change.",
+        )
+
+    existing_versions = await version_repo.list_by_objective(objective.id)
+    next_version = existing_versions[-1].version + 1 if existing_versions else 1
+
+    # Mutate fields in-memory before validation and version snapshot.
+    if payload.target_value is not None:
+        objective.target_value = payload.target_value
+    if payload.weight is not None:
+        objective.weight = payload.weight
+
+    validation = await run_smart_validation(
+        objective,
+        cycle_repo,
+        template_repo,
+        repo,
+        baseline_repo,
+        dimension_repo,
+        last_achievement_value=None,
+        justification_for_lower_target=payload.justification,
+    )
+    if not validation.valid:
+        raise ValidationException(
+            "SMART validation failed for amendment",
+            errors=validation.errors,
+        )
+
+    now = utc_now()
+    await version_repo.add_from_objective(
+        objective=objective,
+        version=next_version,
+        justification=payload.justification,
+        amended_by=changed_by,
+        amended_at=now,
+    )
+
+    objective = await repo.refresh(objective)
+    await audit_repo.add(
+        entity_type="objective",
+        entity_id=objective.id,
+        action="amend",
+        new_value={
+            "target_value": (
+                str(objective.target_value)
+                if objective.target_value is not None
+                else None
+            ),
+            "weight": str(objective.weight),
+            "justification_provided": True,
+            "version": next_version,
+        },
+        changed_by=changed_by,
+    )
+    return ObjectiveResponse.model_validate(objective)
+
+
+@router.patch("/{id}/status", response_model=ObjectiveResponse)
+async def update_objective_status(
+    id: str,
+    payload: ObjectiveUpdateStatus,
+    repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
+    cycle_repo: Annotated[
+        PerformanceCycleRepository, Depends(get_performance_cycle_repo)
+    ],
+    template_repo: Annotated[
+        ObjectiveTemplateRepository, Depends(get_objective_template_repo)
+    ],
+    baseline_repo: Annotated[
+        BaselineSnapshotRepository, Depends(get_baseline_snapshot_repo)
+    ],
+    dimension_repo: Annotated[
+        PerformanceDimensionRepository, Depends(get_performance_dimension_repo)
+    ],
+    _perm: Annotated[None, Depends(require_permission(EDIT_OBJECTIVES))],
 ) -> ObjectiveResponse:
     """Transition objective status (lifecycle + SMART when submitting)."""
-    objective = await get_one_or_raise(repo.get_by_id(id), id, "Objective")
-    from_status = _parse_status(objective.status, ObjectiveStatus.DRAFT)
+    objective = await get_one_or_raise(repo.get_by_id_for_update(id), id, "Objective")
+    if objective.locked_at is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Objective is locked; cannot change status.",
+        )
+    from_status = _parse_status(objective.status, None)
     to_status = _parse_status(payload.status, None)
     if not can_transition(from_status, to_status):
         raise TransitionViolationException(
@@ -174,7 +367,12 @@ async def update_objective_status(
         )
     if to_status == ObjectiveStatus.SUBMITTED:
         validation = await run_smart_validation(
-            objective, cycle_repo, template_repo, repo, baseline_repo
+            objective,
+            cycle_repo,
+            template_repo,
+            repo,
+            baseline_repo,
+            dimension_repo,
         )
         if not validation.valid:
             raise ValidationException(
@@ -189,6 +387,7 @@ async def update_objective_status(
         action="status_change",
         old_value={"status": old_status},
         new_value={"status": objective.status},
+        changed_by=changed_by,
     )
     return ObjectiveResponse.model_validate(objective)
 
@@ -201,13 +400,19 @@ async def calculate_objective_score(
         ObjectiveUpdateRepository, Depends(get_objective_update_repo)
     ],
     score_repo: Annotated[ObjectiveScoreRepository, Depends(get_objective_score_repo)],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(EDIT_OBJECTIVES))],
 ) -> ObjectiveScoreResponse:
     """Compute and persist score for an objective (latest update actual or 0)."""
     objective = await get_one_or_raise(repo.get_by_id(id), id, "Objective")
-    updates = await update_repo.list_by_objective(id)
-    actual_value = None
-    if updates and updates[0].actual_value is not None:
-        actual_value = updates[0].actual_value
+    if objective.locked_at is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Objective is locked.",
+        )
+    latest_update = await update_repo.get_latest_with_actual_value(id)
+    actual_value = latest_update.actual_value if latest_update else None
     target_value = objective.target_value
     weight = objective.weight
     result = compute_score(
@@ -233,6 +438,16 @@ async def calculate_objective_score(
             locked=False,
         )
         score = await score_repo.add(score)
+    await audit_repo.add(
+        entity_type="objective_score",
+        entity_id=score.id,
+        action="calculate",
+        new_value={
+            "objective_id": id,
+            "achievement_percentage": str(result.achievement_percentage),
+        },
+        changed_by=changed_by,
+    )
     return ObjectiveScoreResponse.model_validate(score)
 
 
@@ -242,14 +457,26 @@ async def lock_objective(
     repo: Annotated[ObjectiveRepository, Depends(get_objective_repo)],
     score_repo: Annotated[ObjectiveScoreRepository, Depends(get_objective_score_repo)],
     audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
+    outbox_repo: Annotated[
+        NotificationOutboxRepository, Depends(get_notification_outbox_repo)
+    ],
+    _perm: Annotated[None, Depends(require_permission(APPROVE_OBJECTIVES))],
 ) -> ObjectiveResponse:
     """Lock objective and its score (no further edits; score immutable)."""
-    objective = await get_one_or_raise(repo.get_by_id(id), id, "Objective")
+    objective = await get_one_or_raise(repo.get_by_id_for_update(id), id, "Objective")
     if objective.locked_at is not None:
-        return ObjectiveResponse.model_validate(objective)
+        response = ObjectiveResponse.model_validate(objective)
+        response.already_locked = True
+        return response
     score = await score_repo.get_by_objective(id)
     now = utc_now()
-    objective = await repo.set_locked_at(objective, now)
+    expected_version = objective.row_version
+    try:
+        objective = await repo.set_locked_at_versioned(objective, now, expected_version)
+    except ConflictException:
+        # Surface a clear 409 to caller about concurrent modification.
+        raise
     if score is not None and not score.locked:
         await score_repo.set_locked(score, locked=True)
     await audit_repo.add(
@@ -257,5 +484,16 @@ async def lock_objective(
         entity_id=objective.id,
         action="lock",
         new_value={"locked_at": now.isoformat()},
+        changed_by=changed_by,
     )
-    return ObjectiveResponse.model_validate(objective)
+    await outbox_repo.add(
+        event_type="objective_locked",
+        context={
+            "objective_id": objective.id,
+            "user_id": objective.user_id,
+            "performance_cycle_id": objective.performance_cycle_id,
+        },
+    )
+    response = ObjectiveResponse.model_validate(objective)
+    response.already_locked = False
+    return response

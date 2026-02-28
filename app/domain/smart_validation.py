@@ -4,19 +4,16 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
+from app.domain.protocols import ObjectiveTemplateProtocol
+
 if TYPE_CHECKING:
     from datetime import date
-
-    from app.infrastructure.persistence.models.baseline_snapshot import (
-        BaselineSnapshot,
-    )
-    from app.infrastructure.persistence.models.objective_template import (
-        ObjectiveTemplate,
-    )
 
 
 TITLE_MIN_LENGTH = 10
 WEIGHT_TOTAL_TARGET = Decimal("100")
+MAX_CUSTOM_WEIGHT = Decimal("30")
+LOWER_TARGET_THRESHOLD = Decimal("0.8")  # new target < 80% of last achievement
 
 
 @dataclass(frozen=True)
@@ -37,15 +34,23 @@ def validate_objective(
     end_date: "date",
     cycle_start: "date",
     cycle_end: "date",
-    template: "ObjectiveTemplate | None" = None,
+    template: ObjectiveTemplateProtocol | None = None,
     other_weights_sum: Decimal = Decimal("0"),
     has_baseline_for_template: bool = False,
+    last_achievement_value: Decimal | None = None,
+    justification_for_lower_target: str | None = None,
+    is_custom_objective: bool = False,
+    max_custom_weight: Decimal = MAX_CUSTOM_WEIGHT,
+    is_behavioral_dimension: bool = False,
 ) -> ValidationResult:
     """Run SMART validation; returns ValidationResult(valid, errors).
 
     has_baseline_for_template defaults to False so that callers must explicitly
     pass True when a baseline exists; otherwise template.requires_baseline_snapshot
     is enforced (fail closed).
+
+    Anti-gaming: if target < 80%% of last achievement, justification required;
+    custom objectives max weight 30%%; free-text (no template) only for Behavioral.
     """
     errors: list[str] = []
 
@@ -60,8 +65,11 @@ def validate_objective(
                 f"kpi_type must match template kpi_type ({template.kpi_type})"
             )
 
-    requires_target_value = (
-        template is None or (template and template.kpi_type) or kpi_type
+    # Only require target_value for quantitative context:
+    # - template has kpi_type (quantitative template), or
+    # - objective has kpi_type and the dimension is not behavioral.
+    requires_target_value = bool(
+        (template and template.kpi_type) or (kpi_type and not is_behavioral_dimension)
     )
     if target_value is None and requires_target_value:
         errors.append("target_value is required for quantitative objectives")
@@ -101,21 +109,30 @@ def validate_objective(
     ):
         errors.append("template requires a baseline snapshot for this user/cycle")
 
+    # Anti-gaming: new target >20% below last achievement requires justification
+    if (
+        last_achievement_value is not None
+        and target_value is not None
+        and last_achievement_value > 0
+        and target_value < last_achievement_value * LOWER_TARGET_THRESHOLD
+    ):
+        if not (justification_for_lower_target or "").strip():
+            errors.append(
+                "target more than 20% below last achievement requires a justification"
+            )
+
+    # Anti-gaming: custom objectives max 30% weight
+    if is_custom_objective and weight > max_custom_weight:
+        errors.append(
+            f"custom objectives may not exceed {max_custom_weight}% weight "
+            f"(current: {weight}%)"
+        )
+
+    # Anti-gaming: free-text (no template) only allowed for Behavioral dimension
+    if not is_behavioral_dimension and template is None:
+        errors.append(
+            "free-text objectives (no template) are only allowed "
+            "for Behavioral dimension"
+        )
+
     return ValidationResult(valid=len(errors) == 0, errors=errors)
-
-
-def has_baseline_for_user_cycle_template(
-    baseline_snapshots: list["BaselineSnapshot"],
-    user_id: str,
-    performance_cycle_id: str,
-    template_id: str,
-) -> bool:
-    """Return True if a baseline exists for the given user, cycle, and template."""
-    for b in baseline_snapshots:
-        if (
-            b.user_id == user_id
-            and b.performance_cycle_id == performance_cycle_id
-            and b.template_id == template_id
-        ):
-            return True
-    return False

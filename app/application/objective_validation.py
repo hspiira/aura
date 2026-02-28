@@ -1,5 +1,7 @@
 """Application service: run SMART validation for an objective."""
 
+from decimal import Decimal
+
 from app.domain.smart_validation import validate_objective
 from app.infrastructure.persistence.models.objective import Objective
 from app.infrastructure.persistence.repositories.baseline_snapshot_repo import (
@@ -14,6 +16,9 @@ from app.infrastructure.persistence.repositories.objective_template_repo import 
 from app.infrastructure.persistence.repositories.performance_cycle_repo import (
     PerformanceCycleRepository,
 )
+from app.infrastructure.persistence.repositories.performance_dimension_repo import (
+    PerformanceDimensionRepository,
+)
 from app.schemas.objective_validation import ValidateObjectiveResponse
 
 
@@ -23,6 +28,9 @@ async def run_smart_validation(
     template_repo: ObjectiveTemplateRepository,
     objective_repo: ObjectiveRepository,
     baseline_repo: BaselineSnapshotRepository,
+    dimension_repo: PerformanceDimensionRepository,
+    last_achievement_value: Decimal | None = None,
+    justification_for_lower_target: str | None = None,
 ) -> ValidateObjectiveResponse:
     """Load cycle, template, other weights, baseline; run SMART validation."""
     cycle = await cycle_repo.get_by_id(objective.performance_cycle_id)
@@ -51,6 +59,15 @@ async def run_smart_validation(
             objective.template_id,
         )
         has_baseline = baseline is not None
+    dimension = await dimension_repo.get_by_id(objective.dimension_id)
+    if dimension is None:
+        return ValidateObjectiveResponse(
+            valid=False,
+            errors=["performance dimension not found"],
+        )
+    is_behavioral = not dimension.is_quantitative
+    is_custom = template is None
+
     result = validate_objective(
         title=objective.title,
         kpi_type=objective.kpi_type,
@@ -63,5 +80,9 @@ async def run_smart_validation(
         template=template,
         other_weights_sum=other_weights,
         has_baseline_for_template=has_baseline,
+        last_achievement_value=last_achievement_value,
+        justification_for_lower_target=justification_for_lower_target,
+        is_custom_objective=is_custom,
+        is_behavioral_dimension=is_behavioral,
     )
     return ValidateObjectiveResponse(valid=result.valid, errors=result.errors)

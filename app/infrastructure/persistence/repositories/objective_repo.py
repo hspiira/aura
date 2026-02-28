@@ -4,6 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy import select
+from sqlalchemy import update as sa_update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import func
 
@@ -23,6 +24,24 @@ class ObjectiveRepository:
             select(Objective).order_by(Objective.created_at.desc())
         )
         return list(result.scalars().all())
+
+    async def list_paginated(
+        self,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> tuple[list[Objective], int]:
+        """Return page of objectives and total count."""
+        count_result = await self._session.execute(
+            select(func.count()).select_from(Objective)
+        )
+        total = count_result.scalar_one()
+        result = await self._session.execute(
+            select(Objective)
+            .order_by(Objective.created_at.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return list(result.scalars().all()), total
 
     async def list_by_user(self, user_id: str) -> list[Objective]:
         """Return objectives for a user."""
@@ -66,6 +85,19 @@ class ObjectiveRepository:
         )
         return result.scalar_one_or_none()
 
+    async def get_by_id_for_update(self, id: str) -> Objective | None:
+        """Fetch objective with SELECT FOR UPDATE (pessimistic lock)."""
+        result = await self._session.execute(
+            select(Objective).where(Objective.id == id).with_for_update()
+        )
+        return result.scalar_one_or_none()
+
+    async def refresh(self, objective: Objective) -> Objective:
+        """Flush and refresh an objective after in-place modifications."""
+        await self._session.flush()
+        await self._session.refresh(objective)
+        return objective
+
     async def add(self, objective: Objective) -> Objective:
         """Persist an objective."""
         return await persist_and_refresh(self._session, objective)
@@ -85,3 +117,43 @@ class ObjectiveRepository:
         await self._session.flush()
         await self._session.refresh(objective)
         return objective
+
+    async def set_locked_at_versioned(
+        self,
+        objective: Objective,
+        locked_at: datetime,
+        expected_version: int,
+    ) -> Objective:
+        """Set locked_at only if row_version matches expected; raise 409 on conflict."""
+        result = await self._session.execute(
+            sa_update(Objective)
+            .where(
+                Objective.id == objective.id,
+                Objective.row_version == expected_version,
+            )
+            .values(locked_at=locked_at, row_version=expected_version + 1)
+            .returning(Objective.id)
+        )
+        if result.scalar_one_or_none() is None:
+            from app.domain.exceptions import ConflictException
+
+            raise ConflictException(
+                "Objective was modified by another request. Retry.",
+                entity_type="Objective",
+                entity_id=objective.id,
+            )
+        await self._session.refresh(objective)
+        return objective
+
+    async def list_unlocked_older_than(
+        self,
+        cutoff: datetime,
+    ) -> list[Objective]:
+        """Return unlocked objectives created before the cutoff."""
+        result = await self._session.execute(
+            select(Objective).where(
+                Objective.locked_at.is_(None),
+                Objective.created_at < cutoff,
+            )
+        )
+        return list(result.scalars().all())

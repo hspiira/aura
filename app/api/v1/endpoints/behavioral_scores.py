@@ -5,11 +5,17 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.v1.dependencies import (
+    get_audit_log_repo,
     get_behavioral_indicator_repo,
     get_behavioral_score_repo,
 )
 from app.api.v1.helpers import get_one_or_raise
+from app.core.audit import audit_log
+from app.core.auth import CurrentUserIdOptional
 from app.infrastructure.persistence.models.behavioral_score import BehavioralScore
+from app.infrastructure.persistence.repositories.audit_log_repo import (
+    AuditLogRepository,
+)
 from app.infrastructure.persistence.repositories.behavioral_indicator_repo import (
     BehavioralIndicatorRepository,
 )
@@ -49,6 +55,8 @@ async def create_behavioral_score(
     indicator_repo: Annotated[
         BehavioralIndicatorRepository, Depends(get_behavioral_indicator_repo)
     ],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
 ) -> BehavioralScoreResponse:
     """Create a behavioral score (rating within indicator's scale for user/cycle)."""
     indicator = await indicator_repo.get_by_id(payload.indicator_id)
@@ -73,6 +81,14 @@ async def create_behavioral_score(
         manager_comment=payload.manager_comment,
     )
     score = await repo.add(score)
+    await audit_log(
+        audit_repo,
+        "behavioral_score",
+        score.id,
+        "create",
+        new_value={"indicator_id": score.indicator_id, "rating": score.rating},
+        changed_by=changed_by,
+    )
     return BehavioralScoreResponse.model_validate(score)
 
 

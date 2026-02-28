@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run python -c \":*)",
+      "Bash(pip install openpyxl)",
+      "Bash(uv pip install openpyxl)",
+      "Bash(grep -E \"^@router|^async def\" /Users/piira/dev/aura/app/api/v1/endpoints/*.py)",
+      "Bash(done)",
+      "Bash(grep -h \"class.*CuidMixin\\\\|class.*Base\" /Users/piira/dev/aura/app/infrastructure/persistence/models/*.py)",
+      "Bash(wc -l /Users/piira/dev/aura/mimi/src/routes/_app/*.tsx)",
+      "Skill(sc:design)",
+      "Skill(sc:design:*)"
+    ]
+  }
+}

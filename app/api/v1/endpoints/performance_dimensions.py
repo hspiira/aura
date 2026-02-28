@@ -4,8 +4,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.api.v1.dependencies import get_performance_dimension_repo
+from app.api.v1.dependencies import get_performance_dimension_repo, require_permission
 from app.domain.exceptions import ResourceNotFoundException
+from app.domain.permissions import MANAGE_DIMENSIONS
 from app.infrastructure.persistence.models.performance_dimension import (
     PerformanceDimension,
 )
@@ -37,6 +38,7 @@ async def create_performance_dimension(
     repo: Annotated[
         PerformanceDimensionRepository, Depends(get_performance_dimension_repo)
     ],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_DIMENSIONS))],
 ) -> PerformanceDimensionResponse:
     """Create a performance dimension."""
     dim = PerformanceDimension(

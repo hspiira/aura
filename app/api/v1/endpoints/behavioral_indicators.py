@@ -4,8 +4,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from app.api.v1.dependencies import get_behavioral_indicator_repo
+from app.api.v1.dependencies import get_behavioral_indicator_repo, require_permission
 from app.api.v1.helpers import get_one_or_raise
+from app.domain.permissions import MANAGE_BEHAVIORAL
 from app.infrastructure.persistence.models.behavioral_indicator import (
     BehavioralIndicator,
 )
@@ -41,6 +42,7 @@ async def create_behavioral_indicator(
     repo: Annotated[
         BehavioralIndicatorRepository, Depends(get_behavioral_indicator_repo)
     ],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_BEHAVIORAL))],
 ) -> BehavioralIndicatorResponse:
     """Create a behavioral indicator."""
     indicator = BehavioralIndicator(

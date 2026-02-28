@@ -4,8 +4,9 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from app.api.v1.dependencies import get_organization_repo
+from app.api.v1.dependencies import get_organization_repo, require_permission
 from app.api.v1.helpers import get_one_or_raise
+from app.domain.permissions import MANAGE_RBAC
 from app.infrastructure.persistence.models.organization import Organization
 from app.infrastructure.persistence.repositories.organization_repo import (
     OrganizationRepository,
@@ -28,6 +29,7 @@ async def list_organizations(
 async def create_organization(
     payload: OrganizationCreate,
     repo: Annotated[OrganizationRepository, Depends(get_organization_repo)],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_RBAC))],
 ) -> OrganizationResponse:
     """Create an organization."""
     org = Organization(name=payload.name)

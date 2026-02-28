@@ -5,9 +5,11 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     analytics,
     audit_logs,
+    auth,
     baseline_snapshots,
     behavioral_indicators,
     behavioral_scores,
+    calibration_analytics,
     calibration_sessions,
     departments,
     health,
@@ -28,14 +30,21 @@ from app.api.v1.endpoints import (
     role_dimension_weights,
     role_permissions,
     roles,
+    user_tokens,
     users,
 )
 
 api_router = APIRouter()
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(health.router, prefix="/health", tags=["health"])
 api_router.include_router(
     analytics.router,
     prefix="/analytics",
+    tags=["analytics"],
+)
+api_router.include_router(
+    calibration_analytics.router,
+    prefix="/analytics/calibration",
     tags=["analytics"],
 )
 api_router.include_router(
@@ -137,4 +146,9 @@ api_router.include_router(
     notification_logs.router,
     prefix="/notification-logs",
     tags=["notification-logs"],
+)
+api_router.include_router(
+    user_tokens.router,
+    prefix="/user-tokens",
+    tags=["user-tokens"],
 )
