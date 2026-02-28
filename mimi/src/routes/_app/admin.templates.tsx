@@ -194,7 +194,7 @@ function AdminTemplatesPage() {
                 setActiveOnly(e.target.checked)
                 setPage(1)
               }}
-              className="size-4 rounded border-stone-300"
+              className="size-4 border border-stone-300"
             />
             <span className="text-stone-600">Active only</span>
           </label>
@@ -202,7 +202,7 @@ function AdminTemplatesPage() {
             <button
               type="button"
               onClick={() => setCreateOpen(true)}
-              className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
+              className="inline-flex items-center gap-2 bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
             >
               <Plus className="size-4" />
               Create template
@@ -320,8 +320,8 @@ function AdminTemplatesPage() {
               <span
                 className={
                   t.is_active
-                    ? 'rounded bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800'
-                    : 'rounded bg-stone-100 px-2 py-0.5 text-xs text-stone-500'
+                    ? 'bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800'
+                    : 'bg-stone-100 px-2 py-0.5 text-xs text-stone-500'
                 }
               >
                 {t.is_active ? 'Yes' : 'No'}
@@ -373,7 +373,7 @@ function AdminTemplatesPage() {
       />
       {createOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">
               Create template
             </h2>
@@ -388,7 +388,7 @@ function AdminTemplatesPage() {
                     setCreateForm((f) => ({ ...f, code: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm font-mono"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm font-mono"
                 />
               </div>
               <div>
@@ -401,7 +401,7 @@ function AdminTemplatesPage() {
                     setCreateForm((f) => ({ ...f, title: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -414,7 +414,7 @@ function AdminTemplatesPage() {
                     setCreateForm((f) => ({ ...f, description: e.target.value }))
                   }
                   rows={2}
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -427,7 +427,7 @@ function AdminTemplatesPage() {
                     setCreateForm((f) => ({ ...f, dimension_id: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="">Select…</option>
                   {dimensions.map((d) => (
@@ -446,7 +446,7 @@ function AdminTemplatesPage() {
                   onChange={(e) =>
                     setCreateForm((f) => ({ ...f, kpi_type: e.target.value }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -463,7 +463,7 @@ function AdminTemplatesPage() {
                     }))
                   }
                   placeholder="0 or 0.25"
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -480,7 +480,7 @@ function AdminTemplatesPage() {
                         min_target: e.target.value || undefined,
                       }))
                     }
-                    className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                    className="w-full border border-stone-200 px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
@@ -496,7 +496,7 @@ function AdminTemplatesPage() {
                         max_target: e.target.value || undefined,
                       }))
                     }
-                    className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                    className="w-full border border-stone-200 px-3 py-2 text-sm"
                   />
                 </div>
               </div>
@@ -511,7 +511,7 @@ function AdminTemplatesPage() {
                       requires_baseline_snapshot: e.target.checked,
                     }))
                   }
-                  className="size-4 rounded border-stone-300"
+                  className="size-4 border border-stone-300"
                 />
                 <label
                   htmlFor="create-requires-baseline"
@@ -531,7 +531,7 @@ function AdminTemplatesPage() {
                       is_active: e.target.checked,
                     }))
                   }
-                  className="size-4 rounded border-stone-300"
+                  className="size-4 border border-stone-300"
                 />
                 <label
                   htmlFor="create-active"
@@ -544,14 +544,14 @@ function AdminTemplatesPage() {
                 <button
                   type="button"
                   onClick={() => setCreateOpen(false)}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
+                  className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
                 >
                   Create
                 </button>
@@ -562,7 +562,7 @@ function AdminTemplatesPage() {
       )}
       {editTemplate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">
               Edit template
             </h2>
@@ -571,7 +571,7 @@ function AdminTemplatesPage() {
                 <label className="mb-1 block text-sm font-medium text-stone-700">
                   Code
                 </label>
-                <p className="rounded-lg border border-stone-100 bg-stone-50 px-3 py-2 font-mono text-sm text-stone-600">
+                <p className="border border-stone-100 bg-stone-50 px-3 py-2 font-mono text-sm text-stone-600">
                   {editTemplate.code}
                 </p>
               </div>
@@ -585,7 +585,7 @@ function AdminTemplatesPage() {
                     setEditForm((f) => ({ ...f, title: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -601,14 +601,14 @@ function AdminTemplatesPage() {
                     }))
                   }
                   rows={2}
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-stone-700">
                   Dimension
                 </label>
-                <p className="rounded-lg border border-stone-100 bg-stone-50 px-3 py-2 text-sm text-stone-600">
+                <p className="border border-stone-100 bg-stone-50 px-3 py-2 text-sm text-stone-600">
                   {dimensionById[editTemplate.dimension_id] ??
                     editTemplate.dimension_id}
                 </p>
@@ -625,7 +625,7 @@ function AdminTemplatesPage() {
                       kpi_type: e.target.value || undefined,
                     }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -641,7 +641,7 @@ function AdminTemplatesPage() {
                       default_weight: e.target.value || undefined,
                     }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -658,7 +658,7 @@ function AdminTemplatesPage() {
                         min_target: e.target.value || undefined,
                       }))
                     }
-                    className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                    className="w-full border border-stone-200 px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
@@ -674,7 +674,7 @@ function AdminTemplatesPage() {
                         max_target: e.target.value || undefined,
                       }))
                     }
-                    className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                    className="w-full border border-stone-200 px-3 py-2 text-sm"
                   />
                 </div>
               </div>
@@ -689,7 +689,7 @@ function AdminTemplatesPage() {
                       requires_baseline_snapshot: e.target.checked,
                     }))
                   }
-                  className="size-4 rounded border-stone-300"
+                  className="size-4 border border-stone-300"
                 />
                 <label
                   htmlFor="edit-requires-baseline"
@@ -709,7 +709,7 @@ function AdminTemplatesPage() {
                       is_active: e.target.checked,
                     }))
                   }
-                  className="size-4 rounded border-stone-300"
+                  className="size-4 border border-stone-300"
                 />
                 <label
                   htmlFor="edit-active"
@@ -731,14 +731,14 @@ function AdminTemplatesPage() {
                     setEditTemplate(null)
                     setEditForm({})
                   }}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
+                  className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
                 >
                   Save
                 </button>

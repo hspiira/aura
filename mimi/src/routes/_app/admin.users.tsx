@@ -137,7 +137,7 @@ function AdminUsersPage() {
           <button
             type="button"
             onClick={() => setFormOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
+            className="inline-flex items-center gap-2 bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
           >
             <Plus className="size-4" />
             Create user
@@ -160,11 +160,11 @@ function AdminUsersPage() {
         }}
         showUserId={false}
         onEdit={canManageUsers ? openEdit : undefined}
-        className="rounded-xl shadow-sm"
+        className=""
       />
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">Create user</h2>
             <form onSubmit={handleCreateSubmit} className="mt-4 space-y-3">
               <div>
@@ -173,7 +173,7 @@ function AdminUsersPage() {
                   value={form.name ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -182,7 +182,7 @@ function AdminUsersPage() {
                   type="email"
                   value={form.email ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -191,7 +191,7 @@ function AdminUsersPage() {
                   value={form.role_id ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, role_id: e.target.value }))}
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="">Select…</option>
                   {roles.map((r) => (
@@ -207,7 +207,7 @@ function AdminUsersPage() {
                   value={form.department_id ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, department_id: e.target.value }))}
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="">Select…</option>
                   {departments.map((d) => (
@@ -227,7 +227,7 @@ function AdminUsersPage() {
                       supervisor_id: e.target.value || null,
                     }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="">None</option>
                   {users.map((u) => (
@@ -241,14 +241,14 @@ function AdminUsersPage() {
                 <button
                   type="button"
                   onClick={() => setFormOpen(false)}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
+                  className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
                 >
                   Create
                 </button>
@@ -259,7 +259,7 @@ function AdminUsersPage() {
       )}
       {editOpen && editingUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">Edit user</h2>
             <form onSubmit={handleEditSubmit} className="mt-4 space-y-3">
               <div>
@@ -268,7 +268,7 @@ function AdminUsersPage() {
                   value={editForm.name ?? ''}
                   onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -277,7 +277,7 @@ function AdminUsersPage() {
                   type="email"
                   value={editForm.email ?? ''}
                   onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value || null }))}
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -286,7 +286,7 @@ function AdminUsersPage() {
                   value={editForm.role_id ?? ''}
                   onChange={(e) => setEditForm((f) => ({ ...f, role_id: e.target.value }))}
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="">Select…</option>
                   {roles.map((r) => (
@@ -302,7 +302,7 @@ function AdminUsersPage() {
                   value={editForm.department_id ?? ''}
                   onChange={(e) => setEditForm((f) => ({ ...f, department_id: e.target.value }))}
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="">Select…</option>
                   {departments.map((d) => (
@@ -322,7 +322,7 @@ function AdminUsersPage() {
                       supervisor_id: e.target.value || null,
                     }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="">None</option>
                   {users.filter((u) => u.id !== editingUser.id).map((u) => (
@@ -346,14 +346,14 @@ function AdminUsersPage() {
                     setEditingUser(null)
                     setEditForm({})
                   }}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
+                  className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
                 >
                   Save
                 </button>

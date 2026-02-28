@@ -118,7 +118,7 @@ export function NewObjectiveModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="new-objective-title"
-        className="relative w-full max-w-lg rounded-xl border border-stone-200 bg-white shadow-xl"
+        className="relative w-full max-w-lg border border-stone-200 bg-white"
       >
         <div className="border-b border-stone-200 px-4 py-3">
           <h2 id="new-objective-title" className="text-lg font-semibold text-stone-900">
@@ -136,7 +136,7 @@ export function NewObjectiveModal({
                 const t = templates?.find((x) => x.id === e.target.value) ?? null
                 handleTemplateSelect(t)
               }}
-              className="w-full rounded border border-stone-200 bg-stone-50/80 px-3 py-2 text-sm"
+              className="w-full border border-stone-200 bg-stone-50/80 px-3 py-2 text-sm"
             >
               <option value="">None</option>
               {templates?.filter((t) => t.is_active).map((t) => (
@@ -154,7 +154,7 @@ export function NewObjectiveModal({
             <input
               value={form.title ?? ''}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-              className="w-full rounded border border-stone-200 px-3 py-2 text-sm"
+              className="w-full border border-stone-200 px-3 py-2 text-sm"
               required
             />
           </div>
@@ -167,7 +167,7 @@ export function NewObjectiveModal({
               value={form.description ?? ''}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
               rows={2}
-              className="w-full rounded border border-stone-200 px-3 py-2 text-sm"
+              className="w-full border border-stone-200 px-3 py-2 text-sm"
             />
           </div>
 
@@ -181,7 +181,7 @@ export function NewObjectiveModal({
                 inputMode="decimal"
                 value={form.weight ?? ''}
                 onChange={(e) => setForm((f) => ({ ...f, weight: e.target.value }))}
-                className="w-full rounded border border-stone-200 px-3 py-2 text-sm"
+                className="w-full border border-stone-200 px-3 py-2 text-sm"
                 required
               />
             </div>
@@ -192,7 +192,7 @@ export function NewObjectiveModal({
               <input
                 value={form.kpi_type ?? ''}
                 onChange={(e) => setForm((f) => ({ ...f, kpi_type: e.target.value || undefined }))}
-                className="w-full rounded border border-stone-200 px-3 py-2 text-sm"
+                className="w-full border border-stone-200 px-3 py-2 text-sm"
               />
             </div>
           </div>
@@ -206,7 +206,7 @@ export function NewObjectiveModal({
                 type="date"
                 value={form.start_date ?? cycle?.start_date ?? ''}
                 onChange={(e) => setForm((f) => ({ ...f, start_date: e.target.value }))}
-                className="w-full rounded border border-stone-200 px-3 py-2 text-sm"
+                className="w-full border border-stone-200 px-3 py-2 text-sm"
                 required
               />
             </div>
@@ -218,7 +218,7 @@ export function NewObjectiveModal({
                 type="date"
                 value={form.end_date ?? cycle?.end_date ?? ''}
                 onChange={(e) => setForm((f) => ({ ...f, end_date: e.target.value }))}
-                className="w-full rounded border border-stone-200 px-3 py-2 text-sm"
+                className="w-full border border-stone-200 px-3 py-2 text-sm"
                 required
               />
             </div>
@@ -232,7 +232,7 @@ export function NewObjectiveModal({
               type="text"
               value={form.target_value ?? ''}
               onChange={(e) => setForm((f) => ({ ...f, target_value: e.target.value || undefined }))}
-              className="w-full rounded border border-stone-200 px-3 py-2 text-sm"
+              className="w-full border border-stone-200 px-3 py-2 text-sm"
             />
           </div>
 
@@ -243,12 +243,12 @@ export function NewObjectiveModal({
             <input
               value={form.unit_of_measure ?? ''}
               onChange={(e) => setForm((f) => ({ ...f, unit_of_measure: e.target.value || undefined }))}
-              className="w-full rounded border border-stone-200 px-3 py-2 text-sm"
+              className="w-full border border-stone-200 px-3 py-2 text-sm"
             />
           </div>
 
           {validationErrors.length > 0 && (
-            <div className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700">
+            <div className="border border-red-200 bg-red-50 p-2 text-sm text-red-700">
               <ul className="list-inside list-disc">
                 {validationErrors.map((err, i) => (
                   <li key={i}>{err}</li>
@@ -261,7 +261,7 @@ export function NewObjectiveModal({
             <button
               type="button"
               onClick={() => onOpenChange(false)}
-              className="rounded-lg border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+              className="border border-stone-200 px-4 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
             >
               Cancel
             </button>
@@ -269,7 +269,7 @@ export function NewObjectiveModal({
               type="submit"
               disabled={createMutation.isPending}
               className={cn(
-                'rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800 disabled:opacity-60',
+                'bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800 disabled:opacity-60',
               )}
             >
               {createMutation.isPending ? 'Creating…' : 'Create objective'}

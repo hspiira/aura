@@ -99,7 +99,7 @@ function AdminTokensPage() {
           <button
             type="button"
             onClick={openCreateModal}
-            className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
+            className="inline-flex items-center gap-2 bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
           >
             <Plus className="size-4" />
             Create token
@@ -224,7 +224,7 @@ function AdminTokensPage() {
       />
       {formOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">
               {issuedToken ? 'Token created' : 'Create token'}
             </h2>
@@ -238,12 +238,12 @@ function AdminTokensPage() {
                     type="text"
                     readOnly
                     value={issuedToken}
-                    className="flex-1 rounded border border-stone-200 bg-stone-50 px-3 py-2 font-mono text-xs"
+                    className="flex-1 border border-stone-200 bg-stone-50 px-3 py-2 font-mono text-xs"
                   />
                   <button
                     type="button"
                     onClick={copyToken}
-                    className="inline-flex items-center gap-1 rounded-lg border border-stone-200 px-3 py-2 text-sm hover:bg-stone-50"
+                    className="inline-flex items-center gap-1 border border-stone-200 px-3 py-2 text-sm hover:bg-stone-50"
                   >
                     <Copy className="size-4" />
                     Copy
@@ -255,7 +255,7 @@ function AdminTokensPage() {
                     setFormOpen(false)
                     setIssuedToken(null)
                   }}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800"
+                  className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800"
                 >
                   Done
                 </button>
@@ -272,7 +272,7 @@ function AdminTokensPage() {
                       setForm((f) => ({ ...f, user_id: e.target.value }))
                     }
                     required
-                    className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                    className="w-full border border-stone-200 px-3 py-2 text-sm"
                   >
                     <option value="">Select…</option>
                     {users.map((u) => (
@@ -291,7 +291,7 @@ function AdminTokensPage() {
                     onChange={(e) =>
                       setForm((f) => ({ ...f, description: e.target.value }))
                     }
-                    className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                    className="w-full border border-stone-200 px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
@@ -307,21 +307,21 @@ function AdminTokensPage() {
                         expires_at: e.target.value || null,
                       }))
                     }
-                    className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                    className="w-full border border-stone-200 px-3 py-2 text-sm"
                   />
                 </div>
                 <div className="flex gap-2 pt-2">
                   <button
                     type="button"
                     onClick={() => setFormOpen(false)}
-                    className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                    className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={createMutation.isPending}
-                    className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
+                    className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
                   >
                     Create
                   </button>

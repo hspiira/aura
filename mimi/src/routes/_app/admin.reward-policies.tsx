@@ -44,11 +44,11 @@ function BandedScaleBar({ policies }: { policies: RewardPolicyResponse[] }) {
   const range = globalMax - globalMin
   if (range <= 0) return null
   return (
-    <div className="rounded-lg border border-stone-200 bg-stone-50 p-3">
+    <div className="border border-stone-200 bg-stone-50 p-3">
       <p className="mb-2 text-xs font-medium text-stone-500">
         Score brackets
       </p>
-      <div className="relative h-6 w-full overflow-hidden rounded-md border border-stone-200 bg-white">
+      <div className="relative h-6 w-full overflow-hidden border border-stone-200 bg-white">
         {policies.map((p, i) => {
           const left =
             ((Number(p.min_score) - globalMin) / range) * 100
@@ -185,7 +185,7 @@ function AdminRewardPoliciesPage() {
           <button
             type="button"
             onClick={() => setCreateOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
+            className="inline-flex items-center gap-2 bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
           >
             <Plus className="size-4" />
             Create policy
@@ -260,7 +260,7 @@ function AdminRewardPoliciesPage() {
                       <button
                         type="button"
                         onClick={() => openEdit(p)}
-                        className="rounded p-1 text-stone-400 hover:bg-stone-100 hover:text-amber-600"
+                        className="p-1 text-stone-400 hover:bg-stone-100 hover:text-amber-600"
                         aria-label={`Edit ${p.reward_type}`}
                       >
                         <Pencil className="size-4" />
@@ -289,7 +289,7 @@ function AdminRewardPoliciesPage() {
                         <button
                           type="button"
                           onClick={() => setDeleteConfirmId(p.id)}
-                          className="rounded p-1 text-stone-400 hover:bg-red-50 hover:text-red-600"
+                          className="p-1 text-stone-400 hover:bg-red-50 hover:text-red-600"
                           aria-label={`Delete ${p.reward_type}`}
                         >
                           <Trash2 className="size-4" />
@@ -312,7 +312,7 @@ function AdminRewardPoliciesPage() {
       />
       {createOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">
               Create policy
             </h2>
@@ -328,7 +328,7 @@ function AdminRewardPoliciesPage() {
                     setCreateForm((f) => ({ ...f, min_score: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -342,7 +342,7 @@ function AdminRewardPoliciesPage() {
                     setCreateForm((f) => ({ ...f, max_score: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -359,7 +359,7 @@ function AdminRewardPoliciesPage() {
                     }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -376,21 +376,21 @@ function AdminRewardPoliciesPage() {
                     }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setCreateOpen(false)}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
+                  className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
                 >
                   Create
                 </button>
@@ -401,7 +401,7 @@ function AdminRewardPoliciesPage() {
       )}
       {editPolicy && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">
               Edit policy
             </h2>
@@ -417,7 +417,7 @@ function AdminRewardPoliciesPage() {
                     setEditForm((f) => ({ ...f, min_score: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -431,7 +431,7 @@ function AdminRewardPoliciesPage() {
                     setEditForm((f) => ({ ...f, max_score: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -448,7 +448,7 @@ function AdminRewardPoliciesPage() {
                     }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -465,7 +465,7 @@ function AdminRewardPoliciesPage() {
                     }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               {updateMutation.isError && (
@@ -481,14 +481,14 @@ function AdminRewardPoliciesPage() {
                     setEditPolicy(null)
                     setEditForm({})
                   }}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
+                  className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
                 >
                   Save
                 </button>

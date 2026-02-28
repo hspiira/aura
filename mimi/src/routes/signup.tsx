@@ -13,7 +13,7 @@ import { AuthPageLayout } from '#/components/auth/AuthPageLayout'
 import { Button } from '#/components/ui/button'
 
 const inputClass =
-  'w-full rounded-md bg-stone-800 border border-stone-600 text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-500 px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed'
+  'w-full bg-stone-800 border border-stone-600 text-stone-100 placeholder-stone-400 focus:outline-none focus:ring-1 focus:ring-amber-500 px-3 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed'
 
 export const Route = createFileRoute('/signup')({
   component: SignupPage,
@@ -71,7 +71,7 @@ function SignupPage() {
   return (
     <AuthPageLayout>
       <div className="w-full max-w-md py-8">
-        <div className="bg-stone-900/80 backdrop-blur-md border border-white/10 rounded-lg p-8">
+        <div className="bg-stone-900/80 backdrop-blur-md border border-white/10 p-8">
           <div className="flex justify-center mb-6">
             <span className="text-2xl font-bold text-stone-100">Aura</span>
           </div>
@@ -84,7 +84,7 @@ function SignupPage() {
           </p>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-950/40 border border-red-800/50 rounded-md">
+            <div className="mb-4 p-3 bg-red-950/40 border border-red-800/50">
               <p className="text-sm text-red-300">{error}</p>
             </div>
           )}

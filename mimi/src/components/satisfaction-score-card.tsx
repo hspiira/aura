@@ -56,7 +56,7 @@ export function SatisfactionScoreCard({
   return (
     <Card
       className={cn(
-        'rounded-xl border border-stone-200/80 bg-white shadow-sm',
+        'border border-stone-200/80 bg-white',
         className,
       )}
     >
@@ -70,7 +70,7 @@ export function SatisfactionScoreCard({
         <CardAction>
           <button
             type="button"
-            className="rounded p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-600"
+            className="p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-600"
             aria-label="More options"
           >
             <MoreHorizontal className="size-5" />
@@ -146,9 +146,9 @@ export function SatisfactionScoreCard({
             </text>
           </svg>
         </div>
-        <div className="flex items-start gap-3 rounded-lg bg-stone-50/80 p-3">
+        <div className="flex items-start gap-3 bg-stone-50/80 p-3">
           <div
-            className="size-8 shrink-0 rounded-full bg-gradient-to-br from-violet-400 via-fuchsia-400 to-sky-400 shadow-sm"
+            className="size-8 shrink-0 rounded-full bg-gradient-to-br from-violet-400 via-fuchsia-400 to-sky-400"
             aria-hidden
           />
           <div className="min-w-0">

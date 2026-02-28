@@ -11,7 +11,7 @@ import { useMemo, useState } from 'react'
 import { cn } from '#/lib/utils'
 
 const CARD =
-  'rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden'
+  'border border-stone-200 bg-white overflow-hidden'
 
 function AccountOverviewCard() {
   const [activeTab, setActiveTab] = useState<'locations' | 'age' | 'gender'>(
@@ -69,7 +69,7 @@ function AccountOverviewCard() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                'rounded-lg px-3 py-1.5 text-xs font-medium transition',
+                'px-3 py-1.5 text-xs font-medium transition',
                 activeTab === tab.id
                   ? 'bg-violet-100 text-violet-800'
                   : 'text-stone-500 hover:bg-stone-50 hover:text-stone-700',
@@ -120,7 +120,7 @@ function AccountOverviewCard() {
               strokeLinejoin="round"
             />
           </svg>
-          <div className="absolute left-1/2 top-2 -translate-x-1/2 rounded-lg border border-stone-200 bg-white px-2 py-1 shadow-sm">
+          <div className="absolute left-1/2 top-2 -translate-x-1/2 border border-stone-200 bg-white px-2 py-1">
             <span className="text-xs font-semibold text-stone-900">
               125.2K views
             </span>
@@ -159,7 +159,7 @@ function YourAccountsCard() {
         </div>
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100"
+          className="inline-flex items-center gap-1.5 bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-100"
         >
           <Plus className="size-4" />
           Add Account
@@ -183,7 +183,7 @@ function YourAccountsCard() {
               </div>
             </div>
             {acc.active ? (
-              <span className="shrink-0 rounded-full bg-pink-500 px-2.5 py-1 text-xs font-medium text-white">
+              <span className="shrink-0 bg-pink-500 px-2.5 py-1 text-xs font-medium text-white">
                 Active
               </span>
             ) : (
@@ -215,7 +215,7 @@ function PostActivityCard() {
         </div>
         <button
           type="button"
-          className="rounded-lg border border-blue-200 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-50"
+          className="border border-blue-200 bg-white px-3 py-1.5 text-sm font-medium text-blue-700 hover:bg-blue-50"
         >
           Change Period
         </button>
@@ -274,7 +274,7 @@ function AnomalyDetectedCard() {
             because someone shared one of your posts.
           </p>
         </div>
-        <div className="shrink-0 rounded-full bg-amber-100 p-1.5">
+        <div className="shrink-0 bg-amber-100 p-1.5">
           <Flag className="size-4 text-amber-600" />
         </div>
       </div>
@@ -283,7 +283,7 @@ function AnomalyDetectedCard() {
           {bars.map((h, i) => (
             <div
               key={i}
-              className="flex-1 min-w-0 rounded-t bg-emerald-300"
+              className="flex-1 min-w-0 bg-emerald-300"
               style={{ height: `${Math.round(h * 72)}px` }}
             />
           ))}
@@ -297,7 +297,7 @@ function AnomalyDetectedCard() {
         </div>
         <button
           type="button"
-          className="w-full rounded-lg border border-blue-200 bg-white py-2 text-sm font-medium text-blue-700 hover:bg-blue-50"
+          className="w-full border border-blue-200 bg-white py-2 text-sm font-medium text-blue-700 hover:bg-blue-50"
         >
           See Details
         </button>
@@ -328,7 +328,7 @@ function PostScheduleCard() {
         </div>
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-blue-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-600"
+          className="inline-flex items-center gap-1.5 bg-blue-500 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-600"
         >
           <Plus className="size-4" />
           Add Post
@@ -342,14 +342,14 @@ function PostScheduleCard() {
             </span>
             <div
               className={cn(
-                'flex flex-1 gap-2 rounded-lg border border-stone-100 p-3',
+                'flex flex-1 gap-2 border border-stone-100 p-3',
                 item.color,
               )}
             >
               <p className="line-clamp-2 flex-1 text-sm text-stone-700">
                 {item.text}
               </p>
-              <div className="size-12 shrink-0 overflow-hidden rounded bg-stone-200" />
+              <div className="size-12 shrink-0 overflow-hidden bg-stone-200" />
             </div>
           </div>
         ))}
@@ -368,7 +368,7 @@ function PostInsightsCard() {
             Posted on May 10, 2024 - 6:10pm
           </p>
         </div>
-        <div className="size-14 shrink-0 overflow-hidden rounded-lg bg-stone-200" />
+        <div className="size-14 shrink-0 overflow-hidden bg-stone-200" />
       </div>
       <div className="border-b border-stone-100 p-4">
         <div className="flex items-center justify-between">
@@ -392,12 +392,12 @@ function PostInsightsCard() {
           You have gained more reach and followers when the post is related to
           workspace or productivity. Keep it up!
         </p>
-        <div className="my-4 flex h-24 items-center justify-center rounded-lg bg-stone-100">
+        <div className="my-4 flex h-24 items-center justify-center bg-stone-100">
           <span className="text-xs text-stone-400">Illustration placeholder</span>
         </div>
         <button
           type="button"
-          className="w-full rounded-lg border border-blue-200 bg-white py-2 text-sm font-medium text-blue-700 hover:bg-blue-50"
+          className="w-full border border-blue-200 bg-white py-2 text-sm font-medium text-blue-700 hover:bg-blue-50"
         >
           Subscribe for another finding
         </button>
@@ -408,7 +408,7 @@ function PostInsightsCard() {
 
 export function SocialMediaDashboardDemo() {
   return (
-    <div className="rounded-xl bg-stone-100/80 p-4">
+    <div className="bg-stone-100/80 p-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <AccountOverviewCard />
         <PostActivityCard />

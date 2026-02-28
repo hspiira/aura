@@ -148,7 +148,7 @@ function AdminCyclesPage() {
           <button
             type="button"
             onClick={() => setCreateOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
+            className="inline-flex items-center gap-2 bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
           >
             <Plus className="size-4" />
             Create cycle
@@ -192,7 +192,7 @@ function AdminCyclesPage() {
             ),
             cell: (c) => (
               <span
-                className={`rounded px-2 py-0.5 text-xs capitalize ${statusBadgeClass(c.status)}`}
+                className={`px-2 py-0.5 text-xs capitalize ${statusBadgeClass(c.status)}`}
               >
                 {c.status}
               </span>
@@ -259,7 +259,7 @@ function AdminCyclesPage() {
       />
       {createOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">
               Create cycle
             </h2>
@@ -274,7 +274,7 @@ function AdminCyclesPage() {
                     setCreateForm((f) => ({ ...f, name: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -288,7 +288,7 @@ function AdminCyclesPage() {
                     setCreateForm((f) => ({ ...f, start_date: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -302,7 +302,7 @@ function AdminCyclesPage() {
                     setCreateForm((f) => ({ ...f, end_date: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -314,7 +314,7 @@ function AdminCyclesPage() {
                   onChange={(e) =>
                     setCreateForm((f) => ({ ...f, status: e.target.value }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="draft">draft</option>
                   <option value="active">active</option>
@@ -334,7 +334,7 @@ function AdminCyclesPage() {
                       review_frequency: e.target.value || undefined,
                     }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -350,14 +350,14 @@ function AdminCyclesPage() {
                       objectives_lock_date: e.target.value || null,
                     }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setCreateOpen(false)}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
@@ -375,7 +375,7 @@ function AdminCyclesPage() {
       )}
       {editCycle && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">
               Edit cycle
             </h2>
@@ -390,7 +390,7 @@ function AdminCyclesPage() {
                     setEditForm((f) => ({ ...f, name: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -404,7 +404,7 @@ function AdminCyclesPage() {
                     setEditForm((f) => ({ ...f, start_date: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -418,7 +418,7 @@ function AdminCyclesPage() {
                     setEditForm((f) => ({ ...f, end_date: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -430,7 +430,7 @@ function AdminCyclesPage() {
                   onChange={(e) =>
                     setEditForm((f) => ({ ...f, status: e.target.value }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="draft">draft</option>
                   <option value="active">active</option>
@@ -450,7 +450,7 @@ function AdminCyclesPage() {
                       review_frequency: e.target.value || undefined,
                     }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -466,7 +466,7 @@ function AdminCyclesPage() {
                       objectives_lock_date: e.target.value || undefined,
                     }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               {updateMutation.isError && (
@@ -482,7 +482,7 @@ function AdminCyclesPage() {
                     setEditCycle(null)
                     setEditForm({})
                   }}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
@@ -498,7 +498,7 @@ function AdminCyclesPage() {
                     type="button"
                     onClick={() => lockMutation.mutate(editCycle.id)}
                     disabled={lockMutation.isPending}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-60"
+                    className="inline-flex items-center gap-1.5 border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-60"
                   >
                     <Lock className="size-4" />
                     Lock objectives now

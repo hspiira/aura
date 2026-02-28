@@ -194,7 +194,7 @@ function CycleDetailPage() {
               lockAllMutation.mutate(unlockableObjectives.map((o) => o.id))
             }
             disabled={lockAllMutation.isPending}
-            className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-60"
+            className="inline-flex items-center gap-2 border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-60"
           >
             <Lock className="size-4" />
             Lock all unlocked ({unlockableObjectives.length})
@@ -203,7 +203,7 @@ function CycleDetailPage() {
       </div>
 
       {/* Header card */}
-      <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+      <section className="border border-stone-200 bg-white p-4">
         <h1 className="text-lg font-semibold text-stone-900">{cycle.name}</h1>
         <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-stone-600">
           <span>
@@ -211,7 +211,7 @@ function CycleDetailPage() {
             {format(parseISO(cycle.end_date), 'MMM d')}
           </span>
           <span
-            className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(cycle.status)}`}
+            className={`px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(cycle.status)}`}
           >
             {cycle.status}
           </span>
@@ -239,25 +239,25 @@ function CycleDetailPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Objectives section (col-span-2) */}
         <div className="space-y-4 lg:col-span-2">
-          <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+          <section className="border border-stone-200 bg-white p-4">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-stone-900">
               <Target className="size-4" />
               Objectives
             </h2>
 
             {/* Filter bar */}
-            <div className="mb-4 flex flex-wrap gap-3 rounded-xl border border-stone-200 bg-white p-3">
+            <div className="mb-4 flex flex-wrap gap-3 border border-stone-200 bg-white p-3">
               <input
                 type="search"
                 placeholder="Search by title…"
                 value={titleSearch}
                 onChange={(e) => setTitleSearch(e.target.value)}
-                className="rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                className="border border-stone-200 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
               />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700"
+                className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700"
               >
                 <option value="">All statuses</option>
                 {STATUS_ORDER_SPEC.map((s) => (
@@ -269,7 +269,7 @@ function CycleDetailPage() {
               <select
                 value={dimensionFilter}
                 onChange={(e) => setDimensionFilter(e.target.value)}
-                className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700"
+                className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700"
               >
                 <option value="">All dimensions</option>
                 {dimensions?.map((d) => (
@@ -285,7 +285,7 @@ function CycleDetailPage() {
                 No objectives in this cycle.
               </p>
             ) : (
-              <div className="overflow-hidden rounded-xl border border-stone-200">
+              <div className="overflow-hidden border border-stone-200">
                 <table className="w-full min-w-[520px] text-sm">
                   <thead>
                     <tr className="border-b border-stone-200 bg-stone-50/80">
@@ -334,7 +334,7 @@ function CycleDetailPage() {
                           </td>
                           <td className="px-4 py-3">
                             <span
-                              className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(obj.status)}`}
+                              className={`px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(obj.status)}`}
                             >
                               {obj.status.replace(/_/g, ' ')}
                             </span>
@@ -353,7 +353,7 @@ function CycleDetailPage() {
                                 type="button"
                                 onClick={() => lockMutation.mutate(obj.id)}
                                 disabled={lockMutation.isPending}
-                                className="inline-flex items-center gap-1 rounded-lg border border-stone-200 px-2 py-1 text-xs font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-60"
+                                className="inline-flex items-center gap-1 border border-stone-200 px-2 py-1 text-xs font-medium text-amber-700 hover:bg-amber-50 disabled:opacity-60"
                               >
                                 <Lock className="size-3.5" />
                                 Lock
@@ -374,7 +374,7 @@ function CycleDetailPage() {
 
         {/* Aggregate panel */}
         <div className="space-y-6">
-          <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+          <section className="border border-stone-200 bg-white p-4">
             <h2 className="mb-3 text-sm font-semibold text-stone-900">
               Aggregate
             </h2>

@@ -213,7 +213,7 @@ function ObjectiveDetailPage() {
           <button
             type="button"
             onClick={() => setAmendOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+            className="inline-flex items-center gap-2 border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
           >
             <Pencil className="size-4" />
             Amend
@@ -222,18 +222,18 @@ function ObjectiveDetailPage() {
       </div>
 
       {/* Header card */}
-      <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+      <section className="border border-stone-200 bg-white p-4">
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-lg font-semibold text-stone-900">
             {objective.title}
           </h1>
           <span
-            className={`rounded px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(objective.status)}`}
+            className={`px-2 py-0.5 text-xs font-medium capitalize ${statusBadgeClass(objective.status)}`}
           >
             {objective.status.replace(/_/g, ' ')}
           </span>
           {locked && (
-            <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+            <span className="bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
               Locked
             </span>
           )}
@@ -244,7 +244,7 @@ function ObjectiveDetailPage() {
             {format(parseISO(objective.end_date), 'MMM d')}
           </span>
           {score && (
-            <span className="rounded-full bg-stone-100 px-2.5 py-0.5 font-medium text-stone-700">
+            <span className="bg-stone-100 px-2.5 py-0.5 font-medium text-stone-700">
               Score: {score.achievement_percentage}% (weighted {score.weighted_score})
             </span>
           )}
@@ -255,7 +255,7 @@ function ObjectiveDetailPage() {
         {/* Left column */}
         <div className="space-y-6 lg:col-span-2">
           {/* Details */}
-          <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+          <section className="border border-stone-200 bg-white p-4">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-stone-900">
               <Target className="size-4" />
               Details
@@ -289,7 +289,7 @@ function ObjectiveDetailPage() {
           </section>
 
           {/* Status workflow */}
-          <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+          <section className="border border-stone-200 bg-white p-4">
             <h2 className="mb-3 text-sm font-semibold text-stone-900">
               Status workflow
             </h2>
@@ -299,7 +299,7 @@ function ObjectiveDetailPage() {
                 return (
                   <span
                     key={s}
-                    className={`rounded px-2 py-1 text-xs font-medium ${
+                    className={`px-2 py-1 text-xs font-medium ${
                       reached
                         ? 'bg-amber-100 text-amber-800'
                         : 'bg-stone-100 text-stone-400'
@@ -318,7 +318,7 @@ function ObjectiveDetailPage() {
                     type="button"
                     onClick={() => statusTransition.mutate(toStatus)}
                     disabled={statusTransition.isPending}
-                    className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-60"
+                    className="border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-800 hover:bg-amber-100 disabled:opacity-60"
                   >
                     → {STATUS_LABELS[toStatus] ?? toStatus}
                   </button>
@@ -328,7 +328,7 @@ function ObjectiveDetailPage() {
           </section>
 
           {/* Progress updates feed */}
-          <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+          <section className="border border-stone-200 bg-white p-4">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-stone-900">
               <RefreshCw className="size-4" />
               Progress updates
@@ -374,7 +374,7 @@ function ObjectiveDetailPage() {
                     <ChevronDown className="size-4" />
                   </button>
                 ) : (
-                  <div className="rounded-lg border border-stone-200 bg-stone-50/50 p-3">
+                  <div className="border border-stone-200 bg-stone-50/50 p-3">
                     <button
                       type="button"
                       onClick={() => setProgressFormOpen(false)}
@@ -400,27 +400,27 @@ function ObjectiveDetailPage() {
                         placeholder="Actual value"
                         value={progressActual}
                         onChange={(e) => setProgressActual(e.target.value)}
-                        className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                        className="w-full border border-stone-200 px-3 py-2 text-sm"
                       />
                       <textarea
                         placeholder="Comment"
                         value={progressComment}
                         onChange={(e) => setProgressComment(e.target.value)}
                         rows={2}
-                        className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                        className="w-full border border-stone-200 px-3 py-2 text-sm"
                       />
                       <div className="flex gap-2">
                         <button
                           type="submit"
                           disabled={addProgressMutation.isPending}
-                          className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800 disabled:opacity-60"
+                          className="bg-stone-900 px-3 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800 disabled:opacity-60"
                         >
                           Submit
                         </button>
                         <button
                           type="button"
                           onClick={() => setProgressFormOpen(false)}
-                          className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                          className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                         >
                           Cancel
                         </button>
@@ -436,7 +436,7 @@ function ObjectiveDetailPage() {
         {/* Right column */}
         <div className="space-y-6">
           {/* Evidence */}
-          <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+          <section className="border border-stone-200 bg-white p-4">
             <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-stone-900">
               <FileText className="size-4" />
               Evidence
@@ -469,7 +469,7 @@ function ObjectiveDetailPage() {
                     Attach evidence
                   </button>
                 ) : (
-                  <div className="rounded-lg border border-stone-200 bg-stone-50/50 p-3">
+                  <div className="border border-stone-200 bg-stone-50/50 p-3">
                     <form
                       onSubmit={(e) => {
                         e.preventDefault()
@@ -489,27 +489,27 @@ function ObjectiveDetailPage() {
                           setEvidenceDescription(e.target.value)
                         }
                         rows={2}
-                        className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                        className="w-full border border-stone-200 px-3 py-2 text-sm"
                       />
                       <input
                         type="text"
                         placeholder="File path"
                         value={evidenceFilePath}
                         onChange={(e) => setEvidenceFilePath(e.target.value)}
-                        className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                        className="w-full border border-stone-200 px-3 py-2 text-sm"
                       />
                       <div className="flex gap-2">
                         <button
                           type="submit"
                           disabled={addEvidenceMutation.isPending}
-                          className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800 disabled:opacity-60"
+                          className="bg-stone-900 px-3 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800 disabled:opacity-60"
                         >
                           Submit
                         </button>
                         <button
                           type="button"
                           onClick={() => setEvidenceFormOpen(false)}
-                          className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                          className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                         >
                           Cancel
                         </button>
@@ -522,7 +522,7 @@ function ObjectiveDetailPage() {
           </section>
 
           {/* Audit log */}
-          <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+          <section className="border border-stone-200 bg-white p-4">
             <h2 className="mb-3 text-sm font-semibold text-stone-900">
               Audit log
             </h2>

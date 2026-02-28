@@ -37,16 +37,16 @@ export function SprintCallRecording() {
   const [playing, setPlaying] = useState(false)
 
   return (
-    <div className="rounded-2xl bg-stone-200/60 p-8 md:p-12">
+    <div className="bg-stone-200/60 p-8 md:p-12">
       {/* Header pill */}
       <p className="mb-8 text-center">
-        <span className="rounded-full bg-stone-300/80 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-stone-600">
+        <span className="bg-stone-300/80 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-stone-600">
           Agency Sprint Call Recording – Light Mode
         </span>
       </p>
 
       {/* Main card */}
-      <Card className="mx-auto max-w-2xl border-stone-200 bg-white shadow-lg">
+      <Card className="mx-auto max-w-2xl border-stone-200 bg-white">
         <CardHeader className="gap-4 pb-4">
           <CardTitle className="text-xl font-semibold text-stone-900 md:text-2xl">
             Sprint 203 daily – [Project-238]
@@ -57,7 +57,7 @@ export function SprintCallRecording() {
             {TEAM_TAGS.map(({ label, icon: Icon }) => (
               <span
                 key={label}
-                className="inline-flex items-center gap-1.5 rounded-full border border-stone-200 bg-stone-100 px-3 py-1.5 text-sm text-stone-800"
+                className="inline-flex items-center gap-1.5 border border-stone-200 bg-stone-100 px-3 py-1.5 text-sm text-stone-800"
               >
                 <Icon className="size-3.5 text-stone-500" />
                 {label}
@@ -100,10 +100,10 @@ export function SprintCallRecording() {
             <button
               type="button"
               onClick={() => setPlaying(!playing)}
-              className="flex w-full items-center gap-4 rounded-full bg-stone-900 px-4 py-3 text-white transition hover:bg-stone-800"
+              className="flex w-full items-center gap-4 bg-stone-900 px-4 py-3 text-white transition hover:bg-stone-800"
               aria-label={playing ? 'Pause' : 'Play'}
             >
-              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/10">
+              <span className="flex size-10 shrink-0 items-center justify-center bg-white/10">
                 <Play
                   className={`size-5 ${playing ? 'hidden' : ''}`}
                   aria-hidden
@@ -112,8 +112,8 @@ export function SprintCallRecording() {
                   className={`size-5 ${playing ? 'flex' : 'hidden'} items-center justify-center gap-0.5`}
                   aria-hidden
                 >
-                  <span className="h-4 w-2 rounded-sm bg-white" />
-                  <span className="h-4 w-2 rounded-sm bg-white" />
+                  <span className="h-4 w-2 bg-white" />
+                  <span className="h-4 w-2 bg-white" />
                 </span>
               </span>
               {/* Waveform bars */}
@@ -121,7 +121,7 @@ export function SprintCallRecording() {
                 {Array.from({ length: 24 }).map((_, i) => (
                   <span
                     key={i}
-                    className="w-1 rounded-full bg-white/80"
+                    className="w-1 bg-white/80"
                     style={{
                       height: `${20 + (i % 5) * 12}%`,
                       minHeight: 4,
@@ -179,7 +179,7 @@ export function SprintCallRecording() {
 
       {/* Footer */}
       <div className="mt-8 flex justify-end gap-2">
-        <span className="rounded-full bg-stone-300/80 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-stone-600">
+        <span className="bg-stone-300/80 px-4 py-1.5 text-xs font-medium uppercase tracking-wider text-stone-600">
           Designed by PHE
         </span>
         <Avatar size="sm" className="ring-2 ring-dashed ring-pink-400">

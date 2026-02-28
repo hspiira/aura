@@ -116,7 +116,7 @@ function AdminRolesPage() {
           <button
             type="button"
             onClick={() => setCreateOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
+            className="inline-flex items-center gap-2 bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-800"
           >
             <Plus className="size-4" />
             Create role
@@ -124,7 +124,7 @@ function AdminRolesPage() {
         )}
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
+      <div className="overflow-hidden border border-stone-200 bg-white">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-stone-200 bg-stone-50/80">
@@ -179,7 +179,7 @@ function AdminRolesPage() {
                   </td>
                   <td className="px-3 py-2">
                     {role.is_managerial ? (
-                      <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
+                      <span className="bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
                         Yes
                       </span>
                     ) : (
@@ -220,7 +220,7 @@ function AdminRolesPage() {
 
       {createOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">Create role</h2>
             <form onSubmit={handleCreateSubmit} className="mt-4 space-y-3">
               <div>
@@ -233,7 +233,7 @@ function AdminRolesPage() {
                     setCreateForm((f) => ({ ...f, department_id: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="">Select…</option>
                   {departments.map((d) => (
@@ -253,7 +253,7 @@ function AdminRolesPage() {
                     setCreateForm((f) => ({ ...f, name: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -265,7 +265,7 @@ function AdminRolesPage() {
                   onChange={(e) =>
                     setCreateForm((f) => ({ ...f, level: e.target.value }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -279,7 +279,7 @@ function AdminRolesPage() {
                       is_managerial: e.target.checked,
                     }))
                   }
-                  className="size-4 rounded border-stone-300"
+                  className="size-4 border border-stone-300"
                 />
                 <label
                   htmlFor="create-managerial"
@@ -292,14 +292,14 @@ function AdminRolesPage() {
                 <button
                   type="button"
                   onClick={() => setCreateOpen(false)}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createMutation.isPending}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
+                  className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
                 >
                   Create
                 </button>
@@ -311,7 +311,7 @@ function AdminRolesPage() {
 
       {editRole && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl border border-stone-200 bg-white p-4 shadow-lg">
+          <div className="w-full max-w-md border border-stone-200 bg-white p-4">
             <h2 className="text-lg font-semibold text-stone-900">Edit role</h2>
             <form onSubmit={handleEditSubmit} className="mt-4 space-y-3">
               <div>
@@ -324,7 +324,7 @@ function AdminRolesPage() {
                     setEditForm((f) => ({ ...f, department_id: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 >
                   <option value="">Select…</option>
                   {departments.map((d) => (
@@ -344,7 +344,7 @@ function AdminRolesPage() {
                     setEditForm((f) => ({ ...f, name: e.target.value }))
                   }
                   required
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div>
@@ -356,7 +356,7 @@ function AdminRolesPage() {
                   onChange={(e) =>
                     setEditForm((f) => ({ ...f, level: e.target.value }))
                   }
-                  className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm"
+                  className="w-full border border-stone-200 px-3 py-2 text-sm"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -370,7 +370,7 @@ function AdminRolesPage() {
                       is_managerial: e.target.checked,
                     }))
                   }
-                  className="size-4 rounded border-stone-300"
+                  className="size-4 border border-stone-300"
                 />
                 <label
                   htmlFor="edit-managerial"
@@ -392,14 +392,14 @@ function AdminRolesPage() {
                     setEditRole(null)
                     setEditForm({})
                   }}
-                  className="rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
+                  className="border border-stone-200 px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updateMutation.isPending}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
+                  className="bg-stone-900 px-3 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-60"
                 >
                   Save
                 </button>
@@ -510,7 +510,7 @@ function RoleDetails({
               {weights.map((w) => (
                 <li
                   key={w.id}
-                  className="flex items-center justify-between rounded-lg border border-stone-100 bg-white px-3 py-2"
+                  className="flex items-center justify-between border border-stone-100 bg-white px-3 py-2"
                 >
                   <span className="text-sm text-stone-800">
                     {dimensionById[w.dimension_id] ?? w.dimension_id}{' '}
@@ -527,7 +527,7 @@ function RoleDetails({
                             step="0.01"
                             value={editWeightPct}
                             onChange={(e) => setEditWeightPct(e.target.value)}
-                            className="w-16 rounded border border-stone-200 px-2 py-1 text-sm"
+                            className="w-16 border border-stone-200 px-2 py-1 text-sm"
                           />
                           <button
                             type="button"
@@ -588,11 +588,11 @@ function RoleDetails({
             </ul>
           )}
           {canManageRbac && unassignedDimensions.length > 0 && (
-            <div className="mt-2 flex flex-wrap items-end gap-2 rounded-lg border border-dashed border-stone-200 bg-stone-50/50 p-2">
+            <div className="mt-2 flex flex-wrap items-end gap-2 border border-dashed border-stone-200 bg-stone-50/50 p-2">
               <select
                 value={addWeightDim}
                 onChange={(e) => setAddWeightDim(e.target.value)}
-                className="rounded border border-stone-200 bg-white px-2 py-1.5 text-sm"
+                className="border border-stone-200 bg-white px-2 py-1.5 text-sm"
               >
                 <option value="">Add weight…</option>
                 {unassignedDimensions.map((d) => (
@@ -609,7 +609,7 @@ function RoleDetails({
                 placeholder="%"
                 value={addWeightPct}
                 onChange={(e) => setAddWeightPct(e.target.value)}
-                className="w-16 rounded border border-stone-200 px-2 py-1.5 text-sm"
+                className="w-16 border border-stone-200 px-2 py-1.5 text-sm"
               />
               <button
                 type="button"
@@ -624,7 +624,7 @@ function RoleDetails({
                 disabled={
                   addWeightMutation.isPending || !addWeightDim || !addWeightPct.trim()
                 }
-                className="rounded bg-stone-900 px-2 py-1.5 text-xs font-medium text-white hover:bg-stone-800 disabled:opacity-50"
+                className="bg-stone-900 px-2 py-1.5 text-xs font-medium text-white hover:bg-stone-800 disabled:opacity-50"
               >
                 Add weight
               </button>
@@ -645,7 +645,7 @@ function RoleDetails({
               {rolePerms.map((rp) => (
                 <li
                   key={rp.id}
-                  className="flex items-center justify-between rounded-lg border border-stone-100 bg-white px-3 py-2"
+                  className="flex items-center justify-between border border-stone-100 bg-white px-3 py-2"
                 >
                   <span className="text-sm text-stone-800">
                     {permById[rp.permission_id]?.code ?? permById[rp.permission_id]?.name ?? rp.permission_id}
@@ -685,11 +685,11 @@ function RoleDetails({
             </ul>
           )}
           {canManageRbac && unassignedPermIds.length > 0 && (
-            <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-stone-200 bg-stone-50/50 p-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2 border border-dashed border-stone-200 bg-stone-50/50 p-2">
               <select
                 value={addPermId}
                 onChange={(e) => setAddPermId(e.target.value)}
-                className="rounded border border-stone-200 bg-white px-2 py-1.5 text-sm"
+                className="border border-stone-200 bg-white px-2 py-1.5 text-sm"
               >
                 <option value="">Add permission…</option>
                 {unassignedPermIds.map((p) => (
@@ -709,7 +709,7 @@ function RoleDetails({
                   setAddPermId('')
                 }}
                 disabled={assignPermMutation.isPending || !addPermId}
-                className="rounded bg-stone-900 px-2 py-1.5 text-xs font-medium text-white hover:bg-stone-800 disabled:opacity-50"
+                className="bg-stone-900 px-2 py-1.5 text-xs font-medium text-white hover:bg-stone-800 disabled:opacity-50"
               >
                 Add permission
               </button>

@@ -52,13 +52,13 @@ export function WorkflowStepCard({
   return (
     <div
       className={cn(
-        'flex flex-col rounded-xl border border-stone-200/80 bg-stone-50/60 shadow-sm',
+        'flex flex-col border border-stone-200/80 bg-stone-50/60',
         className,
       )}
     >
       <div
         className={cn(
-          'flex items-center gap-1.5 rounded-t-xl px-3 py-1.5 text-xs font-medium',
+          'flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium',
           style.badgeClass,
         )}
       >
@@ -69,7 +69,7 @@ export function WorkflowStepCard({
         <div className="flex items-start gap-3">
           <div
             className={cn(
-              'flex size-10 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-600',
+              'flex size-10 shrink-0 items-center justify-center border border-stone-200 bg-white text-stone-600',
               iconContainerClassName,
             )}
           >

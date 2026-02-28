@@ -130,7 +130,7 @@ function AnalyticsPage() {
             type="button"
             onClick={() => refreshMutation.mutate()}
             disabled={refreshMutation.isPending || (refreshStatus?.running === true)}
-            className="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60"
+            className="inline-flex items-center gap-2 border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60"
           >
             <RefreshCw
               className={`size-4 ${refreshMutation.isPending || refreshStatus?.running ? 'animate-spin' : ''}`}
@@ -140,7 +140,7 @@ function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-stone-200 bg-white p-3">
+      <div className="flex flex-wrap items-center gap-3 border border-stone-200 bg-white p-3">
         <label className="flex items-center gap-2 text-sm">
           <span className="text-stone-500">Cycle</span>
           <select
@@ -149,7 +149,7 @@ function AnalyticsPage() {
               setCycleId(e.target.value)
               setFactPage(0)
             }}
-            className="rounded border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
+            className="border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
           >
             <option value="">Select…</option>
             {cycles.map((c) => (
@@ -167,7 +167,7 @@ function AnalyticsPage() {
               setDepartmentId(e.target.value)
               setFactPage(0)
             }}
-            className="rounded border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
+            className="border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
           >
             <option value="">All</option>
             {departments.map((d) => (
@@ -180,7 +180,7 @@ function AnalyticsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+        <section className="border border-stone-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-stone-900">Score distribution</h2>
           {!effectiveCycleId ? (
             <p className="text-sm text-stone-500">Select a cycle.</p>
@@ -195,7 +195,7 @@ function AnalyticsPage() {
                   title={`${b.label}: ${b.count} (${b.percentage.toFixed(1)}%)`}
                 >
                   <div
-                    className="w-full min-w-[8px] rounded-t bg-amber-500/70 transition-all"
+                    className="w-full min-w-[8px] bg-amber-500/70 transition-all"
                     style={{ height: `${(b.count / maxCount) * 100}%` }}
                   />
                   <span className="text-[10px] font-medium text-stone-500">{b.label}</span>
@@ -205,7 +205,7 @@ function AnalyticsPage() {
           )}
         </section>
 
-        <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+        <section className="border border-stone-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-stone-900">Department variance</h2>
           {!effectiveCycleId ? (
             <p className="text-sm text-stone-500">Select a cycle.</p>
@@ -237,7 +237,7 @@ function AnalyticsPage() {
                       <td className="py-2 text-stone-600">{v.std_dev.toFixed(2)}</td>
                       <td className="py-2">
                         {v.is_outlier ? (
-                          <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                          <span className="bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                             Yes
                           </span>
                         ) : (
@@ -253,14 +253,14 @@ function AnalyticsPage() {
         </section>
       </div>
 
-      <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+      <section className="border border-stone-200 bg-white p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-stone-900">Fact summaries</h2>
           <button
             type="button"
             onClick={exportCsv}
             disabled={factRows.length === 0}
-            className="inline-flex items-center gap-1.5 rounded border border-stone-200 px-2 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 border border-stone-200 px-2 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-50"
           >
             <Download className="size-3.5" />
             Export CSV
@@ -352,10 +352,10 @@ function ETLStatusBadge({
     last_error?: string | null
   } | undefined
 }) {
-  if (!status) return <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-500">Not run</span>
+  if (!status) return <span className="bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-500">Not run</span>
   if (status.running) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+      <span className="inline-flex items-center gap-1 bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
         <span className="size-1.5 animate-pulse rounded-full bg-amber-500" />
         Running
       </span>
@@ -364,7 +364,7 @@ function ETLStatusBadge({
   if (status.last_error) {
     return (
       <span
-        className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-800"
+        className="bg-red-100 px-2.5 py-1 text-xs font-medium text-red-800"
         title={status.last_error}
       >
         Error
@@ -375,7 +375,7 @@ function ETLStatusBadge({
     const upserted = status.last_upserted != null ? ` · ${status.last_upserted} rows` : ''
     return (
       <span
-        className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800"
+        className="bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800"
         title={
           `Finished ${status.last_finished_at}${upserted}` +
           (status.last_started_at ? ` (started ${status.last_started_at})` : '')
@@ -385,5 +385,5 @@ function ETLStatusBadge({
       </span>
     )
   }
-  return <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-500">Not run</span>
+  return <span className="bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-500">Not run</span>
 }

@@ -12,7 +12,7 @@ import { useMemo, useState } from 'react'
 import { cn } from '#/lib/utils'
 
 const CARD_BASE =
-  'rounded-lg border border-stone-200 bg-white overflow-hidden'
+  'border border-stone-200 bg-white overflow-hidden'
 
 interface KpiMetricProps {
   title: string
@@ -155,16 +155,16 @@ function ViewsChartCard() {
             </span>
           </div>
         </div>
-        <div className="flex rounded-lg border border-stone-200 bg-stone-50 p-0.5">
+        <div className="flex border border-stone-200 bg-stone-50 p-0.5">
           {(['Day', 'Week', 'Month'] as const).map((p) => (
             <button
               key={p}
               type="button"
               onClick={() => setPeriod(p)}
               className={cn(
-                'rounded-md px-3 py-1.5 text-xs font-medium transition',
+                'px-3 py-1.5 text-xs font-medium transition',
                 period === p
-                  ? 'bg-white text-stone-900 shadow-sm'
+                  ? 'bg-white text-stone-900'
                   : 'text-stone-500 hover:text-stone-700',
               )}
             >

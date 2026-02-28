@@ -92,7 +92,7 @@ function PeoplePage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3 rounded-xl border border-stone-200 bg-white p-3">
+          <div className="flex flex-wrap gap-3 border border-stone-200 bg-white p-3">
             <input
               type="search"
               placeholder="Search by name or email…"
@@ -101,11 +101,11 @@ function PeoplePage() {
                 setSearch(e.target.value)
                 setPage(1)
               }}
-              className="min-w-[200px] rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+              className="min-w-[200px] border border-stone-200 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
             />
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm">
+          <div className="overflow-hidden border border-stone-200 bg-white">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[520px] text-sm">
                 <thead>

@@ -35,7 +35,7 @@ export function AppSidebar() {
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}
-            className="rounded-sm p-1.5 text-stone-500 hover:bg-stone-100 hover:text-stone-700"
+            className="p-1.5 text-stone-500 hover:bg-stone-100 hover:text-stone-700"
             aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {collapsed ? (
@@ -57,7 +57,7 @@ export function AppSidebar() {
               to={href}
               onClick={() => isMobile && setOpenMobile(false)}
               className={cn(
-                'flex items-center gap-3 rounded-sm px-2.5 py-2 text-sm font-medium transition',
+                'flex items-center gap-3 px-2.5 py-2 text-sm font-medium transition',
                 isActive
                   ? 'bg-amber-50 text-amber-800'
                   : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900',
@@ -80,7 +80,7 @@ export function AppSidebar() {
           <SheetTrigger asChild>
             <button
               type="button"
-              className="rounded-sm p-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+              className="p-2 text-stone-600 hover:bg-stone-100 hover:text-stone-900"
               aria-label="Open menu"
             >
               <Menu className="size-6" />
@@ -102,7 +102,7 @@ export function AppSidebar() {
                       to={href}
                       onClick={() => setOpenMobile(false)}
                       className={cn(
-                        'flex items-center gap-3 rounded-sm px-2.5 py-2 text-sm font-medium transition',
+                        'flex items-center gap-3 px-2.5 py-2 text-sm font-medium transition',
                         isActive
                           ? 'bg-amber-50 text-amber-800'
                           : 'text-stone-600 hover:bg-stone-100 hover:text-stone-900',

@@ -403,7 +403,7 @@ function LandingPage() {
                 }}
               />
 
-              <div className="relative overflow-hidden rounded-none border border-stone-200/20 bg-white/20 p-6 shadow-sm backdrop-blur-md">
+              <div className="relative overflow-hidden border border-stone-200/20 bg-white/20 p-6 backdrop-blur-md">
 
               {/* mockup header */}
               <div className="mb-3 flex items-center justify-between gap-2 text-xs text-stone-500">
