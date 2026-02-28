@@ -1,23 +1,49 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { format, parseISO } from 'date-fns'
-import { Plus } from 'lucide-react'
 import {
-  calibrationSessionsQueryOptions,
+  Building2,
+  Calendar,
+  FileText,
+  Plus,
+  User,
+  AlertTriangle,
+} from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
+import {
   calibrationDistributionQueryOptions,
+  calibrationSessionsQueryOptions,
   calibrationVarianceQueryOptions,
-  performanceCyclesQueryOptions,
   departmentsQueryOptions,
-  usersQueryOptions,
   meQueryOptions,
   mutations,
+  performanceCyclesQueryOptions,
+  usersQueryOptions,
 } from '#/lib/queries'
 import type { CalibrationSessionCreate } from '#/lib/types'
 
 export const Route = createFileRoute('/_app/calibration')({
   component: CalibrationPage,
 })
+
+function toDatetimeLocal( d: Date ): string {
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  const h = String(d.getHours()).padStart(2, '0')
+  const min = String(d.getMinutes()).padStart(2, '0')
+  return `${y}-${m}-${day}T${h}:${min}`
+}
 
 function CalibrationPage() {
   const queryClient = useQueryClient()
@@ -35,7 +61,7 @@ function CalibrationPage() {
   const { data: me } = useQuery(meQueryOptions())
   const { data: cycles = [] } = useQuery(performanceCyclesQueryOptions())
   const { data: departments = [] } = useQuery(departmentsQueryOptions())
-  const { data: usersData } = useQuery(usersQueryOptions({ limit: 200 }))
+  const { data: usersData } = useQuery(usersQueryOptions({ limit: 500 }))
   const users = usersData?.items ?? []
 
   const effectiveCycleId = (cycleId || cycles[0]?.id) ?? ''
@@ -45,15 +71,12 @@ function CalibrationPage() {
       performance_cycle_id: effectiveCycleId || undefined,
       department_id: departmentId || undefined,
     }),
-    { enabled: !!effectiveCycleId },
   )
   const { data: distribution = [] } = useQuery(
     calibrationDistributionQueryOptions(effectiveCycleId, departmentId || undefined),
-    { enabled: !!effectiveCycleId },
   )
   const { data: variance = [] } = useQuery(
     calibrationVarianceQueryOptions(effectiveCycleId, departmentId || undefined),
-    { enabled: !!effectiveCycleId },
   )
 
   const createMutation = useMutation({
@@ -107,22 +130,11 @@ function CalibrationPage() {
         <button
           type="button"
           onClick={() => {
-            const now = new Date()
-            const localDatetime =
-              now.getFullYear() +
-              '-' +
-              String(now.getMonth() + 1).padStart(2, '0') +
-              '-' +
-              String(now.getDate()).padStart(2, '0') +
-              'T' +
-              String(now.getHours()).padStart(2, '0') +
-              ':' +
-              String(now.getMinutes()).padStart(2, '0')
             setForm({
               performance_cycle_id: effectiveCycleId,
               department_id: departmentId || '',
               conducted_by_id: me?.user?.id ?? '',
-              conducted_at: localDatetime,
+              conducted_at: toDatetimeLocal(new Date()),
               notes: null,
             })
             setFormOpen(true)
@@ -138,7 +150,7 @@ function CalibrationPage() {
         <label className="flex items-center gap-2 text-sm">
           <span className="text-stone-500">Cycle</span>
           <select
-            value={cycleId}
+            value={(cycleId || cycles[0]?.id) ?? ''}
             onChange={(e) => setCycleId(e.target.value)}
             className="rounded border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
           >
@@ -203,27 +215,43 @@ function CalibrationPage() {
           ) : variance.length === 0 ? (
             <p className="text-sm text-stone-500">No variance data.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-stone-200 text-left">
-                    <th className="pb-2 font-semibold text-stone-700">Department</th>
-                    <th className="pb-2 font-semibold text-stone-700">Mean</th>
-                    <th className="pb-2 font-semibold text-stone-700">Std dev</th>
-                    <th className="pb-2 font-semibold text-stone-700">Outlier</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
+            <TableContainer>
+              <Table>
+                <TableHeader>
+                  <TableHeaderRow>
+                    <TableHead icon={<Building2 className="size-3" />}>
+                      Department
+                    </TableHead>
+                    <TableHead icon={<FileText className="size-3" />}>
+                      Mean score
+                    </TableHead>
+                    <TableHead icon={<FileText className="size-3" />}>
+                      Std dev
+                    </TableHead>
+                    <TableHead
+                      className="border-r-0"
+                      icon={<AlertTriangle className="size-3" />}
+                    >
+                      Outlier
+                    </TableHead>
+                  </TableHeaderRow>
+                </TableHeader>
+                <TableBody>
                   {variance.map((v) => (
-                    <tr key={v.department_id} className="hover:bg-stone-50/50">
-                      <td className="py-2 text-stone-800">
+                    <TableRow
+                      key={v.department_id}
+                      className={v.is_outlier ? 'bg-red-50 hover:bg-red-100/50' : undefined}
+                    >
+                      <TableCell className="text-stone-800">
                         {departmentById[v.department_id] ?? v.department_id}
-                      </td>
-                      <td className="py-2 font-medium text-stone-800">
+                      </TableCell>
+                      <TableCell className="font-medium text-stone-800">
                         {v.mean_score.toFixed(2)}
-                      </td>
-                      <td className="py-2 text-stone-600">{v.std_dev.toFixed(2)}</td>
-                      <td className="py-2">
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {v.std_dev.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="border-r-0">
                         {v.is_outlier ? (
                           <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                             Yes
@@ -231,12 +259,12 @@ function CalibrationPage() {
                         ) : (
                           <span className="text-stone-400">—</span>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </section>
       </div>
@@ -248,34 +276,56 @@ function CalibrationPage() {
         ) : sessions.length === 0 ? (
           <p className="text-sm text-stone-500">No sessions for this filter.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-stone-200 text-left">
-                  <th className="pb-2 font-semibold text-stone-700">Cycle</th>
-                  <th className="pb-2 font-semibold text-stone-700">Department</th>
-                  <th className="pb-2 font-semibold text-stone-700">Conducted by</th>
-                  <th className="pb-2 font-semibold text-stone-700">Conducted at</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-stone-100">
+          <TableContainer>
+            <Table>
+              <TableHeader>
+                <TableHeaderRow>
+                  <TableHead icon={<Calendar className="size-3" />}>
+                    Cycle
+                  </TableHead>
+                  <TableHead icon={<Building2 className="size-3" />}>
+                    Department
+                  </TableHead>
+                  <TableHead icon={<User className="size-3" />}>
+                    Conducted by
+                  </TableHead>
+                  <TableHead icon={<Calendar className="size-3" />}>
+                    Conducted at
+                  </TableHead>
+                  <TableHead
+                    className="border-r-0"
+                    icon={<FileText className="size-3" />}
+                  >
+                    Notes
+                  </TableHead>
+                </TableHeaderRow>
+              </TableHeader>
+              <TableBody>
                 {sessions.map((s) => (
-                  <tr key={s.id} className="hover:bg-stone-50/50">
-                    <td className="py-2 text-stone-600">{cycles.find((c) => c.id === s.performance_cycle_id)?.name ?? s.performance_cycle_id}</td>
-                    <td className="py-2 text-stone-800">
+                  <TableRow key={s.id}>
+                    <TableCell className="text-stone-600">
+                      {cycles.find((c) => c.id === s.performance_cycle_id)?.name ?? s.performance_cycle_id}
+                    </TableCell>
+                    <TableCell className="text-stone-800">
                       {departmentById[s.department_id] ?? s.department_id}
-                    </td>
-                    <td className="py-2 text-stone-800">
+                    </TableCell>
+                    <TableCell className="text-stone-800">
                       {userById[s.conducted_by_id] ?? s.conducted_by_id}
-                    </td>
-                    <td className="py-2 text-stone-600">
+                    </TableCell>
+                    <TableCell className="text-stone-600">
                       {format(parseISO(s.conducted_at), 'MMM d, yyyy HH:mm')}
-                    </td>
-                  </tr>
+                    </TableCell>
+                    <TableCell
+                      className="max-w-[12rem] truncate border-r-0 text-stone-600"
+                      title={s.notes ?? undefined}
+                    >
+                      {s.notes ?? '—'}
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </TableContainer>
         )}
       </section>
 

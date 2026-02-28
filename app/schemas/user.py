@@ -13,6 +13,16 @@ class UserCreate(BaseModel):
     email: str | None = None
 
 
+class UserUpdate(BaseModel):
+    """Payload to update a user (partial)."""
+
+    role_id: str | None = None
+    department_id: str | None = None
+    supervisor_id: str | None = None
+    name: str | None = None
+    email: str | None = None
+
+
 class UserResponse(BaseModel):
     """User in API responses."""
 

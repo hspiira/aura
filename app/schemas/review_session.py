@@ -18,6 +18,12 @@ class ReviewSessionCreate(BaseModel):
     scheduled_at: datetime | None = None
 
 
+class ReviewSessionUpdate(BaseModel):
+    """Payload to update a review session (e.g. status transition)."""
+
+    status: ReviewSessionStatus
+
+
 class ReviewSessionResponse(BaseModel):
     """Review session in API responses."""
 

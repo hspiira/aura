@@ -9,12 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppReviewsRouteImport } from './routes/_app/reviews'
 import { Route as AppPeopleRouteImport } from './routes/_app/people'
 import { Route as AppObjectivesRouteImport } from './routes/_app/objectives'
+import { Route as AppMyComponentsRouteImport } from './routes/_app/my-components'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCyclesRouteImport } from './routes/_app/cycles'
 import { Route as AppComponentsRouteImport } from './routes/_app/components'
@@ -22,6 +24,7 @@ import { Route as AppCalibrationRouteImport } from './routes/_app/calibration'
 import { Route as AppAnalyticsRouteImport } from './routes/_app/analytics'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppAdminIndexRouteImport } from './routes/_app/admin.index'
+import { Route as AppReviewsIdRouteImport } from './routes/_app/reviews.$id'
 import { Route as AppPeopleIdRouteImport } from './routes/_app/people.$id'
 import { Route as AppObjectivesIdRouteImport } from './routes/_app/objectives.$id'
 import { Route as AppCyclesIdRouteImport } from './routes/_app/cycles.$id'
@@ -34,6 +37,11 @@ import { Route as AppAdminNotificationsRouteImport } from './routes/_app/admin.n
 import { Route as AppAdminDimensionsRouteImport } from './routes/_app/admin.dimensions'
 import { Route as AppAdminCyclesRouteImport } from './routes/_app/admin.cycles'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -61,6 +69,11 @@ const AppPeopleRoute = AppPeopleRouteImport.update({
 const AppObjectivesRoute = AppObjectivesRouteImport.update({
   id: '/objectives',
   path: '/objectives',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMyComponentsRoute = AppMyComponentsRouteImport.update({
+  id: '/my-components',
+  path: '/my-components',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
@@ -97,6 +110,11 @@ const AppAdminIndexRoute = AppAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppAdminRoute,
+} as any)
+const AppReviewsIdRoute = AppReviewsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppReviewsRoute,
 } as any)
 const AppPeopleIdRoute = AppPeopleIdRouteImport.update({
   id: '/$id',
@@ -157,15 +175,17 @@ const AppAdminCyclesRoute = AppAdminCyclesRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/admin': typeof AppAdminRouteWithChildren
   '/analytics': typeof AppAnalyticsRoute
   '/calibration': typeof AppCalibrationRoute
   '/components': typeof AppComponentsRoute
   '/cycles': typeof AppCyclesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
+  '/my-components': typeof AppMyComponentsRoute
   '/objectives': typeof AppObjectivesRouteWithChildren
   '/people': typeof AppPeopleRouteWithChildren
-  '/reviews': typeof AppReviewsRoute
+  '/reviews': typeof AppReviewsRouteWithChildren
   '/admin/cycles': typeof AppAdminCyclesRoute
   '/admin/dimensions': typeof AppAdminDimensionsRoute
   '/admin/notifications': typeof AppAdminNotificationsRoute
@@ -177,19 +197,22 @@ export interface FileRoutesByFullPath {
   '/cycles/$id': typeof AppCyclesIdRoute
   '/objectives/$id': typeof AppObjectivesIdRoute
   '/people/$id': typeof AppPeopleIdRoute
+  '/reviews/$id': typeof AppReviewsIdRoute
   '/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/analytics': typeof AppAnalyticsRoute
   '/calibration': typeof AppCalibrationRoute
   '/components': typeof AppComponentsRoute
   '/cycles': typeof AppCyclesRouteWithChildren
   '/dashboard': typeof AppDashboardRoute
+  '/my-components': typeof AppMyComponentsRoute
   '/objectives': typeof AppObjectivesRouteWithChildren
   '/people': typeof AppPeopleRouteWithChildren
-  '/reviews': typeof AppReviewsRoute
+  '/reviews': typeof AppReviewsRouteWithChildren
   '/admin/cycles': typeof AppAdminCyclesRoute
   '/admin/dimensions': typeof AppAdminDimensionsRoute
   '/admin/notifications': typeof AppAdminNotificationsRoute
@@ -201,6 +224,7 @@ export interface FileRoutesByTo {
   '/cycles/$id': typeof AppCyclesIdRoute
   '/objectives/$id': typeof AppObjectivesIdRoute
   '/people/$id': typeof AppPeopleIdRoute
+  '/reviews/$id': typeof AppReviewsIdRoute
   '/admin': typeof AppAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -208,15 +232,17 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
   '/_app/admin': typeof AppAdminRouteWithChildren
   '/_app/analytics': typeof AppAnalyticsRoute
   '/_app/calibration': typeof AppCalibrationRoute
   '/_app/components': typeof AppComponentsRoute
   '/_app/cycles': typeof AppCyclesRouteWithChildren
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/my-components': typeof AppMyComponentsRoute
   '/_app/objectives': typeof AppObjectivesRouteWithChildren
   '/_app/people': typeof AppPeopleRouteWithChildren
-  '/_app/reviews': typeof AppReviewsRoute
+  '/_app/reviews': typeof AppReviewsRouteWithChildren
   '/_app/admin/cycles': typeof AppAdminCyclesRoute
   '/_app/admin/dimensions': typeof AppAdminDimensionsRoute
   '/_app/admin/notifications': typeof AppAdminNotificationsRoute
@@ -228,6 +254,7 @@ export interface FileRoutesById {
   '/_app/cycles/$id': typeof AppCyclesIdRoute
   '/_app/objectives/$id': typeof AppObjectivesIdRoute
   '/_app/people/$id': typeof AppPeopleIdRoute
+  '/_app/reviews/$id': typeof AppReviewsIdRoute
   '/_app/admin/': typeof AppAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -235,12 +262,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/signup'
     | '/admin'
     | '/analytics'
     | '/calibration'
     | '/components'
     | '/cycles'
     | '/dashboard'
+    | '/my-components'
     | '/objectives'
     | '/people'
     | '/reviews'
@@ -255,16 +284,19 @@ export interface FileRouteTypes {
     | '/cycles/$id'
     | '/objectives/$id'
     | '/people/$id'
+    | '/reviews/$id'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
+    | '/signup'
     | '/analytics'
     | '/calibration'
     | '/components'
     | '/cycles'
     | '/dashboard'
+    | '/my-components'
     | '/objectives'
     | '/people'
     | '/reviews'
@@ -279,18 +311,21 @@ export interface FileRouteTypes {
     | '/cycles/$id'
     | '/objectives/$id'
     | '/people/$id'
+    | '/reviews/$id'
     | '/admin'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/login'
+    | '/signup'
     | '/_app/admin'
     | '/_app/analytics'
     | '/_app/calibration'
     | '/_app/components'
     | '/_app/cycles'
     | '/_app/dashboard'
+    | '/_app/my-components'
     | '/_app/objectives'
     | '/_app/people'
     | '/_app/reviews'
@@ -305,6 +340,7 @@ export interface FileRouteTypes {
     | '/_app/cycles/$id'
     | '/_app/objectives/$id'
     | '/_app/people/$id'
+    | '/_app/reviews/$id'
     | '/_app/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -312,10 +348,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -356,6 +400,13 @@ declare module '@tanstack/react-router' {
       path: '/objectives'
       fullPath: '/objectives'
       preLoaderRoute: typeof AppObjectivesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/my-components': {
+      id: '/_app/my-components'
+      path: '/my-components'
+      fullPath: '/my-components'
+      preLoaderRoute: typeof AppMyComponentsRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/dashboard': {
@@ -406,6 +457,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AppAdminIndexRouteImport
       parentRoute: typeof AppAdminRoute
+    }
+    '/_app/reviews/$id': {
+      id: '/_app/reviews/$id'
+      path: '/$id'
+      fullPath: '/reviews/$id'
+      preLoaderRoute: typeof AppReviewsIdRouteImport
+      parentRoute: typeof AppReviewsRoute
     }
     '/_app/people/$id': {
       id: '/_app/people/$id'
@@ -551,6 +609,18 @@ const AppPeopleRouteWithChildren = AppPeopleRoute._addFileChildren(
   AppPeopleRouteChildren,
 )
 
+interface AppReviewsRouteChildren {
+  AppReviewsIdRoute: typeof AppReviewsIdRoute
+}
+
+const AppReviewsRouteChildren: AppReviewsRouteChildren = {
+  AppReviewsIdRoute: AppReviewsIdRoute,
+}
+
+const AppReviewsRouteWithChildren = AppReviewsRoute._addFileChildren(
+  AppReviewsRouteChildren,
+)
+
 interface AppRouteChildren {
   AppAdminRoute: typeof AppAdminRouteWithChildren
   AppAnalyticsRoute: typeof AppAnalyticsRoute
@@ -558,9 +628,10 @@ interface AppRouteChildren {
   AppComponentsRoute: typeof AppComponentsRoute
   AppCyclesRoute: typeof AppCyclesRouteWithChildren
   AppDashboardRoute: typeof AppDashboardRoute
+  AppMyComponentsRoute: typeof AppMyComponentsRoute
   AppObjectivesRoute: typeof AppObjectivesRouteWithChildren
   AppPeopleRoute: typeof AppPeopleRouteWithChildren
-  AppReviewsRoute: typeof AppReviewsRoute
+  AppReviewsRoute: typeof AppReviewsRouteWithChildren
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -570,9 +641,10 @@ const AppRouteChildren: AppRouteChildren = {
   AppComponentsRoute: AppComponentsRoute,
   AppCyclesRoute: AppCyclesRouteWithChildren,
   AppDashboardRoute: AppDashboardRoute,
+  AppMyComponentsRoute: AppMyComponentsRoute,
   AppObjectivesRoute: AppObjectivesRouteWithChildren,
   AppPeopleRoute: AppPeopleRouteWithChildren,
-  AppReviewsRoute: AppReviewsRoute,
+  AppReviewsRoute: AppReviewsRouteWithChildren,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -581,6 +653,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

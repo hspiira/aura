@@ -84,6 +84,9 @@ from app.infrastructure.persistence.repositories.role_permission_repo import (
     RolePermissionRepository,
 )
 from app.infrastructure.persistence.repositories.role_repo import RoleRepository
+from app.infrastructure.persistence.repositories.user_identity_repo import (
+    UserIdentityRepository,
+)
 from app.infrastructure.persistence.repositories.user_repo import UserRepository
 from app.infrastructure.persistence.repositories.user_token_repo import (
     UserTokenRepository,
@@ -132,6 +135,7 @@ get_fact_performance_summary_repo = _repo_dep(FactPerformanceSummaryRepository)
 get_objective_version_repo = _repo_dep(ObjectiveVersionRepository)
 get_user_token_repo = _repo_dep(UserTokenRepository)
 get_notification_outbox_repo = _repo_dep(NotificationOutboxRepository)
+get_user_identity_repo = _repo_dep(UserIdentityRepository)
 
 
 async def get_current_user_permissions(
@@ -160,5 +164,18 @@ def require_permission(code: str):
                 status_code=403,
                 detail=f"Insufficient permission: {code} required",
             )
+
+    return _check
+
+
+def require_any_permission(*codes: str):
+    """Dependency: 403 if user has none of the given permission codes."""
+
+    async def _check(
+        permissions: Annotated[set[str], Depends(get_current_user_permissions)],
+    ) -> None:
+        if not any(c in permissions for c in codes):
+            detail = "Insufficient permission: one of " + ", ".join(codes)
+            raise HTTPException(status_code=403, detail=detail)
 
     return _check

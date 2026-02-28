@@ -1,5 +1,7 @@
 """Performance dimension repository."""
 
+from decimal import Decimal
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,3 +36,25 @@ class PerformanceDimensionRepository:
         await self._session.flush()
         await self._session.refresh(dimension)
         return dimension
+
+    async def update(
+        self,
+        dimension_id: str,
+        *,
+        name: str | None = None,
+        is_quantitative: bool | None = None,
+        default_weight_pct: Decimal | None = None,
+    ) -> PerformanceDimension | None:
+        """Update dimension by id. Only provided fields updated. None if not found."""
+        dim = await self.get_by_id(dimension_id)
+        if dim is None:
+            return None
+        if name is not None:
+            dim.name = name
+        if is_quantitative is not None:
+            dim.is_quantitative = is_quantitative
+        if default_weight_pct is not None:
+            dim.default_weight_pct = default_weight_pct
+        await self._session.flush()
+        await self._session.refresh(dim)
+        return dim

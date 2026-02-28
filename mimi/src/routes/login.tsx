@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ApiError, apiPost } from '#/lib/api'
 import { setAccessToken } from '#/stores/auth'
@@ -20,7 +20,34 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handlePasswordLogin(e: React.FormEvent) {
+    e.preventDefault()
+    const emailValue = email.trim()
+    if (!emailValue || !password) {
+      setError('Enter your email and password.')
+      return
+    }
+    setError(null)
+    setLoading(true)
+    try {
+      const resp = await apiPost<LoginResponse, unknown>('auth/login', {
+        email: emailValue,
+        password,
+      })
+      setAuth(resp.token, resp.user.id)
+      navigate({ to: '/reviews' })
+    } catch (err) {
+      setError(
+        err instanceof ApiError && err.status === 401
+          ? 'Invalid email or password.'
+          : 'Something went wrong. Try again.',
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleTokenLogin(e: React.FormEvent) {
     e.preventDefault()
     if (!email.trim() || !password) {
       setError('Enter your email and password.')
@@ -47,17 +74,15 @@ function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-stone-50 px-4">
-      {/* subtle glow to match landing */}
-      <div className="pointer-events-none fixed inset-0 opacity-50" aria-hidden="true">
-        <div className="absolute -top-40 -right-32 h-80 w-80 rounded-full bg-amber-200/30 blur-3xl" />
-        <div className="absolute -bottom-40 -left-20 h-96 w-96 rounded-full bg-emerald-200/25 blur-3xl" />
-      </div>
+    <AuthPageLayout>
+      <div className="w-full max-w-md">
+        <div className="bg-stone-900/80 backdrop-blur-md border border-white/10 rounded-lg p-8">
+          <div className="flex justify-center mb-6">
+            <span className="text-2xl font-bold text-stone-100">Aura</span>
+          </div>
 
-      <div className="relative w-full max-w-sm">
-        <div className="border border-stone-200/80 bg-white p-6 shadow-sm">
-          <h1 className="text-lg font-semibold tracking-tight text-stone-900">
-            Sign in
+          <h1 className="text-2xl font-bold text-center mb-6 text-stone-100">
+            Sign In
           </h1>
           <p className="mt-1 text-[13px] text-stone-500">
             Sign in with your email and password.
@@ -101,27 +126,174 @@ function LoginPage() {
                 disabled={loading}
               />
             </div>
+          )}
 
-            {error && (
-              <p className="text-[13px] text-red-600" role="alert">
-                {error}
-              </p>
-            )}
-
+          <div className="mb-4 inline-flex rounded-full border border-stone-600 bg-stone-800/80 p-0.5 text-[11px]">
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-sm bg-stone-900 px-4 py-2.5 text-sm font-medium text-stone-50 transition hover:bg-stone-800 disabled:opacity-60"
+              type="button"
+              onClick={() => {
+                setMode('password')
+                setError(null)
+              }}
+              className={`rounded-full px-3 py-1.5 transition-colors ${
+                mode === 'password'
+                  ? 'bg-stone-700 text-stone-100'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              Email & password
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode('token')
+                setError(null)
+              }}
+              className={`rounded-full px-3 py-1.5 transition-colors ${
+                mode === 'token'
+                  ? 'bg-stone-700 text-stone-100'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              Admin token
+            </button>
+          </div>
+
+          {mode === 'password' ? (
+            <form onSubmit={handlePasswordLogin} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-stone-300 mb-1.5"
+                >
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value)
+                    setError(null)
+                  }}
+                  placeholder="you@company.com"
+                  autoComplete="email"
+                  disabled={loading}
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-stone-300 mb-1.5"
+                >
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value)
+                      setError(null)
+                    }}
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    disabled={loading}
+                    className={`${inputClass} pr-10`}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 px-2 text-stone-400 hover:text-stone-200"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleTokenLogin} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="token"
+                  className="block text-sm font-medium text-stone-300 mb-1.5"
+                >
+                  Admin-issued bearer token
+                </label>
+                <input
+                  id="token"
+                  type="password"
+                  value={token}
+                  onChange={(e) => {
+                    setToken(e.target.value)
+                    setError(null)
+                  }}
+                  placeholder="Paste your token"
+                  autoComplete="off"
+                  disabled={loading}
+                  className={inputClass}
+                />
+                <p className="mt-1 text-xs text-stone-500">
+                  Tokens are one-time secrets. Revoke them from the admin panel at any time.
+                </p>
+              </div>
+
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? 'Checking…' : 'Sign in with token'}
+              </Button>
+            </form>
+          )}
+
+          {/* SSO: present but inactive for future use */}
+          <div className="mt-4">
+            <button
+              type="button"
+              disabled
+              className="w-full rounded-md border border-stone-600 bg-stone-800/50 px-4 py-2.5 text-sm font-medium text-stone-500 cursor-not-allowed opacity-70"
+              title="SSO coming soon"
             >
               {loading ? 'Signing in…' : 'Sign in'}
             </button>
-          </form>
-        </div>
+          </div>
 
-        <p className="mt-4 text-center text-[11px] text-stone-400">
-          Enterprise Performance Management · Aura
-        </p>
+          <div className="mt-6 flex flex-col items-center gap-3 text-center">
+            <p className="text-sm text-stone-400">
+              Don&apos;t have an account?{' '}
+              <Link
+                to="/signup"
+                className="text-stone-200 font-medium hover:underline"
+              >
+                Create workspace
+              </Link>
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.href = '/'
+              }}
+              className="inline-flex items-center gap-2 text-sm text-stone-400 hover:text-stone-200 transition-colors cursor-pointer"
+              aria-label="Back to home"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to home
+            </button>
+          </div>
+        </div>
       </div>
-    </main>
+    </AuthPageLayout>
   )
 }

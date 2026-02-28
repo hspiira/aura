@@ -17,6 +17,9 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  optimizeDeps: {
+    include: ['@tanstack/react-query', '@tanstack/query-core'],
+  },
   server: {
     proxy: {
       '/api': {

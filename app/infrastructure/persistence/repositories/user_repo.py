@@ -57,3 +57,20 @@ class UserRepository:
         await self._session.flush()
         await self._session.refresh(user)
         return user
+
+    _update_fields = frozenset(
+        {"role_id", "department_id", "supervisor_id", "name", "email"}
+    )
+
+    async def update(self, user_id: str, **fields: str | None) -> User | None:
+        """Update a user by id. Only allowed keys in fields are applied.
+        supervisor_id and email may be set to None. Returns updated user or None."""
+        user = await self.get_by_id(user_id)
+        if user is None:
+            return None
+        for key, value in fields.items():
+            if key in self._update_fields and hasattr(user, key):
+                setattr(user, key, value)
+        await self._session.flush()
+        await self._session.refresh(user)
+        return user

@@ -35,6 +35,31 @@ class PerformanceCycleRepository:
         await self._session.refresh(cycle)
         return cycle
 
+    _update_fields = frozenset(
+        {
+            "name",
+            "start_date",
+            "end_date",
+            "status",
+            "review_frequency",
+            "objectives_lock_date",
+        }
+    )
+
+    async def update(
+        self, cycle_id: str, **fields: date | str | None
+    ) -> PerformanceCycle | None:
+        """Update cycle by id. Allowed keys applied. None if not found."""
+        cycle = await self.get_by_id(cycle_id)
+        if cycle is None:
+            return None
+        for key, value in fields.items():
+            if key in self._update_fields and hasattr(cycle, key):
+                setattr(cycle, key, value)
+        await self._session.flush()
+        await self._session.refresh(cycle)
+        return cycle
+
     async def list_cycles_pending_objectives_lock(
         self, on_date: date
     ) -> list[PerformanceCycle]:

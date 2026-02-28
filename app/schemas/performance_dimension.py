@@ -13,6 +13,14 @@ class PerformanceDimensionCreate(BaseModel):
     default_weight_pct: Decimal = Decimal("0")
 
 
+class PerformanceDimensionUpdate(BaseModel):
+    """Payload to update a performance dimension (partial)."""
+
+    name: str | None = None
+    is_quantitative: bool | None = None
+    default_weight_pct: Decimal | None = None
+
+
 class PerformanceDimensionResponse(BaseModel):
     """Performance dimension in API responses."""
 

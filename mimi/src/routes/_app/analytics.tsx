@@ -2,15 +2,36 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState, useMemo } from 'react'
 import { format, parseISO } from 'date-fns'
-import { Download, RefreshCw } from 'lucide-react'
 import {
-  performanceCyclesQueryOptions,
-  departmentsQueryOptions,
-  calibrationDistributionQueryOptions,
-  calibrationVarianceQueryOptions,
+  Building2,
+  Download,
+  RefreshCw,
+  User,
+  Calendar,
+  BarChart3,
+  Award,
+  Clock,
+  AlertTriangle,
+} from 'lucide-react'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableHeaderRow,
+  TableRow,
+} from '#/components/ui/table'
+import {
   analyticsFactSummariesQueryOptions,
   analyticsRefreshStatusQueryOptions,
+  calibrationDistributionQueryOptions,
+  calibrationVarianceQueryOptions,
+  departmentsQueryOptions,
   mutations,
+  performanceCyclesQueryOptions,
+  usersQueryOptions,
 } from '#/lib/queries'
 
 export const Route = createFileRoute('/_app/analytics')({
@@ -27,6 +48,8 @@ function AnalyticsPage() {
 
   const { data: cycles = [] } = useQuery(performanceCyclesQueryOptions())
   const { data: departments = [] } = useQuery(departmentsQueryOptions())
+  const { data: usersData } = useQuery(usersQueryOptions({ limit: 500 }))
+  const users = usersData?.items ?? []
 
   const effectiveCycleId = (cycleId || cycles[0]?.id) ?? ''
   const cycleYear = effectiveCycleId
@@ -36,29 +59,32 @@ function AnalyticsPage() {
       })()
     : undefined
 
-  const { data: refreshStatus } = useQuery(analyticsRefreshStatusQueryOptions(), {
+  const { data: refreshStatus } = useQuery({
+    ...analyticsRefreshStatusQueryOptions(),
     refetchInterval: (query) =>
       (query.state.data as { running?: boolean })?.running ? 2000 : false,
   })
   const { data: distribution = [] } = useQuery(
     calibrationDistributionQueryOptions(effectiveCycleId, departmentId || undefined),
-    { enabled: !!effectiveCycleId },
   )
   const { data: variance = [] } = useQuery(
     calibrationVarianceQueryOptions(effectiveCycleId, departmentId || undefined),
-    { enabled: !!effectiveCycleId },
   )
-  const { data: factRows = [] } = useQuery(
-    analyticsFactSummariesQueryOptions({
+  const { data: factRows = [] } = useQuery({
+    ...analyticsFactSummariesQueryOptions({
       cycle_year: cycleYear,
       department_id: departmentId || undefined,
       limit: 2000,
     }),
-    { enabled: cycleYear != null },
-  )
+    enabled: cycleYear != null,
+  })
   const departmentById = useMemo(
     () => Object.fromEntries(departments.map((d) => [d.id, d.name])),
     [departments],
+  )
+  const userById = useMemo(
+    () => Object.fromEntries(users.map((u) => [u.id, u.name])),
+    [users],
   )
 
   const refreshMutation = useMutation({
@@ -79,29 +105,27 @@ function AnalyticsPage() {
   function exportCsv() {
     if (factRows.length === 0) return
     const headers = [
-      'user_id',
-      'department_id',
-      'role_id',
-      'performance_cycle_id',
-      'cycle_year',
-      'quantitative_score',
-      'behavioral_score',
-      'final_score',
-      'rating_band',
-      'etl_at',
+      'User',
+      'Department',
+      'Year',
+      'Quant.',
+      'Behavioral',
+      'Final',
+      'Rating',
+      'ETL at',
     ]
+    const escape = (s: string) =>
+      /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
     const rows = factRows.map((r) =>
       [
-        r.user_id,
-        r.department_id,
-        r.role_id,
-        r.performance_cycle_id,
+        escape(userById[r.user_id] ?? r.user_id),
+        escape(departmentById[r.department_id] ?? r.department_id),
         r.cycle_year,
         r.quantitative_score ?? '',
         r.behavioral_score ?? '',
         r.final_score ?? '',
         r.rating_band ?? '',
-        r.etl_at,
+        format(parseISO(r.etl_at), 'yyyy-MM-dd HH:mm'),
       ].join(','),
     )
     const csv = [headers.join(','), ...rows].join('\n')
@@ -119,9 +143,6 @@ function AnalyticsPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-lg font-semibold text-stone-900">Analytics</h1>
-          <p className="mt-0.5 text-sm text-stone-500">
-            Fact summaries, score distribution, and variance.
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <ETLStatusBadge status={refreshStatus} />
@@ -129,7 +150,7 @@ function AnalyticsPage() {
             type="button"
             onClick={() => refreshMutation.mutate()}
             disabled={refreshMutation.isPending || (refreshStatus?.running === true)}
-            className="inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60"
+            className="inline-flex items-center gap-2 border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-60"
           >
             <RefreshCw
               className={`size-4 ${refreshMutation.isPending || refreshStatus?.running ? 'animate-spin' : ''}`}
@@ -139,16 +160,16 @@ function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-stone-200 bg-white p-3">
+      <div className="flex flex-wrap items-center gap-3 border border-stone-200 bg-white p-3">
         <label className="flex items-center gap-2 text-sm">
           <span className="text-stone-500">Cycle</span>
           <select
-            value={cycleId}
+            value={(cycleId || cycles[0]?.id) ?? ''}
             onChange={(e) => {
               setCycleId(e.target.value)
               setFactPage(0)
             }}
-            className="rounded border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
+            className="border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
           >
             <option value="">Select…</option>
             {cycles.map((c) => (
@@ -166,7 +187,7 @@ function AnalyticsPage() {
               setDepartmentId(e.target.value)
               setFactPage(0)
             }}
-            className="rounded border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
+            className="border border-stone-200 bg-stone-50/80 px-2 py-1.5 text-stone-800"
           >
             <option value="">All</option>
             {departments.map((d) => (
@@ -179,7 +200,7 @@ function AnalyticsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+        <section className="border border-stone-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-stone-900">Score distribution</h2>
           {!effectiveCycleId ? (
             <p className="text-sm text-stone-500">Select a cycle.</p>
@@ -194,7 +215,7 @@ function AnalyticsPage() {
                   title={`${b.label}: ${b.count} (${b.percentage.toFixed(1)}%)`}
                 >
                   <div
-                    className="w-full min-w-[8px] rounded-t bg-amber-500/70 transition-all"
+                    className="w-full min-w-[8px] bg-amber-500/70 transition-all"
                     style={{ height: `${(b.count / maxCount) * 100}%` }}
                   />
                   <span className="text-[10px] font-medium text-stone-500">{b.label}</span>
@@ -204,59 +225,75 @@ function AnalyticsPage() {
           )}
         </section>
 
-        <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+        <section className="border border-stone-200 bg-white p-4">
           <h2 className="mb-3 text-sm font-semibold text-stone-900">Department variance</h2>
           {!effectiveCycleId ? (
             <p className="text-sm text-stone-500">Select a cycle.</p>
           ) : variance.length === 0 ? (
             <p className="text-sm text-stone-500">No variance data.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-stone-200 text-left">
-                    <th className="pb-2 font-semibold text-stone-700">Department</th>
-                    <th className="pb-2 font-semibold text-stone-700">Mean</th>
-                    <th className="pb-2 font-semibold text-stone-700">Std dev</th>
-                    <th className="pb-2 font-semibold text-stone-700">Outlier</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
+            <TableContainer>
+              <Table>
+                <TableHeader>
+                  <TableHeaderRow>
+                    <TableHead icon={<Building2 className="size-3" />}>
+                      Department
+                    </TableHead>
+                    <TableHead icon={<BarChart3 className="size-3" />}>
+                      Mean score
+                    </TableHead>
+                    <TableHead icon={<BarChart3 className="size-3" />}>
+                      Std dev
+                    </TableHead>
+                    <TableHead
+                      className="border-r-0"
+                      icon={<AlertTriangle className="size-3" />}
+                    >
+                      Outlier
+                    </TableHead>
+                  </TableHeaderRow>
+                </TableHeader>
+                <TableBody>
                   {variance.map((v) => (
-                    <tr key={v.department_id} className="hover:bg-stone-50/50">
-                      <td className="py-2 text-stone-800">
+                    <TableRow
+                      key={v.department_id}
+                      className={v.is_outlier ? 'bg-red-50 hover:bg-red-100/50' : undefined}
+                    >
+                      <TableCell className="text-stone-800">
                         {departmentById[v.department_id] ?? v.department_id}
-                      </td>
-                      <td className="py-2 font-medium text-stone-800">
+                      </TableCell>
+                      <TableCell className="font-medium text-stone-800">
                         {v.mean_score.toFixed(2)}
-                      </td>
-                      <td className="py-2 text-stone-600">{v.std_dev.toFixed(2)}</td>
-                      <td className="py-2">
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {v.std_dev.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="border-r-0">
                         {v.is_outlier ? (
-                          <span className="rounded bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
+                          <span className="bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
                             Yes
                           </span>
                         ) : (
                           <span className="text-stone-400">—</span>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </TableContainer>
           )}
         </section>
       </div>
 
-      <section className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+      <section className="border border-stone-200 bg-white p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-sm font-semibold text-stone-900">Fact summaries</h2>
           <button
             type="button"
             onClick={exportCsv}
             disabled={factRows.length === 0}
-            className="inline-flex items-center gap-1.5 rounded border border-stone-200 px-2 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 border border-stone-200 px-2 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-50 disabled:opacity-50"
           >
             <Download className="size-3.5" />
             Export CSV
@@ -268,40 +305,71 @@ function AnalyticsPage() {
           <p className="text-sm text-stone-500">No fact rows. Run ETL refresh.</p>
         ) : (
           <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-stone-200 text-left">
-                    <th className="pb-2 font-semibold text-stone-700">User</th>
-                    <th className="pb-2 font-semibold text-stone-700">Department</th>
-                    <th className="pb-2 font-semibold text-stone-700">Year</th>
-                    <th className="pb-2 font-semibold text-stone-700">Quant.</th>
-                    <th className="pb-2 font-semibold text-stone-700">Behavioral</th>
-                    <th className="pb-2 font-semibold text-stone-700">Final</th>
-                    <th className="pb-2 font-semibold text-stone-700">Rating</th>
-                    <th className="pb-2 font-semibold text-stone-700">ETL at</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
+            <TableContainer>
+              <Table>
+                <TableHeader>
+                  <TableHeaderRow>
+                    <TableHead icon={<User className="size-3" />}>
+                      User
+                    </TableHead>
+                    <TableHead icon={<Building2 className="size-3" />}>
+                      Department
+                    </TableHead>
+                    <TableHead icon={<Calendar className="size-3" />}>
+                      Year
+                    </TableHead>
+                    <TableHead icon={<BarChart3 className="size-3" />}>
+                      Quant.
+                    </TableHead>
+                    <TableHead icon={<BarChart3 className="size-3" />}>
+                      Behavioral
+                    </TableHead>
+                    <TableHead icon={<Award className="size-3" />}>
+                      Final
+                    </TableHead>
+                    <TableHead icon={<Award className="size-3" />}>
+                      Rating
+                    </TableHead>
+                    <TableHead
+                      className="border-r-0"
+                      icon={<Clock className="size-3" />}
+                    >
+                      ETL at
+                    </TableHead>
+                  </TableHeaderRow>
+                </TableHeader>
+                <TableBody>
                   {paginatedFacts.map((r) => (
-                    <tr key={r.id} className="hover:bg-stone-50/50">
-                      <td className="py-2 font-mono text-xs text-stone-700">{r.user_id}</td>
-                      <td className="py-2 text-stone-600">
+                    <TableRow key={r.id}>
+                      <TableCell className="text-stone-800">
+                        {userById[r.user_id] ?? r.user_id}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
                         {departmentById[r.department_id] ?? r.department_id}
-                      </td>
-                      <td className="py-2 text-stone-600">{r.cycle_year}</td>
-                      <td className="py-2 text-stone-800">{r.quantitative_score ?? '—'}</td>
-                      <td className="py-2 text-stone-800">{r.behavioral_score ?? '—'}</td>
-                      <td className="py-2 text-stone-800">{r.final_score ?? '—'}</td>
-                      <td className="py-2 text-stone-800">{r.rating_band ?? '—'}</td>
-                      <td className="py-2 text-stone-500 text-xs">
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {r.cycle_year}
+                      </TableCell>
+                      <TableCell className="text-stone-800">
+                        {r.quantitative_score ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-stone-800">
+                        {r.behavioral_score ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-stone-800">
+                        {r.final_score ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-stone-800">
+                        {r.rating_band ?? '—'}
+                      </TableCell>
+                      <TableCell className="border-r-0 text-xs text-stone-500">
                         {format(parseISO(r.etl_at), 'MMM d HH:mm')}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
+                </TableBody>
+              </Table>
+            </TableContainer>
             {totalPages > 1 && (
               <div className="mt-3 flex items-center justify-between border-t border-stone-100 pt-3">
                 <p className="text-xs text-stone-500">
@@ -346,10 +414,10 @@ function ETLStatusBadge({
     last_error?: string | null
   } | undefined
 }) {
-  if (!status) return <span className="text-xs text-stone-400">ETL: —</span>
+  if (!status) return <span className="bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-500">Not run</span>
   if (status.running) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+      <span className="inline-flex items-center gap-1 bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
         <span className="size-1.5 animate-pulse rounded-full bg-amber-500" />
         Running
       </span>
@@ -358,7 +426,7 @@ function ETLStatusBadge({
   if (status.last_error) {
     return (
       <span
-        className="rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-800"
+        className="bg-red-100 px-2.5 py-1 text-xs font-medium text-red-800"
         title={status.last_error}
       >
         Error
@@ -369,7 +437,7 @@ function ETLStatusBadge({
     const upserted = status.last_upserted != null ? ` · ${status.last_upserted} rows` : ''
     return (
       <span
-        className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800"
+        className="bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800"
         title={
           `Finished ${status.last_finished_at}${upserted}` +
           (status.last_started_at ? ` (started ${status.last_started_at})` : '')
@@ -379,5 +447,5 @@ function ETLStatusBadge({
       </span>
     )
   }
-  return <span className="text-xs text-stone-400">ETL: Not run</span>
+  return <span className="bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-500">Not run</span>
 }

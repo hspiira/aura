@@ -1,10 +1,11 @@
 import '#/styles.css'
 import {
   Outlet,
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Scripts,
 } from '@tanstack/react-router'
+import { QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { AppErrorPage, NotFoundPage } from '#/components/error-pages'
 import { wireApiAuth } from '#/lib/api-auth-wire'
@@ -13,7 +14,9 @@ import { wireApiAuth } from '#/lib/api-auth-wire'
 // runs before any render, including SSR. The functions are no-ops when window is undefined.
 wireApiAuth()
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{
+  queryClient?: import('@tanstack/react-query').QueryClient
+}>()({
   head: () => ({
     meta: [
       { charSet: 'utf-8' },
@@ -28,9 +31,19 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
+    <QueryClientProvider client={queryClient}>
+      <RootDocument>
+        <ClientOnly
+          fallback={
+            <div className="flex min-h-screen items-center justify-center bg-stone-50 text-stone-500">
+              Loading…
+            </div>
+          }
+        >
+          <Outlet />
+        </ClientOnly>
+      </RootDocument>
+    </QueryClientProvider>
   )
 }
 
@@ -41,10 +54,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap"
-          rel="stylesheet"
-        />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
           rel="stylesheet"

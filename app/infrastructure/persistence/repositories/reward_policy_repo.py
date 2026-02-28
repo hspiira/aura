@@ -58,3 +58,35 @@ class RewardPolicyRepository:
     async def add(self, policy: RewardPolicy) -> RewardPolicy:
         """Persist a reward policy."""
         return await persist_and_refresh(self._session, policy)
+
+    async def update(
+        self,
+        id: str,
+        *,
+        min_score: Decimal | None = None,
+        max_score: Decimal | None = None,
+        reward_type: str | None = None,
+        reward_value: str | None = None,
+    ) -> RewardPolicy | None:
+        """Update a reward policy by id. Returns updated policy or None if not found."""
+        policy = await self.get_by_id(id)
+        if policy is None:
+            return None
+        if min_score is not None:
+            policy.min_score = min_score
+        if max_score is not None:
+            policy.max_score = max_score
+        if reward_type is not None:
+            policy.reward_type = reward_type
+        if reward_value is not None:
+            policy.reward_value = reward_value
+        return await persist_and_refresh(self._session, policy)
+
+    async def delete(self, id: str) -> bool:
+        """Delete a reward policy by id. Returns True if deleted, False if not found."""
+        policy = await self.get_by_id(id)
+        if policy is None:
+            return False
+        await self._session.delete(policy)
+        await self._session.flush()
+        return True

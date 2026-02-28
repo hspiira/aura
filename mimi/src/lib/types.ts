@@ -71,11 +71,28 @@ export interface UserCreate {
   email?: string | null
 }
 
+export interface UserUpdate {
+  role_id?: string
+  department_id?: string
+  supervisor_id?: string | null
+  name?: string
+  email?: string | null
+}
+
 /** Current user + permission codes (GET /users/me). */
 export interface MeResponse {
   user: UserResponse
   permissions: string[]
 }
+
+// ─── Auth (login / signup responses) ─────────────────────────────────────────
+
+export interface LoginResponse {
+  token: string
+  user: UserResponse
+  permissions: string[]
+}
+
 
 // ─── Organizations ──────────────────────────────────────────────────────────
 
@@ -120,6 +137,13 @@ export interface RoleCreate {
   is_managerial?: boolean
 }
 
+export interface RoleUpdate {
+  department_id?: string
+  name?: string
+  level?: string | null
+  is_managerial?: boolean
+}
+
 // ─── Performance cycles ──────────────────────────────────────────────────────
 
 export interface PerformanceCycleResponse {
@@ -139,6 +163,16 @@ export interface PerformanceCycleCreate {
   end_date: string
   status?: string
   review_frequency?: string | null
+  objectives_lock_date?: string | null // date YYYY-MM-DD
+}
+
+export interface PerformanceCycleUpdate {
+  name?: string
+  start_date?: string
+  end_date?: string
+  status?: string
+  review_frequency?: string | null
+  objectives_lock_date?: string | null
 }
 
 // ─── Performance dimensions ───────────────────────────────────────────────────
@@ -156,6 +190,12 @@ export interface PerformanceDimensionCreate {
   default_weight_pct?: string
 }
 
+export interface PerformanceDimensionUpdate {
+  name?: string
+  is_quantitative?: boolean
+  default_weight_pct?: string
+}
+
 // ─── Role dimension weights ──────────────────────────────────────────────────
 
 export interface RoleDimensionWeightResponse {
@@ -168,6 +208,10 @@ export interface RoleDimensionWeightResponse {
 export interface RoleDimensionWeightCreate {
   role_id: string
   dimension_id: string
+  weight_pct: string
+}
+
+export interface RoleDimensionWeightUpdate {
   weight_pct: string
 }
 
@@ -321,7 +365,7 @@ export interface AuditLogResponse {
   old_value: Record<string, unknown> | null
   new_value: Record<string, unknown> | null
   changed_by: string | null
-  created_at: string
+  changed_at: string
 }
 
 // ─── Baseline snapshots ───────────────────────────────────────────────────────
@@ -437,6 +481,10 @@ export interface ReviewSessionCreate {
   scheduled_at?: string | null
 }
 
+export interface ReviewSessionUpdate {
+  status: ReviewSessionStatus
+}
+
 // ─── Calibration sessions ─────────────────────────────────────────────────────
 
 export interface CalibrationSessionResponse {
@@ -471,6 +519,13 @@ export interface RewardPolicyCreate {
   max_score: string
   reward_type: string
   reward_value: string
+}
+
+export interface RewardPolicyUpdate {
+  min_score?: string
+  max_score?: string
+  reward_type?: string
+  reward_value?: string
 }
 
 // ─── Permissions ──────────────────────────────────────────────────────────────
@@ -518,12 +573,20 @@ export interface NotificationRuleCreate {
   template_body?: string | null
 }
 
+export interface NotificationRuleUpdate {
+  event_type?: string
+  recipient_role_id?: string
+  channel?: string
+  template_body?: string | null
+}
+
 // ─── Notification logs ─────────────────────────────────────────────────────────
 
 export interface NotificationLogResponse {
   id: string
   event_type: string
   recipient_id: string | null
+  recipient_name?: string | null
   channel: string
   sent_at: string
   status: string

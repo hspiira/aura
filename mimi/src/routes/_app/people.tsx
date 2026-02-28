@@ -1,134 +1,219 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { Avatar, AvatarFallback, AvatarImage } from '#/components/ui/avatar'
+import { useMemo, useState } from 'react'
+import {
+  ArrowRight,
+  Building2,
+  Mail,
+  Shield,
+  User,
+  UserCheck,
+} from 'lucide-react'
 import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableHeader,
+  TableHeaderRow,
   TableRow,
 } from '#/components/ui/table'
+import { TablePagination } from '#/components/ui/table-pagination'
 import {
-  usersQueryOptions,
-  rolesQueryOptions,
   departmentsQueryOptions,
+  rolesQueryOptions,
+  usersQueryOptions,
 } from '#/lib/queries'
-import { cn } from '#/lib/utils'
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/)
+  if (parts.length >= 2)
+    return (parts[0][0] + parts[1][0]).toUpperCase().slice(0, 2)
+  return name.slice(0, 2).toUpperCase() || '?'
+}
 
 export const Route = createFileRoute('/_app/people')({
   component: PeoplePage,
 })
 
-function initials(name: string): string {
-  return name
-    .split(/\s+/)
-    .map((s) => s[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
-}
-
 function PeoplePage() {
-  const { data: usersData } = useQuery(usersQueryOptions({ limit: 200 }))
-  const { data: roles = [] } = useQuery(rolesQueryOptions())
-  const { data: departments = [] } = useQuery(departmentsQueryOptions())
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
+  const isListPage = pathname === '/people'
 
-  const users = usersData?.items ?? []
-  const roleById = Object.fromEntries(roles.map((r) => [r.id, r.name]))
-  const departmentById = Object.fromEntries(departments.map((d) => [d.id, d.name]))
-  const userById = Object.fromEntries(users.map((u) => [u.id, u.name]))
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [search, setSearch] = useState('')
+
+  const { data: usersData } = useQuery(
+    usersQueryOptions({ limit: 2000, offset: 0 }),
+  )
+  const { data: rolesData } = useQuery(rolesQueryOptions())
+  const { data: departmentsData } = useQuery(departmentsQueryOptions())
+
+  const allUsers = usersData?.items ?? []
+  const roles = rolesData ?? []
+  const departments = departmentsData ?? []
+
+  const roleById = useMemo(
+    () => new Map(roles.map((r) => [r.id, r.name])),
+    [roles],
+  )
+  const departmentById = useMemo(
+    () => new Map(departments.map((d) => [d.id, d.name])),
+    [departments],
+  )
+  const userNameById = useMemo(
+    () => new Map(allUsers.map((u) => [u.id, u.name])),
+    [allUsers],
+  )
+
+  const filteredUsers = useMemo(() => {
+    if (!search.trim()) return allUsers
+    const q = search.trim().toLowerCase()
+    return allUsers.filter(
+      (u) =>
+        u.name.toLowerCase().includes(q) ||
+        (u.email ?? '').toLowerCase().includes(q),
+    )
+  }, [allUsers, search])
+
+  const totalFiltered = filteredUsers.length
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize))
+  const start = (page - 1) * pageSize
+  const end = Math.min(start + pageSize, totalFiltered)
+  const pageUsers = useMemo(
+    () => filteredUsers.slice(start, end),
+    [filteredUsers, start, end],
+  )
+
+  const goToPage = (p: number) => {
+    setPage(Math.max(1, Math.min(p, totalPages)))
+  }
+
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size)
+    setPage(1)
+  }
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-lg font-semibold text-stone-900">People</h1>
-        <p className="mt-0.5 text-sm text-stone-500">
-          Users, roles, and departments.
-        </p>
-      </div>
+    <div className="space-y-6">
+      {isListPage && (
+        <>
+          <div>
+            <h1 className="text-lg font-semibold text-stone-900">People</h1>
+            <p className="mt-0.5 text-sm text-stone-500">
+              Users, roles, and departments.
+            </p>
+          </div>
 
-      <div
-        className={cn(
-          'overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm',
-        )}
-      >
-        <Table>
-          <TableHeader>
-            <TableRow className="border-stone-200 bg-stone-50 hover:bg-stone-50">
-              <TableHead className="text-xs font-semibold text-stone-500">
-                User
-              </TableHead>
-              <TableHead className="text-xs font-semibold text-stone-500">
-                Role
-              </TableHead>
-              <TableHead className="text-xs font-semibold text-stone-500">
-                Department
-              </TableHead>
-              <TableHead className="text-xs font-semibold text-stone-500">
-                Supervisor
-              </TableHead>
-              <TableHead className="w-10" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((user) => (
-              <TableRow
-                key={user.id}
-                className="border-stone-100 transition-colors hover:bg-stone-50/50"
-              >
-                <TableCell>
-                  <Link
-                    to="/people/$id"
-                    params={{ id: user.id }}
-                    className="flex items-center gap-2.5 hover:opacity-90"
+          <div className="flex flex-wrap gap-3 border border-stone-200 bg-white p-3">
+            <input
+              type="search"
+              placeholder="Search by name or email…"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              className="min-w-[200px] border border-stone-200 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            />
+          </div>
+
+          <TableContainer>
+            <Table className="min-w-[520px]">
+              <TableHeader>
+                <TableHeaderRow>
+                  <TableHead icon={<User className="size-3" />}>User</TableHead>
+                  <TableHead icon={<Mail className="size-3" />}>Email</TableHead>
+                  <TableHead icon={<Shield className="size-3" />}>Role</TableHead>
+                  <TableHead icon={<Building2 className="size-3" />}>
+                    Department
+                  </TableHead>
+                  <TableHead icon={<UserCheck className="size-3" />}>
+                    Supervisor
+                  </TableHead>
+                  <TableHead
+                    className="w-20 border-r-0 text-right"
+                    icon={<ArrowRight className="size-3" />}
                   >
-                    <Avatar size="sm" className="shrink-0">
-                      <AvatarImage src={undefined} alt={user.name} />
-                      <AvatarFallback className="bg-stone-200 text-stone-700 text-xs">
-                        {initials(user.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium text-stone-900">
-                      {user.name}
-                    </span>
-                  </Link>
-                </TableCell>
-                <TableCell className="text-sm text-stone-600">
-                  {roleById[user.role_id] ?? user.role_id}
-                </TableCell>
-                <TableCell className="text-sm text-stone-600">
-                  {departmentById[user.department_id] ?? user.department_id}
-                </TableCell>
-                <TableCell className="text-sm text-stone-600">
-                  {user.supervisor_id
-                    ? userById[user.supervisor_id] ?? user.supervisor_id
-                    : '—'}
-                </TableCell>
-                <TableCell>
-                  <Link
-                    to="/people/$id"
-                    params={{ id: user.id }}
-                    className="text-amber-600 hover:text-amber-700 text-sm"
-                  >
-                    View →
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
-            {users.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={5}
-                  className="py-10 text-center text-sm text-stone-400"
-                >
-                  No users found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                    Actions
+                  </TableHead>
+                </TableHeaderRow>
+              </TableHeader>
+              <TableBody>
+                {pageUsers.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="border-r-0 py-8 text-center text-sm text-stone-500"
+                    >
+                      No users found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  pageUsers.map((u) => (
+                    <TableRow key={u.id}>
+                      <TableCell>
+                        <Link
+                          to="/people/$id"
+                          params={{ id: u.id }}
+                          className="flex items-center gap-2 hover:opacity-90"
+                        >
+                          <span
+                            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-stone-200 text-xs font-medium text-stone-700"
+                            aria-hidden
+                          >
+                            {getInitials(u.name)}
+                          </span>
+                          <span className="font-medium text-stone-900">
+                            {u.name}
+                          </span>
+                        </Link>
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {u.email ?? '—'}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {roleById.get(u.role_id) ?? u.role_id}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {departmentById.get(u.department_id) ?? u.department_id}
+                      </TableCell>
+                      <TableCell className="text-stone-600">
+                        {u.supervisor_id
+                          ? userNameById.get(u.supervisor_id) ?? u.supervisor_id
+                          : '—'}
+                      </TableCell>
+                      <TableCell className="border-r-0 text-right">
+                        <Link
+                          to="/people/$id"
+                          params={{ id: u.id }}
+                          className="inline-flex items-center gap-1 text-sm font-medium text-amber-600 hover:text-amber-700"
+                        >
+                          View
+                          <ArrowRight className="size-4" />
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+            <TablePagination
+              page={page}
+              pageSize={pageSize}
+              total={totalFiltered}
+              onPageChange={goToPage}
+              onPageSizeChange={handlePageSizeChange}
+              pageSizeOptions={PAGE_SIZE_OPTIONS}
+            />
+          </TableContainer>
+        </>
+      )}
+      <Outlet />
     </div>
   )
 }

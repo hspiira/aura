@@ -6,6 +6,8 @@ import { useState, useRef, useEffect } from 'react'
 import { meQueryOptions } from '#/lib/queries'
 import { performanceCyclesQueryOptions } from '#/lib/queries'
 import { cn } from '#/lib/utils'
+import { apiPost } from '#/lib/api'
+import { clearAuth } from '#/stores/auth'
 import { setSelectedCycleId } from '#/stores/selected-cycle'
 import { useStore } from '@tanstack/react-store'
 import { selectedCycleStore } from '#/stores/selected-cycle'
@@ -49,7 +51,7 @@ export function AppTopBar() {
             type="button"
             onClick={() => setDropdownOpen((o) => !o)}
             className={cn(
-              'flex items-center gap-1.5 rounded-sm border border-stone-200 bg-stone-50/80 px-2.5 py-1.5 text-left text-sm text-stone-700 hover:bg-stone-100',
+              'flex items-center gap-1.5 border border-stone-200/70 bg-stone-50/80 px-2.5 py-1.5 text-left text-sm text-stone-700 hover:bg-stone-100',
               dropdownOpen && 'border-amber-400/60 bg-amber-50/50',
             )}
             aria-expanded={dropdownOpen}
@@ -64,7 +66,7 @@ export function AppTopBar() {
           {dropdownOpen && (
             <ul
               role="listbox"
-              className="absolute right-0 top-full z-50 mt-1 max-h-60 w-56 overflow-auto rounded-sm border border-stone-200 bg-white py-1 shadow-lg"
+              className="absolute right-0 top-full z-50 mt-1 max-h-60 w-56 overflow-auto border border-stone-200/70 bg-white py-1"
             >
               {cycles?.length ? (
                 cycles.map((cycle) => (
@@ -94,9 +96,27 @@ export function AppTopBar() {
         </div>
 
         {/* Current user */}
-        <span className="text-sm font-medium text-stone-700 truncate max-w-[8rem]" title={displayName}>
+        <span
+          className="max-w-[8rem] truncate text-sm font-medium text-stone-700"
+          title={displayName}
+        >
           {displayName}
         </span>
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              await apiPost('auth/logout')
+            } catch {
+              // ignore failures; client-side clear is enough
+            }
+            clearAuth()
+            window.location.href = '/login'
+          }}
+          className="border border-stone-200/70 bg-stone-50 px-2.5 py-1.5 text-xs font-medium text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+        >
+          Sign out
+        </button>
       </div>
     </header>
   )

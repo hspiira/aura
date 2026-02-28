@@ -6,6 +6,7 @@
 import type { LinkProps } from '@tanstack/react-router'
 import {
   BarChart3,
+  Box,
   Calendar,
   ClipboardList,
   LayoutDashboard,
@@ -42,6 +43,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Calibration', to: '/calibration', icon: PanelLeftOpen, permission: RUN_CALIBRATION },
   { label: 'Analytics', to: '/analytics', icon: BarChart3 },
   { label: 'Admin', to: '/admin', icon: Shield, permission: MANAGE_RBAC },
+  { label: 'My Components', to: '/my-components', icon: Box },
 ]
 
 export function filterNavByPermission(

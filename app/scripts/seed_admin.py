@@ -66,6 +66,65 @@ async def _find_admin_user(session: AsyncSession) -> User | None:
     return result.scalar_one_or_none()
 
 
+async def ensure_admin_user() -> None:
+    """Idempotent: ensure an Admin user with all permissions exists (e.g. on DB init).
+
+    Creates org/dept/role/user with email admin@example.com and password adminpass
+    if missing. If the user exists but has no password, sets password to adminpass.
+    """
+    if db_module.AsyncSessionLocal is None:
+        return
+    async with db_module.AsyncSessionLocal() as session:
+        async with session.begin():
+            perm_repo = PermissionRepository(session)
+            permission_by_code = await _ensure_permissions(perm_repo)
+            existing_admin = await _find_admin_user(session)
+
+            if existing_admin is not None:
+                if existing_admin.password_hash is None:
+                    existing_admin.password_hash = hash_password(ADMIN_PASSWORD)
+                return
+
+            org = Organization(name="Aura")
+            session.add(org)
+            await session.flush()
+            await session.refresh(org)
+
+            dept = Department(
+                organization_id=org.id,
+                parent_id=None,
+                name="Admin",
+            )
+            session.add(dept)
+            await session.flush()
+            await session.refresh(dept)
+
+            role = Role(
+                department_id=dept.id,
+                name="Admin",
+                level=None,
+                is_managerial=True,
+            )
+            session.add(role)
+            await session.flush()
+            await session.refresh(role)
+
+            for perm in permission_by_code.values():
+                rp = RolePermission(role_id=role.id, permission_id=perm.id)
+                session.add(rp)
+            await session.flush()
+
+            user = User(
+                role_id=role.id,
+                department_id=dept.id,
+                supervisor_id=None,
+                name="Admin",
+                email=ADMIN_EMAIL,
+                password_hash=hash_password(ADMIN_PASSWORD),
+            )
+            session.add(user)
+
+
 async def seed_admin() -> None:
     """Create org, dept, Admin role (all perms), Admin user with password."""
     db_module._ensure_engine()

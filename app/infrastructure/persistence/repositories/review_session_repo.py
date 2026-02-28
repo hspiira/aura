@@ -3,8 +3,10 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.domain.review_session import ReviewSessionStatus
 from app.infrastructure.persistence.models.review_session import ReviewSession
 from app.infrastructure.persistence.persist import persist_and_refresh
+from app.shared.utils.datetime import utc_now
 
 
 class ReviewSessionRepository:
@@ -72,3 +74,14 @@ class ReviewSessionRepository:
     async def add(self, session: ReviewSession) -> ReviewSession:
         """Persist a review session."""
         return await persist_and_refresh(self._session, session)
+
+    async def update_status(
+        self, session: ReviewSession, new_status: ReviewSessionStatus
+    ) -> ReviewSession:
+        """Update session status; set completed_at when transitioning to completed."""
+        session.status = new_status
+        if new_status == ReviewSessionStatus.COMPLETED and session.completed_at is None:
+            session.completed_at = utc_now()
+        await self._session.flush()
+        await self._session.refresh(session)
+        return session

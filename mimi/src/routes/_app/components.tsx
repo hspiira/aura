@@ -1,8 +1,15 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
+import { AiTravelAssistantResultDemo } from '#/components/ai-travel-assistant-result'
 import { CrmContactCardDemo } from '#/components/crm-contact-card'
 import { CrmUserTableDemo } from '#/components/crm-user-table'
+import { MainUserTable } from '#/components/main-user-table'
+import { DashboardWidgetsDemo } from '#/components/dashboard-widgets'
 import { AppErrorPage, NotFoundPage } from '#/components/error-pages'
+import { LedgerixUsabilityCardsDemo } from '#/components/ledgerix-usability-cards'
+import { LedgerixUserInsightsCardsDemo } from '#/components/ledgerix-user-insights-cards'
+import { MediquoWorkflowTimelineDemo } from '#/components/mediquo-workflow-timeline'
+import { UiCardsReference46Demo } from '#/components/ui-cards-reference-46'
 import { SprintCallRecording } from '#/components/sprint-call-recording'
 
 export const Route = createFileRoute('/_app/components')({
@@ -10,6 +17,12 @@ export const Route = createFileRoute('/_app/components')({
 })
 
 const REFERENCE_SECTIONS = [
+  {
+    id: 'main-table',
+    title: 'Main table – User directory',
+    description:
+      'Data table with User (checkbox, avatar, name), User ID, User type and Engagement score pills. Header icons, row selection.',
+  },
   {
     id: 'sprint-call-recording',
     title: 'Sprint Call Recording (Light Mode)',
@@ -49,6 +62,12 @@ const REFERENCE_SECTIONS = [
     id: 'dashboard-widgets',
     title: 'UI UX Design – Dashboard Widgets',
     description: 'Dashboard widget set from reference.',
+  },
+  {
+    id: 'ui-cards-ref-46',
+    title: 'UI Cards – Base components, profile, forms (Ref 46)',
+    description:
+      'Feature cards (Base/Sectoral/Figma), user profile nav, social bar, invite modal, reset password, tags, settings. No shadows, sharp corners.',
   },
   {
     id: 'ledgerix-crm',
@@ -152,10 +171,16 @@ function ComponentsPage() {
               </p>
             </div>
 
-            {section.id === 'sprint-call-recording' ? (
+            {section.id === 'main-table' ? (
+              <MainUserTable />
+            ) : section.id === 'sprint-call-recording' ? (
               <SprintCallRecording />
+            ) : section.id === 'ai-travel-assistant' ? (
+              <AiTravelAssistantResultDemo />
             ) : section.id === 'ledgerix-crm' ? (
               <div className="space-y-8">
+                <LedgerixUsabilityCardsDemo />
+                <LedgerixUserInsightsCardsDemo />
                 <CrmContactCardDemo />
                 <CrmUserTableDemo />
               </div>
@@ -177,6 +202,12 @@ function ComponentsPage() {
                   <AppErrorPage error={new Error('TypeError: Cannot read properties of undefined (reading "id")')} />
                 </div>
               </div>
+            ) : section.id === 'dashboard-widgets' ? (
+              <DashboardWidgetsDemo />
+            ) : section.id === 'ui-cards-ref-46' ? (
+              <UiCardsReference46Demo />
+            ) : section.id === 'mediquo' ? (
+              <MediquoWorkflowTimelineDemo />
             ) : (
               <div className="min-h-[120px] rounded-lg border border-dashed border-stone-200 bg-stone-50/50 p-6 text-center text-sm text-stone-500">
                 Components from this reference will go here.

@@ -42,6 +42,7 @@
     "@tanstack/ai-react": "latest",
     "@tanstack/match-sorter-utils": "^8.19.4",
     "@tanstack/react-devtools": "^0.7.0",
+    "@tanstack/query-core": "5.90.20",
     "@tanstack/react-query": "^5.66.5",
     "@tanstack/react-query-devtools": "^5.84.2",
     "@tanstack/react-router": "^1.132.0",
@@ -105,5 +106,11 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.5",
     "zod": "^4.3.5"
+  },
+  "pnpm": {
+    "overrides": {
+      "@tanstack/query-core": "5.90.20",
+      "@tanstack/react-query": "5.90.20"
+    }
   }
 }

@@ -42,6 +42,7 @@ api_router.include_router(
     prefix="/analytics",
     tags=["analytics"],
 )
+api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 api_router.include_router(
     calibration_analytics.router,
     prefix="/analytics/calibration",
