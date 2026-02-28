@@ -12,13 +12,24 @@ from app.infrastructure.persistence.database import Base
 from app.infrastructure.persistence.models.mixins import CuidMixin, TimestampMixin
 
 if TYPE_CHECKING:
+    from app.infrastructure.persistence.models.objective_group import ObjectiveGroup
     from app.infrastructure.persistence.models.role_dimension_weight import (
         RoleDimensionWeight,
     )
 
 
 class PerformanceDimension(CuidMixin, TimestampMixin, Base):
-    """Performance dimension with default weight."""
+    """Performance dimension (Pillar) with default weight.
+
+    User-facing name: "Pillar"
+    Examples: "Financial", "Client Service", "Operational Excellence",
+              "Talent Development", "Innovation"
+
+    The 3-tier hierarchy is:
+      PerformanceDimension (Pillar)
+        └── ObjectiveGroup (Objective Area)
+              └── Objective (KPI / Individual Target)
+    """
 
     __tablename__ = "performance_dimensions"
 
@@ -30,8 +41,13 @@ class PerformanceDimension(CuidMixin, TimestampMixin, Base):
         nullable=False,
     )
 
-    role_weights: Mapped[list[RoleDimensionWeight]] = relationship(
+    role_weights: Mapped[list["RoleDimensionWeight"]] = relationship(
         "RoleDimensionWeight",
         back_populates="dimension",
         foreign_keys="RoleDimensionWeight.dimension_id",
+    )
+    groups: Mapped[list["ObjectiveGroup"]] = relationship(
+        "ObjectiveGroup",
+        back_populates="dimension",
+        foreign_keys="ObjectiveGroup.dimension_id",
     )
