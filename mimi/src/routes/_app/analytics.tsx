@@ -4,13 +4,14 @@ import { useState, useMemo } from 'react'
 import { format, parseISO } from 'date-fns'
 import { Download, RefreshCw } from 'lucide-react'
 import {
-  performanceCyclesQueryOptions,
-  departmentsQueryOptions,
-  calibrationDistributionQueryOptions,
-  calibrationVarianceQueryOptions,
   analyticsFactSummariesQueryOptions,
   analyticsRefreshStatusQueryOptions,
+  calibrationDistributionQueryOptions,
+  calibrationVarianceQueryOptions,
+  departmentsQueryOptions,
   mutations,
+  performanceCyclesQueryOptions,
+  usersQueryOptions,
 } from '#/lib/queries'
 
 export const Route = createFileRoute('/_app/analytics')({
@@ -27,6 +28,8 @@ function AnalyticsPage() {
 
   const { data: cycles = [] } = useQuery(performanceCyclesQueryOptions())
   const { data: departments = [] } = useQuery(departmentsQueryOptions())
+  const { data: usersData } = useQuery(usersQueryOptions({ limit: 500 }))
+  const users = usersData?.items ?? []
 
   const effectiveCycleId = (cycleId || cycles[0]?.id) ?? ''
   const cycleYear = effectiveCycleId
@@ -60,6 +63,10 @@ function AnalyticsPage() {
     () => Object.fromEntries(departments.map((d) => [d.id, d.name])),
     [departments],
   )
+  const userById = useMemo(
+    () => Object.fromEntries(users.map((u) => [u.id, u.name])),
+    [users],
+  )
 
   const refreshMutation = useMutation({
     mutationFn: () => mutations.analytics.refresh(),
@@ -79,29 +86,27 @@ function AnalyticsPage() {
   function exportCsv() {
     if (factRows.length === 0) return
     const headers = [
-      'user_id',
-      'department_id',
-      'role_id',
-      'performance_cycle_id',
-      'cycle_year',
-      'quantitative_score',
-      'behavioral_score',
-      'final_score',
-      'rating_band',
-      'etl_at',
+      'User',
+      'Department',
+      'Year',
+      'Quant.',
+      'Behavioral',
+      'Final',
+      'Rating',
+      'ETL at',
     ]
+    const escape = (s: string) =>
+      /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
     const rows = factRows.map((r) =>
       [
-        r.user_id,
-        r.department_id,
-        r.role_id,
-        r.performance_cycle_id,
+        escape(userById[r.user_id] ?? r.user_id),
+        escape(departmentById[r.department_id] ?? r.department_id),
         r.cycle_year,
         r.quantitative_score ?? '',
         r.behavioral_score ?? '',
         r.final_score ?? '',
         r.rating_band ?? '',
-        r.etl_at,
+        format(parseISO(r.etl_at), 'yyyy-MM-dd HH:mm'),
       ].join(','),
     )
     const csv = [headers.join(','), ...rows].join('\n')
@@ -119,9 +124,6 @@ function AnalyticsPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-lg font-semibold text-stone-900">Analytics</h1>
-          <p className="mt-0.5 text-sm text-stone-500">
-            Fact summaries, score distribution, and variance.
-          </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <ETLStatusBadge status={refreshStatus} />
@@ -143,7 +145,7 @@ function AnalyticsPage() {
         <label className="flex items-center gap-2 text-sm">
           <span className="text-stone-500">Cycle</span>
           <select
-            value={cycleId}
+            value={(cycleId || cycles[0]?.id) ?? ''}
             onChange={(e) => {
               setCycleId(e.target.value)
               setFactPage(0)
@@ -216,14 +218,17 @@ function AnalyticsPage() {
                 <thead>
                   <tr className="border-b border-stone-200 text-left">
                     <th className="pb-2 font-semibold text-stone-700">Department</th>
-                    <th className="pb-2 font-semibold text-stone-700">Mean</th>
+                    <th className="pb-2 font-semibold text-stone-700">Mean score</th>
                     <th className="pb-2 font-semibold text-stone-700">Std dev</th>
                     <th className="pb-2 font-semibold text-stone-700">Outlier</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
                   {variance.map((v) => (
-                    <tr key={v.department_id} className="hover:bg-stone-50/50">
+                    <tr
+                      key={v.department_id}
+                      className={v.is_outlier ? 'bg-red-50 hover:bg-red-100/50' : 'hover:bg-stone-50/50'}
+                    >
                       <td className="py-2 text-stone-800">
                         {departmentById[v.department_id] ?? v.department_id}
                       </td>
@@ -285,7 +290,9 @@ function AnalyticsPage() {
                 <tbody className="divide-y divide-stone-100">
                   {paginatedFacts.map((r) => (
                     <tr key={r.id} className="hover:bg-stone-50/50">
-                      <td className="py-2 font-mono text-xs text-stone-700">{r.user_id}</td>
+                      <td className="py-2 text-stone-800">
+                        {userById[r.user_id] ?? r.user_id}
+                      </td>
                       <td className="py-2 text-stone-600">
                         {departmentById[r.department_id] ?? r.department_id}
                       </td>
@@ -346,7 +353,7 @@ function ETLStatusBadge({
     last_error?: string | null
   } | undefined
 }) {
-  if (!status) return <span className="text-xs text-stone-400">ETL: —</span>
+  if (!status) return <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-500">Not run</span>
   if (status.running) {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
@@ -379,5 +386,5 @@ function ETLStatusBadge({
       </span>
     )
   }
-  return <span className="text-xs text-stone-400">ETL: Not run</span>
+  return <span className="rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-500">Not run</span>
 }

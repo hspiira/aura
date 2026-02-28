@@ -13,6 +13,18 @@ class PerformanceCycleCreate(BaseModel):
     end_date: date
     status: str = "draft"
     review_frequency: str | None = None
+    objectives_lock_date: date | None = None
+
+
+class PerformanceCycleUpdate(BaseModel):
+    """Payload to update a performance cycle (partial)."""
+
+    name: str | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    status: str | None = None
+    review_frequency: str | None = None
+    objectives_lock_date: date | None = None
 
 
 class PerformanceCycleResponse(BaseModel):

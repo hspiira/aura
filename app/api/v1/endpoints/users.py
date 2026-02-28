@@ -16,7 +16,7 @@ from app.domain.permissions import MANAGE_USERS, VIEW_USERS
 from app.infrastructure.persistence.models.user import User
 from app.infrastructure.persistence.repositories.user_repo import UserRepository
 from app.schemas.pagination import PageResponse
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse, UserUpdate
 
 router = APIRouter()
 
@@ -86,6 +86,26 @@ async def get_user(
 ) -> UserResponse:
     """Get one user by id."""
     user = await repo.get_by_id(id)
+    if user is None:
+        raise ResourceNotFoundException("User", id)
+    return UserResponse.model_validate(user)
+
+
+@router.patch("/{id}", response_model=UserResponse)
+async def update_user(
+    id: str,
+    payload: UserUpdate,
+    repo: Annotated[UserRepository, Depends(get_user_repo)],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_USERS))],
+) -> UserResponse:
+    """Update a user (partial)."""
+    updates = payload.model_dump(exclude_unset=True)
+    if not updates:
+        user = await repo.get_by_id(id)
+        if user is None:
+            raise ResourceNotFoundException("User", id)
+        return UserResponse.model_validate(user)
+    user = await repo.update(id, **updates)
     if user is None:
         raise ResourceNotFoundException("User", id)
     return UserResponse.model_validate(user)

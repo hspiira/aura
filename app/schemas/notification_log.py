@@ -11,6 +11,7 @@ class NotificationLogResponse(BaseModel):
     id: str
     event_type: str
     recipient_id: str | None
+    recipient_name: str | None = None
     channel: str
     sent_at: datetime
     status: str

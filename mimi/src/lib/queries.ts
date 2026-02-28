@@ -24,6 +24,7 @@ import type {
   NotificationLogResponse,
   NotificationRuleCreate,
   NotificationRuleResponse,
+  NotificationRuleUpdate,
   ObjectiveAmend,
   ObjectiveCreate,
   ObjectiveEvidenceCreate,
@@ -41,24 +42,32 @@ import type {
   PageResponse,
   PerformanceCycleCreate,
   PerformanceCycleResponse,
+  PerformanceCycleUpdate,
   PerformanceDimensionCreate,
   PerformanceDimensionResponse,
+  PerformanceDimensionUpdate,
   PerformanceSummaryResponse,
   PerformanceSummaryUpdate,
   PermissionCreate,
   PermissionResponse,
   ReviewSessionCreate,
   ReviewSessionResponse,
+  ReviewSessionStatus,
+  ReviewSessionUpdate,
   RewardPolicyCreate,
   RewardPolicyResponse,
+  RewardPolicyUpdate,
   RoleCreate,
   RoleDimensionWeightCreate,
   RoleDimensionWeightResponse,
+  RoleDimensionWeightUpdate,
   RolePermissionCreate,
   RolePermissionResponse,
   RoleResponse,
+  RoleUpdate,
   UserCreate,
   UserResponse,
+  UserUpdate,
   UserTokenCreateRequest,
   UserTokenCreateResponse,
   UserTokenResponse,
@@ -108,7 +117,8 @@ export const queryKeys = {
     detail: (id: string) => ['performance-dimensions', id] as const,
   },
   roleDimensionWeights: {
-    all: ['role-dimension-weights'] as const,
+    all: (params?: { role_id?: string }) =>
+      ['role-dimension-weights', params] as const,
     detail: (id: string) => ['role-dimension-weights', id] as const,
   },
   objectiveTemplates: {
@@ -388,10 +398,16 @@ export function performanceDimensionDetailQueryOptions(id: string) {
 
 // ─── Role dimension weights ───────────────────────────────────────────────────
 
-export function roleDimensionWeightsQueryOptions() {
+export function roleDimensionWeightsQueryOptions(params?: { role_id?: string }) {
+  const search = new URLSearchParams()
+  if (params?.role_id) search.set('role_id', params.role_id)
+  const qs = search.toString()
   return queryOptions({
-    queryKey: queryKeys.roleDimensionWeights.all,
-    queryFn: () => apiGet<RoleDimensionWeightResponse[]>('role-dimension-weights'),
+    queryKey: queryKeys.roleDimensionWeights.all(params),
+    queryFn: () =>
+      apiGet<RoleDimensionWeightResponse[]>(
+        `role-dimension-weights${qs ? `?${qs}` : ''}`,
+      ),
   })
 }
 
@@ -804,26 +820,53 @@ export const mutations = {
   },
   roles: {
     create: (body: RoleCreate) => apiPost<RoleResponse, RoleCreate>('roles', body),
+    update: (id: string, body: RoleUpdate) =>
+      apiPatch<RoleResponse, RoleUpdate>(`roles/${id}`, body),
     createOptions: () => ({ mutationKey: queryKeys.roles.all } as const),
   },
   users: {
     create: (body: UserCreate) => apiPost<UserResponse, UserCreate>('users', body),
+    update: (id: string, body: UserUpdate) =>
+      apiPatch<UserResponse, UserUpdate>(`users/${id}`, body),
     createOptions: () => ({ mutationKey: queryKeys.users.all() } as const),
   },
   performanceCycles: {
     create: (body: PerformanceCycleCreate) =>
       apiPost<PerformanceCycleResponse, PerformanceCycleCreate>('performance-cycles', body),
+    update: (id: string, body: PerformanceCycleUpdate) =>
+      apiPatch<PerformanceCycleResponse, PerformanceCycleUpdate>(
+        `performance-cycles/${id}`,
+        body,
+      ),
+    lockObjectives: (id: string) =>
+      apiPost<PerformanceCycleResponse>(`performance-cycles/${id}/lock-objectives`),
     createOptions: () => ({ mutationKey: queryKeys.performanceCycles.all } as const),
   },
   performanceDimensions: {
     create: (body: PerformanceDimensionCreate) =>
       apiPost<PerformanceDimensionResponse, PerformanceDimensionCreate>('performance-dimensions', body),
+    update: (id: string, body: PerformanceDimensionUpdate) =>
+      apiPatch<PerformanceDimensionResponse, PerformanceDimensionUpdate>(
+        `performance-dimensions/${id}`,
+        body,
+      ),
     createOptions: () => ({ mutationKey: queryKeys.performanceDimensions.all } as const),
   },
   roleDimensionWeights: {
     create: (body: RoleDimensionWeightCreate) =>
-      apiPost<RoleDimensionWeightResponse, RoleDimensionWeightCreate>('role-dimension-weights', body),
-    createOptions: () => ({ mutationKey: queryKeys.roleDimensionWeights.all } as const),
+      apiPost<RoleDimensionWeightResponse, RoleDimensionWeightCreate>(
+        'role-dimension-weights',
+        body,
+      ),
+    update: (id: string, body: RoleDimensionWeightUpdate) =>
+      apiPatch<RoleDimensionWeightResponse, RoleDimensionWeightUpdate>(
+        `role-dimension-weights/${id}`,
+        body,
+      ),
+    delete: (id: string) => apiDelete(`role-dimension-weights/${id}`),
+    createOptions: () => ({
+      mutationKey: queryKeys.roleDimensionWeights.all(),
+    } as const),
   },
   objectiveTemplates: {
     create: (body: ObjectiveTemplateCreate) =>
@@ -880,6 +923,13 @@ export const mutations = {
   reviewSessions: {
     create: (body: ReviewSessionCreate) =>
       apiPost<ReviewSessionResponse, ReviewSessionCreate>('review-sessions', body),
+    update: (id: string, body: ReviewSessionUpdate) =>
+      apiPatch<ReviewSessionResponse, ReviewSessionUpdate>(`review-sessions/${id}`, body),
+    updateStatus: (id: string, status: ReviewSessionStatus) =>
+      apiPatch<ReviewSessionResponse, { status: ReviewSessionStatus }>(
+        `review-sessions/${id}`,
+        { status },
+      ),
     createOptions: () => ({ mutationKey: queryKeys.reviewSessions.all() } as const),
   },
   calibrationSessions: {
@@ -890,6 +940,12 @@ export const mutations = {
   rewardPolicies: {
     create: (body: RewardPolicyCreate) =>
       apiPost<RewardPolicyResponse, RewardPolicyCreate>('reward-policies', body),
+    update: (id: string, body: RewardPolicyUpdate) =>
+      apiPatch<RewardPolicyResponse, RewardPolicyUpdate>(
+        `reward-policies/${id}`,
+        body,
+      ),
+    delete: (id: string) => apiDelete(`reward-policies/${id}`),
     createOptions: () => ({ mutationKey: queryKeys.rewardPolicies.all } as const),
   },
   permissions: {
@@ -905,13 +961,23 @@ export const mutations = {
   },
   notificationRules: {
     create: (body: NotificationRuleCreate) =>
-      apiPost<NotificationRuleResponse, NotificationRuleCreate>('notification-rules', body),
+      apiPost<NotificationRuleResponse, NotificationRuleCreate>(
+        'notification-rules',
+        body,
+      ),
+    update: (id: string, body: NotificationRuleUpdate) =>
+      apiPatch<NotificationRuleResponse, NotificationRuleUpdate>(
+        `notification-rules/${id}`,
+        body,
+      ),
+    delete: (id: string) => apiDelete(`notification-rules/${id}`),
     createOptions: () => ({ mutationKey: queryKeys.notificationRules.all } as const),
   },
   userTokens: {
     create: (body: UserTokenCreateRequest) =>
       apiPost<UserTokenCreateResponse, UserTokenCreateRequest>('user-tokens', body),
     revoke: (id: string) => apiPost<void>(`user-tokens/${id}/revoke`),
+    delete: (id: string) => apiDelete(`user-tokens/${id}`),
   },
   analytics: {
     refresh: () => apiPost<unknown>('analytics/refresh'),

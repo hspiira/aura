@@ -166,3 +166,16 @@ def require_permission(code: str):
             )
 
     return _check
+
+
+def require_any_permission(*codes: str):
+    """Dependency: 403 if user has none of the given permission codes."""
+
+    async def _check(
+        permissions: Annotated[set[str], Depends(get_current_user_permissions)],
+    ) -> None:
+        if not any(c in permissions for c in codes):
+            detail = "Insufficient permission: one of " + ", ".join(codes)
+            raise HTTPException(status_code=403, detail=detail)
+
+    return _check

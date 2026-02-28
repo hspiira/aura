@@ -35,3 +35,28 @@ class RoleRepository:
         await self._session.flush()
         await self._session.refresh(role)
         return role
+
+    async def update(
+        self,
+        role_id: str,
+        *,
+        department_id: str | None = None,
+        name: str | None = None,
+        level: str | None = None,
+        is_managerial: bool | None = None,
+    ) -> Role | None:
+        """Update role by id. Only provided fields updated. None if not found."""
+        role = await self.get_by_id(role_id)
+        if role is None:
+            return None
+        if department_id is not None:
+            role.department_id = department_id
+        if name is not None:
+            role.name = name
+        if level is not None:
+            role.level = level
+        if is_managerial is not None:
+            role.is_managerial = is_managerial
+        await self._session.flush()
+        await self._session.refresh(role)
+        return role

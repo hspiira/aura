@@ -16,6 +16,7 @@ from app.infrastructure.persistence.repositories.performance_dimension_repo impo
 from app.schemas.performance_dimension import (
     PerformanceDimensionCreate,
     PerformanceDimensionResponse,
+    PerformanceDimensionUpdate,
 )
 
 router = APIRouter()
@@ -47,6 +48,28 @@ async def create_performance_dimension(
         default_weight_pct=payload.default_weight_pct,
     )
     dim = await repo.add(dim)
+    return PerformanceDimensionResponse.model_validate(dim)
+
+
+@router.patch("/{id}", response_model=PerformanceDimensionResponse)
+async def update_performance_dimension(
+    id: str,
+    payload: PerformanceDimensionUpdate,
+    repo: Annotated[
+        PerformanceDimensionRepository, Depends(get_performance_dimension_repo)
+    ],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_DIMENSIONS))],
+) -> PerformanceDimensionResponse:
+    """Update a performance dimension (partial)."""
+    updates = payload.model_dump(exclude_unset=True)
+    if not updates:
+        dim = await repo.get_by_id(id)
+        if dim is None:
+            raise ResourceNotFoundException("PerformanceDimension", id)
+        return PerformanceDimensionResponse.model_validate(dim)
+    dim = await repo.update(id, **updates)
+    if dim is None:
+        raise ResourceNotFoundException("PerformanceDimension", id)
     return PerformanceDimensionResponse.model_validate(dim)
 
 

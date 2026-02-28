@@ -21,6 +21,7 @@ from app.infrastructure.persistence.repositories.role_repo import RoleRepository
 from app.schemas.notification_rule import (
     NotificationRuleCreate,
     NotificationRuleResponse,
+    NotificationRuleUpdate,
 )
 
 router = APIRouter()
@@ -72,3 +73,41 @@ async def get_notification_rule(
     """Get one notification rule by id."""
     rule = await get_one_or_raise(repo.get_by_id(id), id, "NotificationRule")
     return NotificationRuleResponse.model_validate(rule)
+
+
+@router.patch("/{id}", response_model=NotificationRuleResponse)
+async def update_notification_rule(
+    id: str,
+    payload: NotificationRuleUpdate,
+    repo: Annotated[NotificationRuleRepository, Depends(get_notification_rule_repo)],
+    role_repo: Annotated[RoleRepository, Depends(get_role_repo)],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_NOTIFICATIONS))] = None,
+) -> NotificationRuleResponse:
+    """Update a notification rule."""
+    await get_one_or_raise(repo.get_by_id(id), id, "NotificationRule")
+    if payload.recipient_role_id is not None:
+        await get_one_or_raise(
+            role_repo.get_by_id(payload.recipient_role_id),
+            payload.recipient_role_id,
+            "Role",
+        )
+    updated = await repo.update(
+        id,
+        event_type=payload.event_type,
+        recipient_role_id=payload.recipient_role_id,
+        channel=payload.channel,
+        template_body=payload.template_body,
+    )
+    assert updated is not None
+    return NotificationRuleResponse.model_validate(updated)
+
+
+@router.delete("/{id}", status_code=204)
+async def delete_notification_rule(
+    id: str,
+    repo: Annotated[NotificationRuleRepository, Depends(get_notification_rule_repo)],
+    _perm: Annotated[None, Depends(require_permission(MANAGE_NOTIFICATIONS))] = None,
+) -> None:
+    """Delete a notification rule."""
+    await get_one_or_raise(repo.get_by_id(id), id, "NotificationRule")
+    await repo.delete(id)

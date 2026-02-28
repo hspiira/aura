@@ -21,7 +21,11 @@ from app.infrastructure.persistence.repositories.audit_log_repo import (
 from app.infrastructure.persistence.repositories.reward_policy_repo import (
     RewardPolicyRepository,
 )
-from app.schemas.reward_policy import RewardPolicyCreate, RewardPolicyResponse
+from app.schemas.reward_policy import (
+    RewardPolicyCreate,
+    RewardPolicyResponse,
+    RewardPolicyUpdate,
+)
 
 router = APIRouter()
 
@@ -76,6 +80,80 @@ async def create_reward_policy(
         changed_by=changed_by,
     )
     return RewardPolicyResponse.model_validate(policy)
+
+
+async def _bands_overlap(
+    repo: RewardPolicyRepository,
+    min_score: Decimal,
+    max_score: Decimal,
+    exclude_id: str | None,
+) -> bool:
+    """True if [min_score, max_score] overlaps another band (excluding exclude_id)."""
+    items = await repo.list_all()
+    for p in items:
+        if p.id == exclude_id:
+            continue
+        if not (p.max_score < min_score or p.min_score > max_score):
+            return True
+    return False
+
+
+@router.patch("/{id}", response_model=RewardPolicyResponse)
+async def update_reward_policy(
+    id: str,
+    payload: RewardPolicyUpdate,
+    repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_REWARD_POLICY))],
+) -> RewardPolicyResponse:
+    """Update a reward policy band."""
+    policy = await get_one_or_raise(repo.get_by_id(id), id, "RewardPolicy")
+    min_score = payload.min_score if payload.min_score is not None else policy.min_score
+    max_score = payload.max_score if payload.max_score is not None else policy.max_score
+    if await _bands_overlap(repo, min_score, max_score, exclude_id=id):
+        raise HTTPException(
+            409,
+            "reward policy band overlaps an existing band",
+        )
+    updated = await repo.update(
+        id,
+        min_score=payload.min_score,
+        max_score=payload.max_score,
+        reward_type=payload.reward_type,
+        reward_value=payload.reward_value,
+    )
+    assert updated is not None
+    await audit_log(
+        audit_repo,
+        "reward_policy",
+        updated.id,
+        "update",
+        new_value={"reward_type": updated.reward_type},
+        changed_by=changed_by,
+    )
+    return RewardPolicyResponse.model_validate(updated)
+
+
+@router.delete("/{id}", status_code=204)
+async def delete_reward_policy(
+    id: str,
+    repo: Annotated[RewardPolicyRepository, Depends(get_reward_policy_repo)],
+    audit_repo: Annotated[AuditLogRepository, Depends(get_audit_log_repo)],
+    changed_by: CurrentUserIdOptional,
+    _perm: Annotated[None, Depends(require_permission(MANAGE_REWARD_POLICY))],
+) -> None:
+    """Delete a reward policy band."""
+    policy = await get_one_or_raise(repo.get_by_id(id), id, "RewardPolicy")
+    await repo.delete(id)
+    await audit_log(
+        audit_repo,
+        "reward_policy",
+        policy.id,
+        "delete",
+        new_value={"reward_type": policy.reward_type},
+        changed_by=changed_by,
+    )
 
 
 @router.get("/band", response_model=RewardPolicyResponse)

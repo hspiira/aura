@@ -5,6 +5,7 @@ import { useState } from 'react'
 import {
   ChevronDown,
   Hash,
+  Pencil,
   SquareArrowOutUpRight,
   User as UserIcon,
 } from 'lucide-react'
@@ -128,6 +129,8 @@ type MainUserTableProps =
       totalCount?: number
       onPageChange?: (page: number) => void
       onPageSizeChange?: (pageSize: number) => void
+      showUserId?: boolean
+      onEdit?: (row: MainUserTablePeopleRow) => void
       className?: string
     }
 
@@ -142,6 +145,8 @@ export function MainUserTable({
   totalCount,
   onPageChange,
   onPageSizeChange,
+  showUserId = true,
+  onEdit,
   className,
 }: MainUserTableProps) {
   const isPeople = variant === 'people'
@@ -192,14 +197,16 @@ export function MainUserTable({
                 <span className="text-xs font-semibold text-stone-700">User</span>
               </div>
             </TableHead>
-            <TableHead className="h-9 border-r border-stone-200 px-3 py-1.5">
-              <div className="flex items-center gap-1.5">
-                <span className="flex size-5 items-center justify-center border border-stone-300 bg-white text-stone-500">
-                  <Hash className="size-3" />
-                </span>
-                <span className="text-xs font-semibold text-stone-700">User ID</span>
-              </div>
-            </TableHead>
+            {(!isPeople || showUserId) && (
+              <TableHead className="h-9 border-r border-stone-200 px-3 py-1.5">
+                <div className="flex items-center gap-1.5">
+                  <span className="flex size-5 items-center justify-center border border-stone-300 bg-white text-stone-500">
+                    <Hash className="size-3" />
+                  </span>
+                  <span className="text-xs font-semibold text-stone-700">User ID</span>
+                </div>
+              </TableHead>
+            )}
             <TableHead className="h-9 border-r border-stone-200 px-3 py-1.5">
               <div className="flex items-center gap-1.5">
                 <ChevronDown className="size-3.5 text-stone-500" />
@@ -221,7 +228,7 @@ export function MainUserTable({
                   <span className="text-xs font-semibold text-stone-700">Supervisor</span>
                 </TableHead>
                 <TableHead className="h-9 w-10 px-3 py-1.5">
-                  <span className="sr-only">View</span>
+                  <span className="sr-only">{onEdit ? 'Edit' : 'View'}</span>
                 </TableHead>
               </>
             )}
@@ -263,9 +270,11 @@ export function MainUserTable({
                         </Link>
                       </div>
                     </TableCell>
-                    <TableCell className="border-r border-stone-200 px-3 py-1.5 font-mono text-xs text-stone-600">
-                      {row.id}
-                    </TableCell>
+                    {showUserId && (
+                      <TableCell className="border-r border-stone-200 px-3 py-1.5 font-mono text-xs text-stone-600">
+                        {row.id}
+                      </TableCell>
+                    )}
                     <TableCell className="border-r border-stone-200 px-3 py-1.5">
                       <Pill className={rolePillClass(roleName)}>{roleName}</Pill>
                     </TableCell>
@@ -279,14 +288,25 @@ export function MainUserTable({
                       {supervisorName ?? '—'}
                     </TableCell>
                     <TableCell className="w-10 px-3 py-1.5">
-                      <Link
-                        to="/people/$id"
-                        params={{ id: row.id }}
-                        className="inline-flex items-center justify-center text-stone-400 hover:text-amber-600"
-                        aria-label={`View ${row.name}`}
-                      >
-                        <SquareArrowOutUpRight className="size-4" />
-                      </Link>
+                      {onEdit ? (
+                        <button
+                          type="button"
+                          onClick={() => onEdit(row)}
+                          className="inline-flex items-center justify-center text-stone-400 hover:text-amber-600"
+                          aria-label={`Edit ${row.name}`}
+                        >
+                          <Pencil className="size-4" />
+                        </button>
+                      ) : (
+                        <Link
+                          to="/people/$id"
+                          params={{ id: row.id }}
+                          className="inline-flex items-center justify-center text-stone-400 hover:text-amber-600"
+                          aria-label={`View ${row.name}`}
+                        >
+                          <SquareArrowOutUpRight className="size-4" />
+                        </Link>
+                      )}
                     </TableCell>
                   </TableRow>
                 )
@@ -331,7 +351,7 @@ export function MainUserTable({
           {isPeople && (data as MainUserTablePeopleRow[]).length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={7}
+                colSpan={showUserId ? 7 : 6}
                 className="py-8 text-center text-sm text-stone-400"
               >
                 No users found.

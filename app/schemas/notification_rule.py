@@ -12,6 +12,15 @@ class NotificationRuleCreate(BaseModel):
     template_body: str | None = None
 
 
+class NotificationRuleUpdate(BaseModel):
+    """Payload to update a notification rule (partial)."""
+
+    event_type: str | None = None
+    recipient_role_id: str | None = None
+    channel: str | None = None
+    template_body: str | None = None
+
+
 class NotificationRuleResponse(BaseModel):
     """Notification rule in API responses."""
 

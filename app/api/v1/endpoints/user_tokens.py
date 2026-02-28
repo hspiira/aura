@@ -10,9 +10,9 @@ from pydantic import BaseModel
 from app.api.v1.dependencies import (
     get_user_repo,
     get_user_token_repo,
-    require_permission,
+    require_any_permission,
 )
-from app.domain.permissions import MANAGE_RBAC
+from app.domain.permissions import MANAGE_RBAC, MANAGE_USERS
 from app.infrastructure.persistence.models.user_token import UserToken
 from app.infrastructure.persistence.repositories.user_repo import UserRepository
 from app.infrastructure.persistence.repositories.user_token_repo import (
@@ -48,7 +48,7 @@ class UserTokenResponse(BaseModel):
 @router.get("", response_model=list[UserTokenResponse])
 async def list_user_tokens(
     token_repo: Annotated[UserTokenRepository, Depends(get_user_token_repo)],
-    _perm: Annotated[None, Depends(require_permission(MANAGE_RBAC))],
+    _perm: Annotated[None, Depends(require_any_permission(MANAGE_RBAC, MANAGE_USERS))],
     user_id: str | None = Query(None, description="Filter by user"),
     limit: int = Query(200, ge=1, le=500),
 ) -> list[UserTokenResponse]:
@@ -66,7 +66,7 @@ async def create_user_token(
     payload: UserTokenCreateRequest,
     token_repo: Annotated[UserTokenRepository, Depends(get_user_token_repo)],
     user_repo: Annotated[UserRepository, Depends(get_user_repo)],
-    _perm: Annotated[None, Depends(require_permission(MANAGE_RBAC))],
+    _perm: Annotated[None, Depends(require_any_permission(MANAGE_RBAC, MANAGE_USERS))],
 ) -> UserTokenCreateResponse:
     """Create a new user token and return the raw token once."""
     user = await user_repo.get_by_id(payload.user_id)
@@ -99,9 +99,25 @@ async def create_user_token(
 async def revoke_user_token(
     id: str,
     token_repo: Annotated[UserTokenRepository, Depends(get_user_token_repo)],
-    _perm: Annotated[None, Depends(require_permission(MANAGE_RBAC))],
+    _perm: Annotated[None, Depends(require_any_permission(MANAGE_RBAC, MANAGE_USERS))],
 ) -> None:
     """Revoke a user token so it can no longer authenticate."""
+    token = await token_repo.get_by_id(id)
+    if token is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Token not found",
+        )
+    await token_repo.revoke(token)
+
+
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user_token(
+    id: str,
+    token_repo: Annotated[UserTokenRepository, Depends(get_user_token_repo)],
+    _perm: Annotated[None, Depends(require_any_permission(MANAGE_RBAC, MANAGE_USERS))],
+) -> None:
+    """Revoke (delete) a user token so it can no longer authenticate."""
     token = await token_repo.get_by_id(id)
     if token is None:
         raise HTTPException(

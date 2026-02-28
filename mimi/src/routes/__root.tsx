@@ -4,7 +4,9 @@ import {
   createRootRouteWithContext,
   HeadContent,
   Scripts,
+  useRouter,
 } from '@tanstack/react-router'
+import { QueryClientProvider } from '@tanstack/react-query'
 import type { QueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
@@ -32,6 +34,13 @@ export const Route = createRootRouteWithContext<{
 })
 
 function RootComponent() {
+  const router = useRouter()
+  const queryClient = (router.options as { context?: { queryClient: QueryClient } })
+    .context?.queryClient
+  if (!queryClient) {
+    throw new Error('Root route context must include queryClient')
+  }
+
   // Rehydrate auth from localStorage after client mount (SSR may have left store empty)
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -49,9 +58,11 @@ function RootComponent() {
   }, [])
 
   return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
+    <QueryClientProvider client={queryClient}>
+      <RootDocument>
+        <Outlet />
+      </RootDocument>
+    </QueryClientProvider>
   )
 }
 

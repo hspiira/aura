@@ -1,5 +1,7 @@
 """Role dimension weight repository."""
 
+from decimal import Decimal
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -48,3 +50,19 @@ class RoleDimensionWeightRepository:
         await self._session.flush()
         await self._session.refresh(role_dimension_weight)
         return role_dimension_weight
+
+    async def update(
+        self, weight_id: str, *, weight_pct: Decimal
+    ) -> RoleDimensionWeight | None:
+        """Update weight_pct by id. Returns None if not found."""
+        weight = await self.get_by_id(weight_id)
+        if weight is None:
+            return None
+        weight.weight_pct = weight_pct
+        await self._session.flush()
+        await self._session.refresh(weight)
+        return weight
+
+    async def delete(self, weight: RoleDimensionWeight) -> None:
+        """Delete a role dimension weight."""
+        await self._session.delete(weight)

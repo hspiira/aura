@@ -44,3 +44,35 @@ class NotificationRuleRepository:
     async def add(self, rule: NotificationRule) -> NotificationRule:
         """Persist a notification rule."""
         return await persist_and_refresh(self._session, rule)
+
+    async def update(
+        self,
+        id: str,
+        *,
+        event_type: str | None = None,
+        recipient_role_id: str | None = None,
+        channel: str | None = None,
+        template_body: str | None = None,
+    ) -> NotificationRule | None:
+        """Update a notification rule by id. Returns updated rule or None."""
+        rule = await self.get_by_id(id)
+        if rule is None:
+            return None
+        if event_type is not None:
+            rule.event_type = event_type
+        if recipient_role_id is not None:
+            rule.recipient_role_id = recipient_role_id
+        if channel is not None:
+            rule.channel = channel
+        if template_body is not None:
+            rule.template_body = template_body
+        return await persist_and_refresh(self._session, rule)
+
+    async def delete(self, id: str) -> bool:
+        """Delete a notification rule by id. Returns True if deleted."""
+        rule = await self.get_by_id(id)
+        if rule is None:
+            return False
+        await self._session.delete(rule)
+        await self._session.flush()
+        return True

@@ -13,6 +13,12 @@ class RoleDimensionWeightCreate(BaseModel):
     weight_pct: Decimal
 
 
+class RoleDimensionWeightUpdate(BaseModel):
+    """Payload to update a role dimension weight."""
+
+    weight_pct: Decimal
+
+
 class RoleDimensionWeightResponse(BaseModel):
     """Role dimension weight in API responses."""
 

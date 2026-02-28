@@ -44,6 +44,13 @@ class UserRepository:
         result = await self._session.execute(select(User).where(User.id == id))
         return result.scalar_one_or_none()
 
+    async def get_by_ids(self, ids: list[str]) -> list[User]:
+        """Return users whose id is in the given list (order not preserved)."""
+        if not ids:
+            return []
+        result = await self._session.execute(select(User).where(User.id.in_(ids)))
+        return list(result.scalars().all())
+
     async def get_by_email(self, email: str) -> User | None:
         """Return one user by email (case-insensitive match)."""
         result = await self._session.execute(
@@ -54,6 +61,23 @@ class UserRepository:
     async def add(self, user: User) -> User:
         """Persist a user."""
         self._session.add(user)
+        await self._session.flush()
+        await self._session.refresh(user)
+        return user
+
+    _update_fields = frozenset(
+        {"role_id", "department_id", "supervisor_id", "name", "email"}
+    )
+
+    async def update(self, user_id: str, **fields: str | None) -> User | None:
+        """Update a user by id. Only allowed keys in fields are applied.
+        supervisor_id and email may be set to None. Returns updated user or None."""
+        user = await self.get_by_id(user_id)
+        if user is None:
+            return None
+        for key, value in fields.items():
+            if key in self._update_fields and hasattr(user, key):
+                setattr(user, key, value)
         await self._session.flush()
         await self._session.refresh(user)
         return user
