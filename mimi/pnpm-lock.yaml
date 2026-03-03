@@ -22,8 +22,8 @@ importers:
         specifier: ^1.17.0
         version: 1.27.1(zod@4.3.6)
       '@orpc/client':
-        specifier: ^1.13.0
-        version: 1.13.5
+        specifier: ^1.13.6
+        version: 1.13.6
       '@orpc/json-schema':
         specifier: ^1.13.0
         version: 1.13.5(crossws@0.4.4(srvx@0.11.8))(ws@8.19.0)
@@ -35,7 +35,7 @@ importers:
         version: 1.13.5(crossws@0.4.4(srvx@0.11.8))(ws@8.19.0)
       '@orpc/tanstack-query':
         specifier: ^1.13.0
-        version: 1.13.5(@orpc/client@1.13.5)(@tanstack/query-core@5.90.20)
+        version: 1.13.5(@orpc/client@1.13.6)(@tanstack/query-core@5.90.20)
       '@orpc/zod':
         specifier: ^1.13.0
         version: 1.13.5(@orpc/contract@1.13.5)(@orpc/server@1.13.5(crossws@0.4.4(srvx@0.11.8))(ws@8.19.0))(crossws@0.4.4(srvx@0.11.8))(ws@8.19.0)(zod@4.3.6)
@@ -47,25 +47,25 @@ importers:
         version: 4.2.1(vite@7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       '@tanstack/ai':
         specifier: latest
-        version: 0.5.1
+        version: 0.6.1
       '@tanstack/ai-anthropic':
         specifier: latest
-        version: 0.5.0(@tanstack/ai@0.5.1)(zod@4.3.6)
+        version: 0.6.0(@tanstack/ai@0.6.1)(zod@4.3.6)
       '@tanstack/ai-client':
         specifier: latest
-        version: 0.4.5
+        version: 0.5.1
       '@tanstack/ai-gemini':
         specifier: latest
-        version: 0.5.0(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))(@tanstack/ai@0.5.1)
+        version: 0.7.0(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))(@tanstack/ai@0.6.1)
       '@tanstack/ai-ollama':
         specifier: latest
-        version: 0.5.0(@tanstack/ai@0.5.1)
+        version: 0.6.0(@tanstack/ai@0.6.1)
       '@tanstack/ai-openai':
         specifier: latest
-        version: 0.5.0(@tanstack/ai@0.5.1)(ws@8.19.0)(zod@4.3.6)
+        version: 0.6.0(@tanstack/ai@0.6.1)(ws@8.19.0)(zod@4.3.6)
       '@tanstack/ai-react':
         specifier: latest
-        version: 0.5.4(@tanstack/ai@0.5.1)(@types/react@19.2.14)(react@19.2.4)
+        version: 0.6.1(@tanstack/ai@0.6.1)(@types/react@19.2.14)(react@19.2.4)
       '@tanstack/match-sorter-utils':
         specifier: ^8.19.4
         version: 8.19.4
@@ -143,7 +143,7 @@ importers:
         version: 15.0.12
       nitro:
         specifier: npm:nitro-nightly@latest
-        version: nitro-nightly@3.0.1-20260226-083821-5ccf672a(chokidar@4.0.3)(dotenv@16.6.1)(drizzle-orm@0.45.1(@types/pg@8.16.0)(pg@8.19.0))(jiti@2.6.1)(lru-cache@11.2.6)(rollup@4.59.0)(vite@7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: nitro-nightly@3.0.1-20260227-181935-bfbb207c(chokidar@4.0.3)(dotenv@16.6.1)(drizzle-orm@0.45.1(@types/pg@8.16.0)(pg@8.19.0))(jiti@2.6.1)(lru-cache@11.2.6)(rollup@4.59.0)(vite@7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2))
       pg:
         specifier: ^8.16.3
         version: 8.19.0
@@ -1278,6 +1278,9 @@ packages:
   '@orpc/client@1.13.5':
     resolution: {integrity: sha512-j0VJpiWiFv9Xfan3NOoouHL07nSiHX8haxYaZzHYWSdWh+ABzwa8aRTwQSUpuCfD6i0EtYEZJAB6gVwtAnQoxQ==}
 
+  '@orpc/client@1.13.6':
+    resolution: {integrity: sha512-M6lYM6fJUFp9GR+It/qglYTeXwspb6sGj46xXWHqHS6iDVquqju0bdYuLOfHx8CGJcUSzi0aKUcqMXiGJhBG3w==}
+
   '@orpc/contract@1.13.5':
     resolution: {integrity: sha512-JeklRu2kxsRKyaPeKqA40YHsGRLjQdAuEGNCNU6VxA3v4UReh8ZsDG+WvEoHfXIOLRn2VWBzEsbE1G2MwRCGsg==}
 
@@ -1312,6 +1315,14 @@ packages:
       '@opentelemetry/api':
         optional: true
 
+  '@orpc/shared@1.13.6':
+    resolution: {integrity: sha512-XqpXPgmtkg2tviDXZC13Y4a3B0D5r1yuG4Q2qPG3gM1dargxob6/aSIeKE6rs1tNXOoI+IpJaGV53EWWB+x+iA==}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.9.0'
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
+
   '@orpc/standard-server-aws-lambda@1.13.5':
     resolution: {integrity: sha512-fnjglw4a24ORmFxRgqrPATwOjxhjrAx7i1mDM9JYVSouRBb5X3J3kcvvOeuqiCw6Ov1X6WczykziB5cLy8aIpQ==}
 
@@ -1326,14 +1337,23 @@ packages:
   '@orpc/standard-server-fetch@1.13.5':
     resolution: {integrity: sha512-Z0xzVQ2rpLxjrsgUC5b4ezlAEpL4enDXx9fOJUfYouUUVnbgUkDe/uTpavKLgA/I97svWeZ5Smt6ycWuuoHoAQ==}
 
+  '@orpc/standard-server-fetch@1.13.6':
+    resolution: {integrity: sha512-O0bK4crjEOU9H4LzJ2abMjku3dvEhs8tcLXP/W5NXyH+Wm7qjBjDr6psxZ3YuaWdVbfd/P7CHtvw2rQDHJCNfQ==}
+
   '@orpc/standard-server-node@1.13.5':
     resolution: {integrity: sha512-cFyoKU6kHM2AcLd+fLdty3hohm5h1Sc0wAvXasI7PVZlx9mKxSfV1n4Ej2Una8ik1Jt62AH+o9fMLtPJ6/wvbQ==}
 
   '@orpc/standard-server-peer@1.13.5':
     resolution: {integrity: sha512-pEvnaYtwXaw2Fjy0VJyvfZTma/AprSUGSJlOcnfBySo0TU3ZfsB54vhTlQCCN+WUCGjInZ75vCjIQnGj3Af3gg==}
 
+  '@orpc/standard-server-peer@1.13.6':
+    resolution: {integrity: sha512-WTqjNS6A9sxR4HVxWUb9ZoBHeQiesHeANmVBFdM/QjAaPUZYKn6WACYU6Q2eGmsCUeTQFfMssk0BG2EsgRNEYw==}
+
   '@orpc/standard-server@1.13.5':
     resolution: {integrity: sha512-Upu82h5TlKOWlttcL+TTkIxyJEzjdKWd8Ri9ya8o1+BxYiqd/y3TQnmBQM+pfj8N1w+zI86Q3cLGB8RGtMqf5g==}
+
+  '@orpc/standard-server@1.13.6':
+    resolution: {integrity: sha512-GNYZXCWxYLVHsxBWR+bg5F12vDCsQghqxbqoFpMnA4goe58dugNWmuxM+aSDbI0D81YxkKDULSqft5S+GWi5ww==}
 
   '@orpc/tanstack-query@1.13.5':
     resolution: {integrity: sha512-DUgwJ/IiXAf7CFes2eLFKwFS9bBB4y6OZCiiualHiBE8nUumUw1/ErbXJnD52JbbyT9EriITInUM5iz0c1PBjQ==}
@@ -2513,40 +2533,40 @@ packages:
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7
 
-  '@tanstack/ai-anthropic@0.5.0':
-    resolution: {integrity: sha512-PiQx4Kpw+NNjXvVhes29LoO/IvD8M9GGQsNvtLCd+dDhZt3FzdNwHWMZBCpaQWPW142iuhowagh79X//onNjDw==}
+  '@tanstack/ai-anthropic@0.6.0':
+    resolution: {integrity: sha512-xVKq6Co58etETfxrCfLzESyxrmR28D9+sh6FH/mPTeHWnOt3Tyb12OqOD5Gu2Ox4nZKWviHbmLKxavR4iFSYag==}
     peerDependencies:
-      '@tanstack/ai': ^0.5.0
+      '@tanstack/ai': ^0.6.1
       zod: ^4.0.0
 
-  '@tanstack/ai-client@0.4.5':
-    resolution: {integrity: sha512-L5pAuwtBs/iLFgiFB3acq/NNj/xBCMWTCZvOKC2PQsMHBnxjU5l8cZNYVCGk8Tzf/a9fe6s4wHOgckcHxkHStA==}
+  '@tanstack/ai-client@0.5.1':
+    resolution: {integrity: sha512-96Qm8sQYBgfLIUR3f09aaLERsNtg+lpZ1J2jiqFTc8YiL+21Ya2Q1JDU3Opd8nNDIhvjwv1tdNxXAsZnwGKKKQ==}
 
-  '@tanstack/ai-gemini@0.5.0':
-    resolution: {integrity: sha512-gunJgwRG+38fbYSE83/XJMHFy/7hDN4Fb91vAAZLK3nh4DoN0ReVbRB4BK9cY9iVYQqGq2PA8d5ruDgfcKO2hQ==}
+  '@tanstack/ai-gemini@0.7.0':
+    resolution: {integrity: sha512-A2ahYPbQ15bOfn0byE6g6dzCL/pSxhmBBCDjj+Mrwu5xLnhfwkSTkb+GnXCs6QTQOrg3lww1vZjRt251tr6u9A==}
     peerDependencies:
-      '@tanstack/ai': ^0.5.0
+      '@tanstack/ai': ^0.6.1
 
-  '@tanstack/ai-ollama@0.5.0':
-    resolution: {integrity: sha512-CR/f6OS7WzrC1VIK819lDSHeEJWfpaEVyO0bSmE7EGUAfbv+JmDLd8tI2Pk/DhIRVw/rk0Zlcn35jWvvXLjwTg==}
+  '@tanstack/ai-ollama@0.6.0':
+    resolution: {integrity: sha512-fWa2PfPZ4xeYdN8PUEoiFx30RUaLhLISOOMfux3MPYKW6lNu+04TDHWC6mKP5JXTCc1wVxpSpeVjBfwbrsnu9w==}
     peerDependencies:
-      '@tanstack/ai': ^0.5.0
+      '@tanstack/ai': ^0.6.1
 
-  '@tanstack/ai-openai@0.5.0':
-    resolution: {integrity: sha512-0xJg+BkqVgIRbl4LyiPQWCLOapfGpK4lSzqjaWRkz2Hf1C3m4exg76rBuv1mvr4G3XAR5SnMRSj3XxlWMuRImA==}
+  '@tanstack/ai-openai@0.6.0':
+    resolution: {integrity: sha512-CSDgYr63ftw+nGb1IpB+3qIOngLE1pZjasiaeOdDQ6CbSEJDNcR7VNmyTx3RsoTh9fChKbLhJzYpem1Mpag2og==}
     peerDependencies:
-      '@tanstack/ai': ^0.5.0
+      '@tanstack/ai': ^0.6.1
       zod: ^4.0.0
 
-  '@tanstack/ai-react@0.5.4':
-    resolution: {integrity: sha512-vglZLEiTkwGkYhXkXCk9MfskrFyUSVLI8c+kIeGcx7e0AnsI0jda9mLq3Hkm3+WWNSYuqLqDk4KXkKo3XZCezw==}
+  '@tanstack/ai-react@0.6.1':
+    resolution: {integrity: sha512-9cGHe1z5NSV5QpFRV5CX2CBXco393JfVxEl4DbGkO9bHsc4cHOUm3sglYZ01Ebcq/pDVoUFDrkHaBxn511GrxA==}
     peerDependencies:
-      '@tanstack/ai': ^0.5.1
+      '@tanstack/ai': ^0.6.1
       '@types/react': '>=18.0.0'
       react: '>=18.0.0'
 
-  '@tanstack/ai@0.5.1':
-    resolution: {integrity: sha512-kHZb8Q/aI/z20d4CB7U49Pbk8IoypbFA1saDYlPBFPbdSzikeutJ2oRyN4hY2qtrxnfyC1oHOhiWkDH0i+5kwg==}
+  '@tanstack/ai@0.6.1':
+    resolution: {integrity: sha512-k+4JrjBm5O1j5ccxErlUVC2IC2rJIqQCK45loLckeLow0cJ5rWdKtG03UwR+9VjppDdL6oO27jyk5CzU6ym+HQ==}
     engines: {node: '>=18'}
 
   '@tanstack/devtools-client@0.0.3':
@@ -4255,8 +4275,8 @@ packages:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
     engines: {node: '>=16'}
 
-  flatted@3.3.3:
-    resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
+  flatted@3.3.4:
+    resolution: {integrity: sha512-3+mMldrTAPdta5kjX2G2J7iX4zxtnwpdA8Tr2ZSjkyPSanvbZAcy6flmtnXbEybHrDcU9641lxrMfFuUxVz9vA==}
 
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
@@ -5122,8 +5142,8 @@ packages:
   nf3@0.3.10:
     resolution: {integrity: sha512-UlqmHkZiHGgSkRj17yrOXEsSu5ECvtlJ3Xm1W5WsWrTKgu9m7OjrMZh9H/ME2LcWrTlMD0/vmmNVpyBG4yRdGg==}
 
-  nitro-nightly@3.0.1-20260226-083821-5ccf672a:
-    resolution: {integrity: sha512-FlY0Vfxa4JUW5DomJYyjr7J0DFUfvMqZIRt4m0uXAzXa9pQ/9FFTT84TOyMHddn3BKhGRJ1dT1U/hBg1oEhUNw==}
+  nitro-nightly@3.0.1-20260227-181935-bfbb207c:
+    resolution: {integrity: sha512-J9dNAHHuZqzDra4Zr9N6+4hkRPgfrUVw++9I32BHDmwo6MkyRdvmqucWTB5T+J8G3xAMc4+XskExmUEEqxpbZw==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -7319,6 +7339,15 @@ snapshots:
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
+  '@orpc/client@1.13.6':
+    dependencies:
+      '@orpc/shared': 1.13.6
+      '@orpc/standard-server': 1.13.6
+      '@orpc/standard-server-fetch': 1.13.6
+      '@orpc/standard-server-peer': 1.13.6
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
   '@orpc/contract@1.13.5':
     dependencies:
       '@orpc/client': 1.13.5
@@ -7395,6 +7424,11 @@ snapshots:
       radash: 12.1.1
       type-fest: 5.4.4
 
+  '@orpc/shared@1.13.6':
+    dependencies:
+      radash: 12.1.1
+      type-fest: 5.4.4
+
   '@orpc/standard-server-aws-lambda@1.13.5':
     dependencies:
       '@orpc/shared': 1.13.5
@@ -7419,6 +7453,13 @@ snapshots:
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
+  '@orpc/standard-server-fetch@1.13.6':
+    dependencies:
+      '@orpc/shared': 1.13.6
+      '@orpc/standard-server': 1.13.6
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
   '@orpc/standard-server-node@1.13.5':
     dependencies:
       '@orpc/shared': 1.13.5
@@ -7434,15 +7475,28 @@ snapshots:
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
+  '@orpc/standard-server-peer@1.13.6':
+    dependencies:
+      '@orpc/shared': 1.13.6
+      '@orpc/standard-server': 1.13.6
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
   '@orpc/standard-server@1.13.5':
     dependencies:
       '@orpc/shared': 1.13.5
     transitivePeerDependencies:
       - '@opentelemetry/api'
 
-  '@orpc/tanstack-query@1.13.5(@orpc/client@1.13.5)(@tanstack/query-core@5.90.20)':
+  '@orpc/standard-server@1.13.6':
     dependencies:
-      '@orpc/client': 1.13.5
+      '@orpc/shared': 1.13.6
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@orpc/tanstack-query@1.13.5(@orpc/client@1.13.6)(@tanstack/query-core@5.90.20)':
+    dependencies:
+      '@orpc/client': 1.13.6
       '@orpc/shared': 1.13.5
       '@tanstack/query-core': 5.90.20
     transitivePeerDependencies:
@@ -8591,47 +8645,47 @@ snapshots:
       tailwindcss: 4.2.1
       vite: 7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)
 
-  '@tanstack/ai-anthropic@0.5.0(@tanstack/ai@0.5.1)(zod@4.3.6)':
+  '@tanstack/ai-anthropic@0.6.0(@tanstack/ai@0.6.1)(zod@4.3.6)':
     dependencies:
       '@anthropic-ai/sdk': 0.71.2(zod@4.3.6)
-      '@tanstack/ai': 0.5.1
+      '@tanstack/ai': 0.6.1
       zod: 4.3.6
 
-  '@tanstack/ai-client@0.4.5':
+  '@tanstack/ai-client@0.5.1':
     dependencies:
-      '@tanstack/ai': 0.5.1
+      '@tanstack/ai': 0.6.1
 
-  '@tanstack/ai-gemini@0.5.0(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))(@tanstack/ai@0.5.1)':
+  '@tanstack/ai-gemini@0.7.0(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))(@tanstack/ai@0.6.1)':
     dependencies:
       '@google/genai': 1.43.0(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))
-      '@tanstack/ai': 0.5.1
+      '@tanstack/ai': 0.6.1
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
       - bufferutil
       - supports-color
       - utf-8-validate
 
-  '@tanstack/ai-ollama@0.5.0(@tanstack/ai@0.5.1)':
+  '@tanstack/ai-ollama@0.6.0(@tanstack/ai@0.6.1)':
     dependencies:
-      '@tanstack/ai': 0.5.1
+      '@tanstack/ai': 0.6.1
       ollama: 0.6.3
 
-  '@tanstack/ai-openai@0.5.0(@tanstack/ai@0.5.1)(ws@8.19.0)(zod@4.3.6)':
+  '@tanstack/ai-openai@0.6.0(@tanstack/ai@0.6.1)(ws@8.19.0)(zod@4.3.6)':
     dependencies:
-      '@tanstack/ai': 0.5.1
+      '@tanstack/ai': 0.6.1
       openai: 6.25.0(ws@8.19.0)(zod@4.3.6)
       zod: 4.3.6
     transitivePeerDependencies:
       - ws
 
-  '@tanstack/ai-react@0.5.4(@tanstack/ai@0.5.1)(@types/react@19.2.14)(react@19.2.4)':
+  '@tanstack/ai-react@0.6.1(@tanstack/ai@0.6.1)(@types/react@19.2.14)(react@19.2.4)':
     dependencies:
-      '@tanstack/ai': 0.5.1
-      '@tanstack/ai-client': 0.4.5
+      '@tanstack/ai': 0.6.1
+      '@tanstack/ai-client': 0.5.1
       '@types/react': 19.2.14
       react: 19.2.4
 
-  '@tanstack/ai@0.5.1':
+  '@tanstack/ai@0.6.1':
     dependencies:
       '@tanstack/devtools-event-client': 0.4.0
       partial-json: 0.1.7
@@ -10543,10 +10597,10 @@ snapshots:
 
   flat-cache@4.0.1:
     dependencies:
-      flatted: 3.3.3
+      flatted: 3.3.4
       keyv: 4.5.4
 
-  flatted@3.3.3: {}
+  flatted@3.3.4: {}
 
   foreground-child@3.3.1:
     dependencies:
@@ -11774,7 +11828,7 @@ snapshots:
 
   nf3@0.3.10: {}
 
-  nitro-nightly@3.0.1-20260226-083821-5ccf672a(chokidar@4.0.3)(dotenv@16.6.1)(drizzle-orm@0.45.1(@types/pg@8.16.0)(pg@8.19.0))(jiti@2.6.1)(lru-cache@11.2.6)(rollup@4.59.0)(vite@7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)):
+  nitro-nightly@3.0.1-20260227-181935-bfbb207c(chokidar@4.0.3)(dotenv@16.6.1)(drizzle-orm@0.45.1(@types/pg@8.16.0)(pg@8.19.0))(jiti@2.6.1)(lru-cache@11.2.6)(rollup@4.59.0)(vite@7.3.1(@types/node@22.19.13)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
       consola: 3.4.2
       crossws: 0.4.4(srvx@0.11.8)
